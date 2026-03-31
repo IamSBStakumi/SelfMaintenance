@@ -1159,10 +1159,10 @@ acorn@^8.15.0:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.16.0.tgz#4ce79c89be40afe7afe8f3adb902a1f1ce9ac08a"
   integrity sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==
 
-agent-base@^7.1.2:
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-7.1.4.tgz#e3cd76d4c548ee895d3c3fd8dc1f6c5b9032e7a8"
-  integrity sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==
+agent-base@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-8.0.0.tgz#3eb7c2c198ccb93368c77969530594e725b804b5"
+  integrity sha512-QT8i0hCz6C/KQ+KTAbSNwCHDGdmUJl2tp2ZpNlGSWCfhUNVbYG2WLE3MdZGBAgXPV4GAvjGMxo+C1hroyxmZEg==
 
 ajv@^6.14.0:
   version "6.14.0"
@@ -1635,19 +1635,19 @@ date-fns@^4.1.0:
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-4.1.0.tgz#64b3d83fff5aa80438f5b1a633c2e83b8a1c2d14"
   integrity sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==
 
-debug@4, debug@^4.1.0, debug@^4.3.1, debug@^4.3.2, debug@^4.4.0, debug@^4.4.3:
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-4.4.3.tgz#c6ae432d9bd9662582fce08709b038c58e9e3d6a"
-  integrity sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==
-  dependencies:
-    ms "^2.1.3"
-
 debug@^3.2.7:
   version "3.2.7"
   resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.7.tgz#72580b7e9145fb39b6676f9c5e5fb100b934179a"
   integrity sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==
   dependencies:
     ms "^2.1.1"
+
+debug@^4.1.0, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4, debug@^4.4.0, debug@^4.4.3:
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-4.4.3.tgz#c6ae432d9bd9662582fce08709b038c58e9e3d6a"
+  integrity sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==
+  dependencies:
+    ms "^2.1.3"
 
 deep-is@^0.1.3:
   version "0.1.4"
@@ -2401,13 +2401,13 @@ hermes-parser@^0.25.1:
   dependencies:
     hermes-estree "0.25.1"
 
-https-proxy-agent@^7.0.2:
-  version "7.0.6"
-  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-7.0.6.tgz#da8dfeac7da130b05c2ba4b59c9b6cd66611a6b9"
-  integrity sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==
+https-proxy-agent@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-8.0.0.tgz#2ab138d2706d473ede6d1f5e7158d7586d5ca738"
+  integrity sha512-YYeW+iCnAS3xhvj2dvVoWgsbca3RfQy/IlaNHHOtDmU0jMqPI9euIq3Y9BJETdxk16h9NHHCKqp/KB9nIMStCQ==
   dependencies:
-    agent-base "^7.1.2"
-    debug "4"
+    agent-base "8.0.0"
+    debug "^4.3.4"
 
 husky@^9.1.7:
   version "9.1.7"
@@ -3763,15 +3763,15 @@ styled-jsx@5.1.6:
   dependencies:
     client-only "0.0.1"
 
-supabase@^2.83.0:
-  version "2.83.0"
-  resolved "https://registry.yarnpkg.com/supabase/-/supabase-2.83.0.tgz#73877fac860c9324ebf87a32f529417df26f2f72"
-  integrity sha512-80j5YeYMkJqVc5gZGySMxiUJSUcwES6mNqi1nCa9q40qnPftff+LevcdZGLct4xtpaefkTtgmZArPSdq+H2RZQ==
+supabase@^2.84.5:
+  version "2.84.5"
+  resolved "https://registry.yarnpkg.com/supabase/-/supabase-2.84.5.tgz#2142bf7c256001d692b38a3679f8fa33eb0f800e"
+  integrity sha512-quguD5MJVcbbMie35d++BaV3ejXyTTZQIz3zH/z485bLxcEl+wC1EttGboq9Snukzv6sDoQkshXYga+6K4SQwA==
   dependencies:
     bin-links "^6.0.0"
-    https-proxy-agent "^7.0.2"
+    https-proxy-agent "^8.0.0"
     node-fetch "^3.3.2"
-    tar "7.5.11"
+    tar "7.5.13"
 
 supports-color@^7.1.0:
   version "7.2.0"
@@ -3795,10 +3795,10 @@ tapable@^2.3.0:
   resolved "https://registry.yarnpkg.com/tapable/-/tapable-2.3.2.tgz#86755feabad08d82a26b891db044808c6ad00f15"
   integrity sha512-1MOpMXuhGzGL5TTCZFItxCc0AARf1EZFQkGqMm7ERKj8+Hgr5oLvJOVFcC+lRmR8hCe2S3jC4T5D7Vg/d7/fhA==
 
-tar@7.5.11:
-  version "7.5.11"
-  resolved "https://registry.yarnpkg.com/tar/-/tar-7.5.11.tgz#1250fae45d98806b36d703b30973fa8e0a6d8868"
-  integrity sha512-ChjMH33/KetonMTAtpYdgUFr0tbz69Fp2v7zWxQfYZX4g5ZN2nOBXm1R2xyA+lMIKrLKIoKAwFj93jE/avX9cQ==
+tar@7.5.13:
+  version "7.5.13"
+  resolved "https://registry.yarnpkg.com/tar/-/tar-7.5.13.tgz#0d214ed56781a26edc313581c0e2d929ceeb866d"
+  integrity sha512-tOG/7GyXpFevhXVh8jOPJrmtRpOTsYqUIkVdVooZYJS/z8WhfQUX8RJILmeuJNinGAMSu1veBr4asSHFt5/hng==
   dependencies:
     "@isaacs/fs-minipass" "^4.0.0"
     chownr "^3.0.0"
