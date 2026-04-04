@@ -19,22 +19,23 @@
 
 ## 🛠 技術スタック
 
-| カテゴリ       | 技術                               |
-| :------------- | :--------------------------------- |
-| フロントエンド | Next.js 16 / React 19 / TypeScript |
-| バックエンド   | Node.js                            |
-| データベース   | PostgreSQL                         |
-| インフラ       | Vercel / Docker                    |
-| CI/CD          | GitHub Actions                     |
-| テスト         | Vitest / Playwright                |
+| カテゴリ          | 技術                                |
+| ----------------- | ----------------------------------- |
+| フレームワーク    | Next.js 16 (App Router)             |
+| UI ライブラリ     | React 19                            |
+| スタイリング      | Tailwind CSS v4                     |
+| 言語              | TypeScript 5.x                      |
+| バックエンド / DB | Supabase (PostgreSQL 17)            |
+| 認証              | Supabase Auth                       |
+| テスト            | Vitest 4.x · @testing-library/react |
+| リンター          | ESLint 9 (eslint-config-next)       |
+| フォーマッター    | Prettier                            |
+| Git フック        | Husky + lint-staged                 |
+| CI/CD             | GitHub Actions (Node 22, yarn)      |
+| デプロイ          | Vercel                              |
+| パッケージ管理    | yarn                                |
 
 ## 🏗 アーキテクチャ
-
-```Architecture
-[Client] → [Next.js App Router] → [API Routes] → [PostgreSQL]
-                                        ↓
-                                  [External APIs]
-```
 
 詳細は [docs/architecture.md](docs/architecture.md) を参照してください。
 
