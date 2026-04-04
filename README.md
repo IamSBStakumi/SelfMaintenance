@@ -71,7 +71,7 @@ yarn db:migrate
 yarn dev
 ```
 
-http://localhost:3000 でアプリケーションにアクセスできます。
+<http://localhost:3000> でアプリケーションにアクセスできます。
 
 ### テストの実行
 
