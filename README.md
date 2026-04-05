@@ -3,7 +3,18 @@
 [![CI](https://github.com/IamSBStakumi/SelfMaintenance/actions/workflows/ci.yml/badge.svg)](https://github.com/IamSBStakumi/SelfMaintenance/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 
-> **一言で説明**: このプロジェクトが何をするものか、1〜2文で。
+セルフメンテナンスをサポートするアプリ\
+個人のコンディションを最適に保ち、日々の気持ちを向上させる。
+
+具体的には以下の周期的なタスクを管理する
+
+- コンタクトレンズの交換
+- 処方箋受け取りのための通院
+- 定期健診
+- 歯のクリーニング
+- シーツや枕カバーの洗濯
+- 部屋の掃除
+- 歯ブラシの交換
 
 ![デモのスクリーンショットやGIF](docs/images/demo.gif)
 
