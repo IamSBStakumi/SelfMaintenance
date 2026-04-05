@@ -62,7 +62,7 @@
     "vitest": "^4.1.2"
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
+    "src/**/*.{ts,tsx}": [
       "eslint --fix",
       "prettier --write",
       "vitest related --run --passWithNoTests"
