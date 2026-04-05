@@ -15,7 +15,7 @@ export default function SplashScreen() {
 
     // 一定時間経過後にログイン画面へ自動遷移
     const redirectTimer = setTimeout(() => {
-      router.push("/login");
+      router.replace("/login");
     }, 2500); // 2.5秒後に遷移
 
     return () => {
@@ -24,8 +24,17 @@ export default function SplashScreen() {
     };
   }, [router]);
 
+  // タップ/クリックですぐに遷移させるハンドラー
+  const handleSkip = () => {
+    router.replace("/login");
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-900 font-sans overflow-hidden">
+    <div
+      className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-900 font-sans overflow-hidden cursor-pointer select-none"
+      onClick={handleSkip}
+      title="クリックしてスキップ"
+    >
       <div
         className={`flex flex-col items-center transition-all duration-1000 ease-out transform ${
           mounted
