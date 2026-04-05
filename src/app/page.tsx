@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/supabase";
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -13,9 +14,20 @@ export default function SplashScreen() {
       setMounted(true);
     }, 50);
 
-    // 一定時間経過後にログイン画面へ自動遷移
+    // 遷移先の判定ロジック
+    const navigateNext = async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.replace("/list_mock");
+      } else {
+        router.replace("/login");
+      }
+    };
+
+    // 一定時間経過後に自動遷移
     const redirectTimer = setTimeout(() => {
-      router.replace("/login");
+      navigateNext();
     }, 2500); // 2.5秒後に遷移
 
     return () => {
@@ -25,8 +37,14 @@ export default function SplashScreen() {
   }, [router]);
 
   // タップ/クリックですぐに遷移させるハンドラー
-  const handleSkip = () => {
-    router.replace("/login");
+  const handleSkip = async () => {
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      router.replace("/list_mock");
+    } else {
+      router.replace("/login");
+    }
   };
 
   return (
