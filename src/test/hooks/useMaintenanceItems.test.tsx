@@ -10,8 +10,10 @@ import type { MaintenanceItem } from "@/types/maintenance";
 
 // getMaintenanceItems Server Action をモック化
 const mockGetMaintenanceItems = vi.fn();
+const mockCreateMaintenanceItem = vi.fn();
 vi.mock("@/services/maintenance_items", () => ({
   getMaintenanceItems: () => mockGetMaintenanceItems(),
+  createMaintenanceItem: () => mockCreateMaintenanceItem(),
 }));
 
 // テスト用のモックデータ
@@ -80,16 +82,18 @@ describe("useMaintenanceItems", () => {
     });
 
     // 初期状態は isPending: true
-    expect(result.current.isPending).toBe(true);
-    expect(result.current.data).toBeUndefined();
+    expect(result.current.fetchMaintenanceItems.isPending).toBe(true);
+    expect(result.current.fetchMaintenanceItems.data).toBeUndefined();
 
     // データ取得完了を待機
-    await waitFor(() => expect(result.current.isPending).toBe(false));
+    await waitFor(() =>
+      expect(result.current.fetchMaintenanceItems.isPending).toBe(false),
+    );
 
     // 取得したデータが正しく返却されているか確認
-    expect(result.current.isError).toBe(false);
-    expect(result.current.data).toEqual(mockItems);
-    expect(result.current.data).toHaveLength(2);
+    expect(result.current.fetchMaintenanceItems.isError).toBe(false);
+    expect(result.current.fetchMaintenanceItems.data).toEqual(mockItems);
+    expect(result.current.fetchMaintenanceItems.data).toHaveLength(2);
   });
 
   it("データが空配列の場合、空の配列が返却されること", async () => {
@@ -99,10 +103,12 @@ describe("useMaintenanceItems", () => {
       wrapper: createWrapper(),
     });
 
-    await waitFor(() => expect(result.current.isPending).toBe(false));
+    await waitFor(() =>
+      expect(result.current.fetchMaintenanceItems.isPending).toBe(false),
+    );
 
-    expect(result.current.isError).toBe(false);
-    expect(result.current.data).toEqual([]);
+    expect(result.current.fetchMaintenanceItems.isError).toBe(false);
+    expect(result.current.fetchMaintenanceItems.data).toEqual([]);
   });
 
   it("データ取得に失敗した場合、isError が true になること", async () => {
@@ -116,10 +122,12 @@ describe("useMaintenanceItems", () => {
     });
 
     // エラー状態になるまで待機
-    await waitFor(() => expect(result.current.isError).toBe(true));
+    await waitFor(() =>
+      expect(result.current.fetchMaintenanceItems.isError).toBe(true),
+    );
 
-    expect(result.current.isPending).toBe(false);
-    expect(result.current.data).toBeUndefined();
+    expect(result.current.fetchMaintenanceItems.isPending).toBe(false);
+    expect(result.current.fetchMaintenanceItems.data).toBeUndefined();
   });
 
   it("getMaintenanceItems が1度だけ呼び出されること", async () => {
@@ -129,7 +137,9 @@ describe("useMaintenanceItems", () => {
       wrapper: createWrapper(),
     });
 
-    await waitFor(() => expect(result.current.isPending).toBe(false));
+    await waitFor(() =>
+      expect(result.current.fetchMaintenanceItems.isPending).toBe(false),
+    );
 
     // 同一マウント中にフェッチが重複して呼ばれていないことを確認
     expect(mockGetMaintenanceItems).toHaveBeenCalledTimes(1);
