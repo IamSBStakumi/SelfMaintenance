@@ -1,6 +1,7 @@
 "use client";
 
 import { addDays, format, isBefore, isToday, isTomorrow } from "date-fns";
+import { useRouter } from "next/navigation";
 
 import Header from "@/components/Header";
 import useMaintenanceItems from "@/hooks/useMaintenanceItems";
@@ -88,12 +89,15 @@ function SkeletonCard() {
 }
 
 export default function DashboardPage() {
-  const { data: items, isPending, isError } = useMaintenanceItems();
+  const { fetchMaintenanceItems } = useMaintenanceItems();
+  const { data: items, isPending, isError } = fetchMaintenanceItems;
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-zinc-50 p-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100">
       <Header />
       <main className="max-w-5xl mx-auto pb-20">
+        <button onClick={() => router.push("/create_task")}>新規登録</button>
         {/* ローディング中: スケルトンを3件分表示 */}
         {isPending && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
