@@ -17,9 +17,11 @@ export default function SplashScreen() {
     // 遷移先の判定ロジック
     const navigateNext = async () => {
       const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
-        router.replace("/list_mock");
+        router.replace("/dashboard");
       } else {
         router.replace("/login");
       }
@@ -39,9 +41,11 @@ export default function SplashScreen() {
   // タップ/クリックですぐに遷移させるハンドラー
   const handleSkip = async () => {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (session) {
-      router.replace("/list_mock");
+      router.replace("/dashboard");
     } else {
       router.replace("/login");
     }
