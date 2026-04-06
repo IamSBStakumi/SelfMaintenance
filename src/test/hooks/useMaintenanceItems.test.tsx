@@ -6,14 +6,18 @@ import React from "react";
 import useMaintenanceItems, {
   MAINTENANCE_ITEMS_QUERY_KEY,
 } from "@/hooks/useMaintenanceItems";
-import type { MaintenanceItem } from "@/types/maintenance";
+import type {
+  InsertMaintenanceItem,
+  MaintenanceItem,
+} from "@/types/maintenance";
 
 // getMaintenanceItems Server Action をモック化
 const mockGetMaintenanceItems = vi.fn();
 const mockCreateMaintenanceItem = vi.fn();
 vi.mock("@/services/maintenance_items", () => ({
   getMaintenanceItems: () => mockGetMaintenanceItems(),
-  createMaintenanceItem: () => mockCreateMaintenanceItem(),
+  createMaintenanceItem: (data: InsertMaintenanceItem) =>
+    mockCreateMaintenanceItem(data),
 }));
 
 // テスト用のモックデータ
@@ -143,5 +147,31 @@ describe("useMaintenanceItems", () => {
 
     // 同一マウント中にフェッチが重複して呼ばれていないことを確認
     expect(mockGetMaintenanceItems).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("useMaintenanceItems mutation", () => {
+  beforeEach(() => {
+    mockCreateMaintenanceItem.mockClear();
+  });
+
+  it("createMaintenanceItem が正しい引数で呼び出されること", async () => {
+    const newItem = {
+      name: "テストタスク",
+      interval_days: 7,
+      last_completed_at: "2026-04-01T00:00:00.000Z",
+      icon: "🧪",
+      memo: "テストメモ",
+    };
+
+    mockCreateMaintenanceItem.mockResolvedValue({ id: "new-id", ...newItem });
+
+    const { result } = renderHook(() => useMaintenanceItems(), {
+      wrapper: createWrapper(),
+    });
+
+    await result.current.createMaintenanceItem.mutateAsync(newItem);
+
+    expect(mockCreateMaintenanceItem).toHaveBeenCalledWith(newItem);
   });
 });
