@@ -84,7 +84,7 @@ describe("SplashScreen", () => {
     expect(mockReplace).toHaveBeenCalledTimes(1);
   });
 
-  it("セッションが確立している場合、2.5秒後に自動で /list_mock へ遷移 (router.replace) すること", async () => {
+  it("セッションが確立している場合、2.5秒後に自動で /dashboard へ遷移 (router.replace) すること", async () => {
     mockGetSession.mockResolvedValue({
       data: { session: {} },
       error: null,
@@ -106,16 +106,15 @@ describe("SplashScreen", () => {
     });
 
     // 指定時間経過後に呼び出されたことを確認
-    expect(mockReplace).toHaveBeenCalledWith("/list_mock");
+    expect(mockReplace).toHaveBeenCalledWith("/dashboard");
     expect(mockReplace).toHaveBeenCalledTimes(1);
   });
 
-  it("セッションが確立している場合、画面がクリック・タップされたとき即座に /list_mock へ遷移すること", async () => {
+  it("セッションが確立している場合、画面がクリック・タップされたとき即座に /dashboard へ遷移すること", async () => {
     mockGetSession.mockResolvedValue({
       data: { session: {} },
       error: null,
     });
-
     render(<SplashScreen />);
 
     // 画面全体（親コンテナ）の要素を取得してクリックを発火
@@ -127,7 +126,7 @@ describe("SplashScreen", () => {
     });
 
     // タイマーを待たずに即座に遷移関数が呼ばれたことを確認
-    expect(mockReplace).toHaveBeenCalledWith("/list_mock");
+    expect(mockReplace).toHaveBeenCalledWith("/dashboard");
     expect(mockReplace).toHaveBeenCalledTimes(1);
   });
 });
