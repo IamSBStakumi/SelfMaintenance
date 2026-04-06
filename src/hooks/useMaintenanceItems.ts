@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getMaintenanceItems,
   createMaintenanceItem,
@@ -17,10 +17,12 @@ const useMaintenanceItems = () => {
     staleTime: 1000 * 60 * 5,
   });
 
+  const queryClient = useQueryClient();
+
   const createMaintenanceItemMutation = useMutation({
     mutationFn: createMaintenanceItem,
     onSuccess: () => {
-      fetchMaintenanceItems.refetch();
+      queryClient.invalidateQueries({ queryKey: MAINTENANCE_ITEMS_QUERY_KEY });
     },
   });
 
