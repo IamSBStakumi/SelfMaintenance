@@ -24,6 +24,9 @@ const useMaintenanceItems = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MAINTENANCE_ITEMS_QUERY_KEY });
     },
+    onError: () => {
+      console.error("メンテナンス項目の作成に失敗しました。");
+    },
   });
 
   return {
