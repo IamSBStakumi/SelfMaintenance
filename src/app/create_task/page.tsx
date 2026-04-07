@@ -1,78 +1,33 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { z } from "zod";
 import useMaintenanceItems from "@/hooks/useMaintenanceItems";
-
-const taskSchema = z.object({
-  name: z.string().trim().min(1, "タスク名を入力してください。"),
-  icon: z.string().max(2, "アイコンは2文字以内で入力してください。").optional(),
-  interval_days: z
-    .number({ message: "周期には数値を入力してください。" })
-    .int("周期には整数を入力してください。")
-    .min(1, "周期には1以上の数値を入力してください。"),
-  last_completed_at: z.string().min(1, "前回の実施日を入力してください。"),
-  memo: z.string().optional(),
-});
+import TaskForm, { TaskFormValues } from "@/components/TaskForm";
 
 export default function CreateTaskPage() {
   const router = useRouter();
   const { createMaintenanceItem } = useMaintenanceItems();
 
-  // フォーム状態の管理
-  const [formData, setFormData] = useState({
+  const handleCreateSubmit = async (data: TaskFormValues) => {
+    // APIへ送信する処理
+    await createMaintenanceItem.mutateAsync({
+      name: data.name,
+      icon: data.icon || null,
+      interval_days: data.interval_days,
+      last_completed_at: new Date(data.last_completed_at).toISOString(),
+      memo: data.memo || null,
+    });
+    // 成功時にダッシュボードへリダイレクト
+    router.push("/dashboard");
+  };
+
+  const defaultFormValues: TaskFormValues = {
     name: "",
     icon: "✨",
     interval_days: 30,
     last_completed_at: format(new Date(), "yyyy-MM-dd"),
     memo: "",
-  });
-
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "interval_days" ? parseInt(value) || 0 : value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg(null);
-
-    // Zodによるバリデーション
-    const result = taskSchema.safeParse(formData);
-    if (!result.success) {
-      const firstError =
-        result.error.issues[0]?.message || "入力内容に誤りがあります。";
-      setErrorMsg(firstError);
-      return;
-    }
-
-    const validatedData = result.data;
-
-    try {
-      await createMaintenanceItem.mutateAsync({
-        name: validatedData.name,
-        icon: validatedData.icon || null,
-        interval_days: validatedData.interval_days,
-        last_completed_at: new Date(
-          validatedData.last_completed_at,
-        ).toISOString(),
-        memo: validatedData.memo || null,
-      });
-      // 成功時にダッシュボードへリダイレクト
-      router.push("/dashboard");
-    } catch (err) {
-      console.error("Failed to create maintenance item:", err);
-      setErrorMsg("登録に失敗しました。時間をおいて再度お試しください。");
-    }
   };
 
   return (
@@ -104,114 +59,11 @@ export default function CreateTaskPage() {
             transition-all duration-500 transform
           `}
         >
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* アイコン選択（簡易版）とタスク名 */}
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="w-full md:w-1/4">
-                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1">
-                  アイコン
-                </label>
-                <input
-                  type="text"
-                  name="icon"
-                  value={formData.icon}
-                  onChange={handleChange}
-                  placeholder="✨"
-                  maxLength={2}
-                  className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 text-2xl text-center focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden"
-                />
-              </div>
-              <div className="w-full md:w-3/4">
-                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1">
-                  タスク名 <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="例: コンタクトレンズ交換"
-                  required
-                  className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 text-lg font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden"
-                />
-              </div>
-            </div>
-
-            {/* 周期と最終実施日 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1">
-                  実施周期 (日間) <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  name="interval_days"
-                  value={formData.interval_days}
-                  onChange={handleChange}
-                  min="1"
-                  required
-                  className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1">
-                  前回の実施日 <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  name="last_completed_at"
-                  value={formData.last_completed_at}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden"
-                />
-              </div>
-            </div>
-
-            {/* メモ */}
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1">
-                メモ (任意)
-              </label>
-              <textarea
-                name="memo"
-                value={formData.memo}
-                onChange={handleChange}
-                placeholder="備考や注意点など..."
-                rows={4}
-                className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden resize-none"
-              />
-            </div>
-
-            {/* エラーメッセージ */}
-            {errorMsg && (
-              <div className="bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 p-4 rounded-2xl text-sm font-medium border border-rose-200 dark:border-rose-800/50 animate-in fade-in slide-in-from-top-1">
-                {errorMsg}
-              </div>
-            )}
-
-            {/* 送信ボタン */}
-            <button
-              type="submit"
-              disabled={createMaintenanceItem.isPending}
-              className={`
-                w-full py-5 rounded-2xl font-bold text-white text-lg shadow-xl shadow-indigo-500/20
-                bg-linear-to-r from-indigo-500 via-indigo-600 to-purple-600
-                hover:opacity-90 active:scale-[0.98] transition-all duration-200
-                disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100
-                flex items-center justify-center gap-3
-              `}
-            >
-              {createMaintenanceItem.isPending ? (
-                <>
-                  <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>登録中...</span>
-                </>
-              ) : (
-                <span>新しいタスクを登録する</span>
-              )}
-            </button>
-          </form>
+          <TaskForm
+            defaultValues={defaultFormValues}
+            onSubmit={handleCreateSubmit}
+            submitButtonText="新しいタスクを登録する"
+          />
         </main>
 
         <footer className="mt-12 text-center text-zinc-400 text-sm">
