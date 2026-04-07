@@ -174,4 +174,24 @@ describe("useMaintenanceItems mutation", () => {
 
     expect(mockCreateMaintenanceItem).toHaveBeenCalledWith(newItem);
   });
+
+  it("createMaintenanceItem がエラーを返した場合、例外がスローされること", async () => {
+    mockCreateMaintenanceItem.mockRejectedValue(
+      new Error("作成に失敗しました"),
+    );
+
+    const { result } = renderHook(() => useMaintenanceItems(), {
+      wrapper: createWrapper(),
+    });
+
+    await expect(
+      result.current.createMaintenanceItem.mutateAsync({
+        name: "テスト",
+        interval_days: 7,
+        last_completed_at: "2026-04-01T00:00:00.000Z",
+        icon: null,
+        memo: null,
+      }),
+    ).rejects.toThrow("作成に失敗しました");
+  });
 });
