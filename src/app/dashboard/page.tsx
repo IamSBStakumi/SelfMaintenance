@@ -136,7 +136,7 @@ export default function DashboardPage() {
         )}
 
         {/* データが0件 */}
-        {!isPending && !isError && items.length === 0 && (
+        {!isPending && !isError && items?.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 text-center gap-3">
             <p className="text-zinc-500 dark:text-zinc-400 text-lg">
               メンテナンス項目がまだありません。
@@ -148,7 +148,7 @@ export default function DashboardPage() {
         )}
 
         {/* 正常にデータが取得できた場合 */}
-        {!isPending && !isError && items.length > 0 && (
+        {!isPending && !isError && items && items.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {items.map((item) => (
               <MaintenanceItemCard key={item.id} item={item} />
