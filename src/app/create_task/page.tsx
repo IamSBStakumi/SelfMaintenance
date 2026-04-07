@@ -3,7 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import { z } from "zod";
 import useMaintenanceItems from "@/hooks/useMaintenanceItems";
+
+const taskSchema = z.object({
+  name: z.string().trim().min(1, "タスク名を入力してください。"),
+  icon: z.string().max(2, "アイコンは2文字以内で入力してください。").optional(),
+  interval_days: z
+    .number({ message: "周期には数値を入力してください。" })
+    .int("周期には整数を入力してください。")
+    .min(1, "周期には1以上の数値を入力してください。"),
+  last_completed_at: z.string().min(1, "前回の実施日を入力してください。"),
+  memo: z.string().optional(),
+});
 
 export default function CreateTaskPage() {
   const router = useRouter();
@@ -34,23 +46,26 @@ export default function CreateTaskPage() {
     e.preventDefault();
     setErrorMsg(null);
 
-    // バリデーション
-    if (!formData.name.trim()) {
-      setErrorMsg("タスク名を入力してください。");
-      return;
-    }
-    if (formData.interval_days <= 0) {
-      setErrorMsg("周期には1以上の数値を入力してください。");
+    // Zodによるバリデーション
+    const result = taskSchema.safeParse(formData);
+    if (!result.success) {
+      const firstError =
+        result.error.issues[0]?.message || "入力内容に誤りがあります。";
+      setErrorMsg(firstError);
       return;
     }
 
+    const validatedData = result.data;
+
     try {
       await createMaintenanceItem.mutateAsync({
-        name: formData.name,
-        icon: formData.icon || null,
-        interval_days: formData.interval_days,
-        last_completed_at: new Date(formData.last_completed_at).toISOString(),
-        memo: formData.memo || null,
+        name: validatedData.name,
+        icon: validatedData.icon || null,
+        interval_days: validatedData.interval_days,
+        last_completed_at: new Date(
+          validatedData.last_completed_at,
+        ).toISOString(),
+        memo: validatedData.memo || null,
       });
       // 成功時にダッシュボードへリダイレクト
       router.push("/dashboard");
@@ -102,6 +117,7 @@ export default function CreateTaskPage() {
                   value={formData.icon}
                   onChange={handleChange}
                   placeholder="✨"
+                  maxLength={2}
                   className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 text-2xl text-center focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden"
                 />
               </div>
