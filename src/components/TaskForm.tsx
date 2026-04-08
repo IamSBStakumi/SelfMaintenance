@@ -55,10 +55,14 @@ export default function TaskForm({
       {/* アイコン選択（簡易版）とタスク名 */}
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-full md:w-1/4">
-          <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1">
+          <label
+            htmlFor="icon"
+            className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1"
+          >
             アイコン
           </label>
           <input
+            id="icon"
             type="text"
             placeholder="✨"
             maxLength={2}
@@ -72,10 +76,14 @@ export default function TaskForm({
           )}
         </div>
         <div className="w-full md:w-3/4">
-          <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1">
+          <label
+            htmlFor="task-name"
+            className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1"
+          >
             タスク名 <span className="text-rose-500">*</span>
           </label>
           <input
+            id="task-name"
             type="text"
             placeholder="例: コンタクトレンズ交換"
             {...register("name")}
@@ -92,10 +100,14 @@ export default function TaskForm({
       {/* 周期と最終実施日 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1">
+          <label
+            htmlFor="interval-days"
+            className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1"
+          >
             実施周期 (日間) <span className="text-rose-500">*</span>
           </label>
           <input
+            id="interval-days"
             type="number"
             min="1"
             {...register("interval_days", { valueAsNumber: true })}
@@ -108,10 +120,14 @@ export default function TaskForm({
           )}
         </div>
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1">
+          <label
+            htmlFor="last-completed-at"
+            className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1"
+          >
             前回の実施日 <span className="text-rose-500">*</span>
           </label>
           <input
+            id="last-completed-at"
             type="date"
             {...register("last_completed_at")}
             className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden"
@@ -126,10 +142,14 @@ export default function TaskForm({
 
       {/* メモ */}
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1">
+        <label
+          htmlFor="memo"
+          className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2 ml-1"
+        >
           メモ (任意)
         </label>
         <textarea
+          id="memo"
           placeholder="備考や注意点など..."
           rows={4}
           {...register("memo")}
