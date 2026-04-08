@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
+import { parseISO, startOfDay } from "date-fns";
 import useMaintenanceItems from "@/hooks/useMaintenanceItems";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
 
@@ -15,7 +15,9 @@ export default function CreateTaskPage() {
       name: data.name,
       icon: data.icon || null,
       interval_days: data.interval_days,
-      last_completed_at: new Date(data.last_completed_at).toISOString(),
+      last_completed_at: startOfDay(
+        parseISO(data.last_completed_at),
+      ).toISOString(),
       memo: data.memo || null,
     });
     // 成功時にダッシュボードへリダイレクト
@@ -26,7 +28,7 @@ export default function CreateTaskPage() {
     name: "",
     icon: "✨",
     interval_days: 30,
-    last_completed_at: format(new Date(), "yyyy-MM-dd"),
+    last_completed_at: new Date().toISOString(),
     memo: "",
   };
 
