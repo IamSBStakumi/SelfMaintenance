@@ -1,19 +1,7 @@
-import { addDays, format, isBefore, isToday, isTomorrow } from "date-fns";
+import { addDays, format, isBefore, isToday } from "date-fns";
 import { MaintenanceItem } from "@/types/maintenance";
-
-// interval_days の大きさからカードの背景色を決定するヘルパー
-function getCardColor(intervalDays: number): string {
-  if (intervalDays <= 14) return "bg-soft-pink";
-  if (intervalDays <= 90) return "bg-mint";
-  return "bg-lavender";
-}
-
-// 次回予定日の表示文字列を生成するヘルパー
-function formatNextDue(nextDue: Date): string {
-  if (isToday(nextDue)) return "今日";
-  if (isTomorrow(nextDue)) return "明日";
-  return format(nextDue, "yyyy-MM-dd");
-}
+import getCardColor from "@/utils/getCardColor";
+import formatNextDue from "@/utils/formatNextDue";
 
 const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
   const lastCompleted = new Date(item.last_completed_at);
