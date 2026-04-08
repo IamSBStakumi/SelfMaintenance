@@ -46,6 +46,10 @@ export async function getMaintenanceItems(): Promise<MaintenanceItem[]> {
 export async function getMaintenanceItemById(
   id: string,
 ): Promise<MaintenanceItem> {
+  if (!id || id.trim().length === 0) {
+    throw new Error("指定されたIDは不正です。");
+  }
+
   const supabase = await createClient();
 
   const {
