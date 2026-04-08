@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, test, expect, vi, beforeEach } from "vitest";
 import React from "react";
 
 import useMaintenanceItems, {
@@ -73,11 +73,11 @@ describe("useMaintenanceItems", () => {
     mockGetMaintenanceItems.mockClear();
   });
 
-  it("MAINTENANCE_ITEMS_QUERY_KEY が正しい値でエクスポートされていること", () => {
+  test("MAINTENANCE_ITEMS_QUERY_KEY が正しい値でエクスポートされていること", () => {
     expect(MAINTENANCE_ITEMS_QUERY_KEY).toEqual(["maintenance_items"]);
   });
 
-  it("データ取得が成功した場合、items が返却されること", async () => {
+  test("データ取得が成功した場合、items が返却されること", async () => {
     // 成功レスポンスをモック
     mockGetMaintenanceItems.mockResolvedValue(mockItems);
 
@@ -100,7 +100,7 @@ describe("useMaintenanceItems", () => {
     expect(result.current.fetchMaintenanceItems.data).toHaveLength(2);
   });
 
-  it("データが空配列の場合、空の配列が返却されること", async () => {
+  test("データが空配列の場合、空の配列が返却されること", async () => {
     mockGetMaintenanceItems.mockResolvedValue([]);
 
     const { result } = renderHook(() => useMaintenanceItems(), {
@@ -115,7 +115,7 @@ describe("useMaintenanceItems", () => {
     expect(result.current.fetchMaintenanceItems.data).toEqual([]);
   });
 
-  it("データ取得に失敗した場合、isError が true になること", async () => {
+  test("データ取得に失敗した場合、isError が true になること", async () => {
     // エラーレスポンスをモック
     mockGetMaintenanceItems.mockRejectedValue(
       new Error("メンテナンス項目の取得に失敗しました。"),
@@ -134,7 +134,7 @@ describe("useMaintenanceItems", () => {
     expect(result.current.fetchMaintenanceItems.data).toBeUndefined();
   });
 
-  it("getMaintenanceItems が1度だけ呼び出されること", async () => {
+  test("getMaintenanceItems が1度だけ呼び出されること", async () => {
     mockGetMaintenanceItems.mockResolvedValue(mockItems);
 
     const { result } = renderHook(() => useMaintenanceItems(), {
@@ -155,7 +155,7 @@ describe("useMaintenanceItems mutation", () => {
     mockCreateMaintenanceItem.mockClear();
   });
 
-  it("createMaintenanceItem が正しい引数で呼び出されること", async () => {
+  test("createMaintenanceItem が正しい引数で呼び出されること", async () => {
     const newItem = {
       name: "テストタスク",
       interval_days: 7,
@@ -175,7 +175,7 @@ describe("useMaintenanceItems mutation", () => {
     expect(mockCreateMaintenanceItem).toHaveBeenCalledWith(newItem);
   });
 
-  it("createMaintenanceItem がエラーを返した場合、例外がスローされること", async () => {
+  test("createMaintenanceItem がエラーを返した場合、例外がスローされること", async () => {
     mockCreateMaintenanceItem.mockRejectedValue(
       new Error("作成に失敗しました"),
     );
