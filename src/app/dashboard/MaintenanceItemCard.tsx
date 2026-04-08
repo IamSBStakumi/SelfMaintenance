@@ -61,6 +61,10 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
         <button
           className="bg-white/90 hover:bg-white text-zinc-800 font-bold py-2.5 px-5 rounded-full shadow-sm transition-colors text-sm hover:shadow-md active:scale-95"
           aria-label={`${item.name}を完了にする`}
+          onClick={() => {
+            // TODO: 完了処理を実装する
+            console.log("完了ボタンが押されました。");
+          }}
         >
           完了
         </button>
