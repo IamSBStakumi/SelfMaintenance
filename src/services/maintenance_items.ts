@@ -41,6 +41,38 @@ export async function getMaintenanceItems(): Promise<MaintenanceItem[]> {
 }
 
 /**
+ * 指定したIDのメンテナンス項目を取得します。
+ */
+export async function getMaintenanceItemById(
+  id: string,
+): Promise<MaintenanceItem> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error("認証に失敗しました。ログインしているか確認してください。");
+  }
+
+  const { data, error } = await supabase
+    .from("maintenance_items")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching maintenance item:", error);
+    throw new Error("メンテナンス項目の取得に失敗しました。");
+  }
+
+  return data as MaintenanceItem;
+}
+
+/**
  * 新しいメンテナンス項目を登録します。
  */
 export async function createMaintenanceItem(
