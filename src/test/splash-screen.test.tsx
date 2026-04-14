@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import SplashScreen from "@/app/page";
 
 // next/navigation の useRouter をモック化
@@ -37,7 +37,7 @@ describe("SplashScreen", () => {
     vi.useRealTimers();
   });
 
-  it("初期レンダリングでタイトルやサブタイトルが正しく表示されること", () => {
+  test("初期レンダリングでタイトルやサブタイトルが正しく表示されること", () => {
     render(<SplashScreen />);
 
     // タイトルとサブタイトルが表示されているか確認
@@ -47,7 +47,7 @@ describe("SplashScreen", () => {
     ).toBeInTheDocument();
   });
 
-  it("2.5秒後に自動で /login へ遷移 (router.replace) すること", async () => {
+  test("2.5秒後に自動で /login へ遷移 (router.replace) すること", async () => {
     render(<SplashScreen />);
 
     // マウント直後はまだ遷移していない
@@ -68,7 +68,7 @@ describe("SplashScreen", () => {
     expect(mockReplace).toHaveBeenCalledTimes(1);
   });
 
-  it("画面がクリック・タップされたとき即座に /login へ遷移すること", async () => {
+  test("画面がクリック・タップされたとき即座に /login へ遷移すること", async () => {
     render(<SplashScreen />);
 
     // 画面全体（親コンテナ）の要素を取得してクリックを発火
@@ -84,7 +84,7 @@ describe("SplashScreen", () => {
     expect(mockReplace).toHaveBeenCalledTimes(1);
   });
 
-  it("セッションが確立している場合、2.5秒後に自動で /dashboard へ遷移 (router.replace) すること", async () => {
+  test("セッションが確立している場合、2.5秒後に自動で /dashboard へ遷移 (router.replace) すること", async () => {
     mockGetSession.mockResolvedValue({
       data: { session: {} },
       error: null,
@@ -110,7 +110,7 @@ describe("SplashScreen", () => {
     expect(mockReplace).toHaveBeenCalledTimes(1);
   });
 
-  it("セッションが確立している場合、画面がクリック・タップされたとき即座に /dashboard へ遷移すること", async () => {
+  test("セッションが確立している場合、画面がクリック・タップされたとき即座に /dashboard へ遷移すること", async () => {
     mockGetSession.mockResolvedValue({
       data: { session: {} },
       error: null,

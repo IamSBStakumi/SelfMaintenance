@@ -45,4 +45,5 @@ next-env.d.ts
 storybook-static
 
 # issues
-.anti_docs/issues
+.anti_docs/**/*
+!.anti_docs/mvp_schedule.md
