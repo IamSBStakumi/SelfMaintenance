@@ -1,11 +1,12 @@
 import { addDays, format, isBefore, isToday } from "date-fns";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import useMaintenanceItem from "@/hooks/useMaintenanceItem";
 import { MaintenanceItem } from "@/types/maintenance";
 import getCardColor from "@/utils/getCardColor";
 import formatNextDue from "@/utils/formatNextDue";
 
 const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
+  const { updateMaintenanceItemNextCycle } = useMaintenanceItem(item.id);
   const router = useRouter();
 
   const lastCompleted = new Date(item.last_completed_at);
@@ -13,16 +14,31 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
   const isOverdue = isBefore(nextDue, new Date()) && !isToday(nextDue);
   const color = getCardColor(item.interval_days);
 
-  const handleCompleteTask = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCompleteTask = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
-    // TODO: 完了処理を実装する
-    console.log("完了ボタンが押されました。");
+    if (updateMaintenanceItemNextCycle.isPending) return;
+
+    try {
+      await updateMaintenanceItemNextCycle.mutateAsync();
+    } catch (error) {
+      // TODO: ユーザー向けの通知ロジックを実装する
+      console.error("タスクの完了に失敗しました。", error);
+    }
+  };
+
+  const handleCardClick = () => {
+    router.push(`/task/${item.id}`);
   };
 
   return (
-    <Link
-      href={`/task/${item.id}`}
+    <div
+      onClick={handleCardClick}
+      role="link"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") handleCardClick();
+      }}
       className={`rounded-3xl p-6 shadow-soft transition-all duration-300 hover:scale-105 hover:-translate-y-1 flex flex-col justify-between ${color} text-zinc-800`}
     >
       <div>
@@ -59,14 +75,15 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
           </p>
         </div>
         <button
-          className="bg-white/90 hover:bg-white text-zinc-800 font-bold py-2.5 px-5 rounded-full shadow-sm transition-colors text-sm hover:shadow-md active:scale-95 cursor-pointer"
+          className={`bg-white/90 hover:bg-white text-zinc-800 font-bold py-2.5 px-5 rounded-full shadow-sm transition-colors text-sm hover:shadow-md active:scale-95 ${updateMaintenanceItemNextCycle.isPending ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           aria-label={`${item.name}を完了にする`}
           onClick={handleCompleteTask}
+          disabled={updateMaintenanceItemNextCycle.isPending}
         >
-          完了
+          {updateMaintenanceItemNextCycle.isPending ? "処理中..." : "完了"}
         </button>
       </div>
-    </Link>
+    </div>
   );
 };
 

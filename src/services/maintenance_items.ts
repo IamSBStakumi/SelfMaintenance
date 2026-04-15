@@ -115,6 +115,10 @@ export async function updateMaintenanceItem(
   id: string,
   data: UpdateMaintenanceItem,
 ): Promise<MaintenanceItem> {
+  if (!id || id.trim().length === 0) {
+    throw new Error("指定されたIDは不正です。");
+  }
+
   const supabase = await createClient();
 
   const {
@@ -141,9 +145,24 @@ export async function updateMaintenanceItem(
 }
 
 /**
+ * 指定したIDのメンテナンス項目を次の周期に更新します。
+ */
+export async function updateMaintenanceItemNextCycle(
+  id: string,
+): Promise<MaintenanceItem> {
+  return updateMaintenanceItem(id, {
+    last_completed_at: new Date().toISOString(),
+  });
+}
+
+/**
  * 指定したIDのメンテナンス項目を削除します。
  */
 export async function deleteMaintenanceItem(id: string): Promise<void> {
+  if (!id || id.trim().length === 0) {
+    throw new Error("指定されたIDは不正です。");
+  }
+
   const supabase = await createClient();
 
   const {
