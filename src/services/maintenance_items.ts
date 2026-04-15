@@ -46,8 +46,8 @@ export async function getMaintenanceItems(): Promise<MaintenanceItem[]> {
 export async function getMaintenanceItemById(
   id: string,
 ): Promise<MaintenanceItem> {
-  const normalizedId = id.trim();
-  if (!normalizedId || normalizedId.length === 0) {
+  const normalizedId = id?.trim();
+  if (!normalizedId) {
     throw new Error("指定されたIDは不正です。");
   }
 
@@ -116,8 +116,8 @@ export async function updateMaintenanceItem(
   id: string,
   data: UpdateMaintenanceItem,
 ): Promise<MaintenanceItem> {
-  const normalizedId = id.trim();
-  if (!normalizedId || normalizedId.length === 0) {
+  const normalizedId = id?.trim();
+  if (!normalizedId) {
     throw new Error("指定されたIDは不正です。");
   }
 
@@ -161,8 +161,8 @@ export async function updateMaintenanceItemNextCycle(
  * 指定したIDのメンテナンス項目を削除します。
  */
 export async function deleteMaintenanceItem(id: string): Promise<void> {
-  const normalizedId = id.trim();
-  if (!normalizedId || normalizedId.length === 0) {
+  const normalizedId = id?.trim();
+  if (!normalizedId) {
     throw new Error("指定されたIDは不正です。");
   }
 
