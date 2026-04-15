@@ -178,7 +178,7 @@ export default function TaskForm({
           bg-linear-to-r from-indigo-500 via-indigo-600 to-purple-600
           hover:opacity-90 active:scale-[0.98] transition-all duration-200
           disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100
-          flex items-center justify-center gap-3
+          flex items-center justify-center gap-3 cursor-pointer
         `}
       >
         {isSubmitting ? (
