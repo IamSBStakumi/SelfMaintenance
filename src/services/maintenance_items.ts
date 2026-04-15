@@ -158,7 +158,7 @@ export async function updateMaintenanceItemNextCycle(
   const { data: updatedData, error } = await supabase
     .from("maintenance_items")
     .update({
-      last_completed_at: new Date(),
+      last_completed_at: new Date().toISOString(),
     })
     .eq("id", id)
     .eq("user_id", user.id) // 所有者チェックを追加
