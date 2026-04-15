@@ -18,7 +18,7 @@ const TaskContent = ({ taskData }: Props) => {
     name: taskData.name,
     icon: taskData.icon || "",
     interval_days: taskData.interval_days,
-    last_completed_at: taskData.last_completed_at,
+    last_completed_at: taskData.last_completed_at.split("T")[0],
     memo: taskData.memo || "",
   };
 
