@@ -16,7 +16,14 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
   const handleCompleteTask = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
-    await updateMaintenanceItemNextCycle.mutateAsync();
+    if (updateMaintenanceItemNextCycle.isPending) return;
+
+    try {
+      await updateMaintenanceItemNextCycle.mutateAsync();
+    } catch (error) {
+      // TODO: ユーザー向けの通知ロジックを実装する
+      console.error("タスクの完了に失敗しました。", error);
+    }
   };
 
   return (
