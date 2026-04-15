@@ -45,6 +45,9 @@ const useMaintenanceItem = (id: string) => {
       queryClient.invalidateQueries({
         queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
       });
+      queryClient.invalidateQueries({
+        queryKey: MAINTENANCE_ITEM_QUERY_KEY(id),
+      });
     },
     onError: () => {
       console.error("メンテナンス項目の更新に失敗しました。");
