@@ -1,5 +1,6 @@
 import { addDays, format, isBefore, isToday } from "date-fns";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { MaintenanceItem } from "@/types/maintenance";
 import getCardColor from "@/utils/getCardColor";
 import formatNextDue from "@/utils/formatNextDue";
@@ -20,9 +21,9 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
   };
 
   return (
-    <div
-      className={`rounded-3xl p-6 shadow-soft transition-all duration-300 hover:scale-105 hover:-translate-y-1 flex flex-col justify-between ${color} text-zinc-800 cursor-pointer`}
-      onClick={() => router.push(`/task/${item.id}`)}
+    <Link
+      href={`/task/${item.id}`}
+      className={`rounded-3xl p-6 shadow-soft transition-all duration-300 hover:scale-105 hover:-translate-y-1 flex flex-col justify-between ${color} text-zinc-800`}
     >
       <div>
         {/* アイコンが設定されている場合は表示 */}
@@ -65,7 +66,7 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
           完了
         </button>
       </div>
-    </div>
+    </Link>
   );
 };
 
