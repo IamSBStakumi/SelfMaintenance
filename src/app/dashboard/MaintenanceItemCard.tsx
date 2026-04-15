@@ -1,5 +1,5 @@
 import { addDays, format, isBefore, isToday } from "date-fns";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import useMaintenanceItem from "@/hooks/useMaintenanceItem";
 import { MaintenanceItem } from "@/types/maintenance";
 import getCardColor from "@/utils/getCardColor";
@@ -7,6 +7,7 @@ import formatNextDue from "@/utils/formatNextDue";
 
 const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
   const { updateMaintenanceItemNextCycle } = useMaintenanceItem(item.id);
+  const router = useRouter();
 
   const lastCompleted = new Date(item.last_completed_at);
   const nextDue = addDays(lastCompleted, item.interval_days);
@@ -26,9 +27,18 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
     }
   };
 
+  const handleCardClick = () => {
+    router.push(`/task/${item.id}`);
+  };
+
   return (
-    <Link
-      href={`/task/${item.id}`}
+    <div
+      onClick={handleCardClick}
+      role="link"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") handleCardClick();
+      }}
       className={`rounded-3xl p-6 shadow-soft transition-all duration-300 hover:scale-105 hover:-translate-y-1 flex flex-col justify-between ${color} text-zinc-800`}
     >
       <div>
@@ -73,7 +83,7 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
           {updateMaintenanceItemNextCycle.isPending ? "処理中..." : "完了"}
         </button>
       </div>
-    </Link>
+    </div>
   );
 };
 
