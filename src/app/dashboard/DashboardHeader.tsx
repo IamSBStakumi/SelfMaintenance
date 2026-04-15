@@ -13,7 +13,7 @@ const DashboardHeader = () => {
       </div>
       <button
         onClick={() => router.push("/create_task")}
-        className="bg-linear-to-r from-indigo-500 to-purple-600 hover:opacity-90 text-white font-bold py-3 px-8 rounded-2xl shadow-xl shadow-indigo-500/20 transition-all active:scale-95 flex items-center gap-2"
+        className="bg-linear-to-r from-indigo-500 to-purple-600 hover:opacity-90 text-white font-bold py-3 px-8 rounded-2xl shadow-xl shadow-indigo-500/20 transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
       >
         <span className="text-2xl leading-none">+</span>
         <span>新規登録する</span>

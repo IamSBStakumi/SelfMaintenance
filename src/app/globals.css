@@ -5,6 +5,12 @@
   --foreground: #171717;
 }
 
+@theme {
+  --color-soft-pink: #ffb7c5;
+  --color-mint: #98fb98;
+  --color-lavender: #e6e6fa;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
