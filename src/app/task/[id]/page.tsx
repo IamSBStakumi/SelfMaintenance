@@ -2,12 +2,11 @@
 
 import { useParams } from "next/navigation";
 import useMaintenanceItem from "@/hooks/useMaintenanceItem";
-import escapeString from "@/utils/escapeString";
 import TaskContent from "./TaskContent";
 
 const TaskPage = () => {
   const params = useParams();
-  const taskId = escapeString(params.id as string);
+  const taskId = params.id as string;
 
   const { fetchMaintenanceItem } = useMaintenanceItem(taskId);
 
