@@ -7,6 +7,14 @@ import {
   UpdateMaintenanceItem,
 } from "@/types/maintenance";
 
+const normalizeAndValidateId = (id: string) => {
+  const normalizedId = id?.trim();
+  if (!normalizedId) {
+    throw new Error("指定されたIDは不正です。");
+  }
+  return normalizedId;
+};
+
 /**
  * ログインユーザーのすべてのメンテナンス項目を取得します。
  * @returns メンテナンス項目の配列
@@ -46,9 +54,7 @@ export async function getMaintenanceItems(): Promise<MaintenanceItem[]> {
 export async function getMaintenanceItemById(
   id: string,
 ): Promise<MaintenanceItem> {
-  if (!id || id.trim().length === 0) {
-    throw new Error("指定されたIDは不正です。");
-  }
+  const normalizedId = normalizeAndValidateId(id);
 
   const supabase = await createClient();
 
@@ -64,7 +70,7 @@ export async function getMaintenanceItemById(
   const { data, error } = await supabase
     .from("maintenance_items")
     .select("*")
-    .eq("id", id)
+    .eq("id", normalizedId)
     .eq("user_id", user.id)
     .single();
 
@@ -115,9 +121,7 @@ export async function updateMaintenanceItem(
   id: string,
   data: UpdateMaintenanceItem,
 ): Promise<MaintenanceItem> {
-  if (!id || id.trim().length === 0) {
-    throw new Error("指定されたIDは不正です。");
-  }
+  const normalizedId = normalizeAndValidateId(id);
 
   const supabase = await createClient();
 
@@ -131,7 +135,7 @@ export async function updateMaintenanceItem(
   const { data: updatedData, error } = await supabase
     .from("maintenance_items")
     .update(data)
-    .eq("id", id)
+    .eq("id", normalizedId)
     .eq("user_id", user.id) // 所有者チェックを追加
     .select()
     .single();
@@ -159,9 +163,7 @@ export async function updateMaintenanceItemNextCycle(
  * 指定したIDのメンテナンス項目を削除します。
  */
 export async function deleteMaintenanceItem(id: string): Promise<void> {
-  if (!id || id.trim().length === 0) {
-    throw new Error("指定されたIDは不正です。");
-  }
+  const normalizedId = normalizeAndValidateId(id);
 
   const supabase = await createClient();
 
@@ -175,7 +177,7 @@ export async function deleteMaintenanceItem(id: string): Promise<void> {
   const { error } = await supabase
     .from("maintenance_items")
     .delete()
-    .eq("id", id)
+    .eq("id", normalizedId)
     .eq("user_id", user.id); // 所有者チェックを追加
 
   if (error) {

@@ -37,6 +37,7 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
       role="link"
       tabIndex={0}
       onKeyDown={(e) => {
+        if (e.target !== e.currentTarget) return;
         if (e.key === "Enter") handleCardClick();
       }}
       className={`rounded-3xl p-6 shadow-soft transition-all duration-300 hover:scale-105 hover:-translate-y-1 flex flex-col justify-between ${color} text-zinc-800`}

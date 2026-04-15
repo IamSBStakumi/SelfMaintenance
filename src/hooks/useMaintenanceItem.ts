@@ -16,21 +16,22 @@ export const MAINTENANCE_ITEM_QUERY_KEY = (id: string) =>
 const useMaintenanceItem = (id: string) => {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const normalizedId = id?.trim();
 
   const fetchMaintenanceItem = useQuery({
-    queryKey: MAINTENANCE_ITEM_QUERY_KEY(id),
-    queryFn: () => getMaintenanceItemById(id),
+    queryKey: MAINTENANCE_ITEM_QUERY_KEY(normalizedId),
+    queryFn: () => getMaintenanceItemById(normalizedId),
     gcTime: 1000 * 60 * 5,
     staleTime: 1000 * 60 * 5,
-    enabled: !!id, // IDが存在する場合のみフェッチを実行
+    enabled: !!normalizedId, // IDが存在する場合のみフェッチを実行
   });
 
   const updateMaintenanceItemMutation = useMutation({
     mutationFn: (data: UpdateMaintenanceItem) =>
-      updateMaintenanceItem(id, data),
+      updateMaintenanceItem(normalizedId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: MAINTENANCE_ITEM_QUERY_KEY(id),
+        queryKey: MAINTENANCE_ITEM_QUERY_KEY(normalizedId),
       });
       router.push("/dashboard");
     },
@@ -40,10 +41,13 @@ const useMaintenanceItem = (id: string) => {
   });
 
   const updateMaintenanceItemNextCycleMutation = useMutation({
-    mutationFn: () => updateMaintenanceItemNextCycle(id),
+    mutationFn: () => updateMaintenanceItemNextCycle(normalizedId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
+      });
+      queryClient.invalidateQueries({
+        queryKey: MAINTENANCE_ITEM_QUERY_KEY(normalizedId),
       });
     },
     onError: () => {
