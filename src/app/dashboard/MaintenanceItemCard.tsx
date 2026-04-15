@@ -12,6 +12,13 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
   const isOverdue = isBefore(nextDue, new Date()) && !isToday(nextDue);
   const color = getCardColor(item.interval_days);
 
+  const handleCompleteTask = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    // TODO: 完了処理を実装する
+    console.log("完了ボタンが押されました。");
+  };
+
   return (
     <div
       className={`rounded-3xl p-6 shadow-soft transition-all duration-300 hover:scale-105 hover:-translate-y-1 flex flex-col justify-between ${color} text-zinc-800 cursor-pointer`}
@@ -51,12 +58,9 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
           </p>
         </div>
         <button
-          className="bg-white/90 hover:bg-white text-zinc-800 font-bold py-2.5 px-5 rounded-full shadow-sm transition-colors text-sm hover:shadow-md active:scale-95"
+          className="bg-white/90 hover:bg-white text-zinc-800 font-bold py-2.5 px-5 rounded-full shadow-sm transition-colors text-sm hover:shadow-md active:scale-95 cursor-pointer"
           aria-label={`${item.name}を完了にする`}
-          onClick={() => {
-            // TODO: 完了処理を実装する
-            console.log("完了ボタンが押されました。");
-          }}
+          onClick={handleCompleteTask}
         >
           完了
         </button>
