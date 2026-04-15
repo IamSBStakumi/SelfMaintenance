@@ -5,8 +5,7 @@ import useMaintenanceItem from "@/hooks/useMaintenanceItem";
 import TaskContent from "./TaskContent";
 
 const TaskPage = () => {
-  const params = useParams();
-  const taskId = params.id as string;
+  const { id: taskId } = useParams<{ id: string }>();
 
   const { fetchMaintenanceItem } = useMaintenanceItem(taskId);
 
