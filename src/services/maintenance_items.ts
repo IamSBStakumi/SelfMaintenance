@@ -146,31 +146,9 @@ export async function updateMaintenanceItem(
 export async function updateMaintenanceItemNextCycle(
   id: string,
 ): Promise<MaintenanceItem> {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    throw new Error("認証が必要です。");
-  }
-
-  const { data: updatedData, error } = await supabase
-    .from("maintenance_items")
-    .update({
-      last_completed_at: new Date().toISOString(),
-    })
-    .eq("id", id)
-    .eq("user_id", user.id) // 所有者チェックを追加
-    .select()
-    .single();
-
-  if (error) {
-    console.error("Error updating maintenance item:", error);
-    throw new Error("項目の更新に失敗しました。");
-  }
-
-  return updatedData as MaintenanceItem;
+  return updateMaintenanceItem(id, {
+    last_completed_at: new Date().toISOString(),
+  });
 }
 
 /**
