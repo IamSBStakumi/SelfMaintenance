@@ -65,11 +65,12 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
           </p>
         </div>
         <button
-          className="bg-white/90 hover:bg-white text-zinc-800 font-bold py-2.5 px-5 rounded-full shadow-sm transition-colors text-sm hover:shadow-md active:scale-95 cursor-pointer"
+          className={`bg-white/90 hover:bg-white text-zinc-800 font-bold py-2.5 px-5 rounded-full shadow-sm transition-colors text-sm hover:shadow-md active:scale-95 ${updateMaintenanceItemNextCycle.isPending ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           aria-label={`${item.name}を完了にする`}
           onClick={handleCompleteTask}
+          disabled={updateMaintenanceItemNextCycle.isPending}
         >
-          完了
+          {updateMaintenanceItemNextCycle.isPending ? "処理中..." : "完了"}
         </button>
       </div>
     </Link>
