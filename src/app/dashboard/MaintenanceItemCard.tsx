@@ -1,23 +1,22 @@
 import { addDays, format, isBefore, isToday } from "date-fns";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import useMaintenanceItem from "@/hooks/useMaintenanceItem";
 import { MaintenanceItem } from "@/types/maintenance";
 import getCardColor from "@/utils/getCardColor";
 import formatNextDue from "@/utils/formatNextDue";
 
 const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
-  const router = useRouter();
+  const { updateMaintenanceItemNextCycle } = useMaintenanceItem(item.id);
 
   const lastCompleted = new Date(item.last_completed_at);
   const nextDue = addDays(lastCompleted, item.interval_days);
   const isOverdue = isBefore(nextDue, new Date()) && !isToday(nextDue);
   const color = getCardColor(item.interval_days);
 
-  const handleCompleteTask = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCompleteTask = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
-    // TODO: 完了処理を実装する
-    console.log("完了ボタンが押されました。");
+    await updateMaintenanceItemNextCycle.mutateAsync();
   };
 
   return (
