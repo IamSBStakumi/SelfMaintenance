@@ -129,4 +129,35 @@ describe("SplashScreen", () => {
     expect(mockReplace).toHaveBeenCalledWith("/dashboard");
     expect(mockReplace).toHaveBeenCalledTimes(1);
   });
+
+  test("50ms経過後にmountedステートが切り替わり、アニメーション用クラスが付与されること", () => {
+    const { container } = render(<SplashScreen />);
+
+    const animationDiv = container.querySelector(".transition-all");
+
+    // マウント直後はアニメーション前のクラスを持つ
+    expect(animationDiv).toHaveClass("opacity-0");
+
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    // 50ms経過でアニメーション後のクラスに切り替わる
+    expect(animationDiv).toHaveClass("opacity-100");
+  });
+
+  test("コンポーネントがアンマウントされた際、タイマーが適切にクリアされ予期せぬ遷移が起きないこと", () => {
+    const { unmount } = render(<SplashScreen />);
+
+    // 2.5秒経過する前にアンマウントする
+    unmount();
+
+    // 2.5秒経過させる
+    act(() => {
+      vi.advanceTimersByTime(2500);
+    });
+
+    // アンマウント時にタイマーがクリアされていれば、遷移処理は発火しない
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
 });
