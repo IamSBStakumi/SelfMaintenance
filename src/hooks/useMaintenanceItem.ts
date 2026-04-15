@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   getMaintenanceItemById,
   updateMaintenanceItem,
+  updateMaintenanceItemNextCycle,
 } from "@/services/maintenance_items";
 import { UpdateMaintenanceItem } from "@/types/maintenance";
 
@@ -37,9 +38,22 @@ const useMaintenanceItem = (id: string) => {
     },
   });
 
+  const updateMaintenanceItemNextCycleMutation = useMutation({
+    mutationFn: () => updateMaintenanceItemNextCycle(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: MAINTENANCE_ITEM_QUERY_KEY(id),
+      });
+    },
+    onError: () => {
+      console.error("メンテナンス項目の更新に失敗しました。");
+    },
+  });
+
   return {
     fetchMaintenanceItem,
     updateMaintenanceItem: updateMaintenanceItemMutation,
+    updateMaintenanceItemNextCycle: updateMaintenanceItemNextCycleMutation,
   };
 };
 
