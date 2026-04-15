@@ -10,8 +10,12 @@ const TaskContent = ({ taskData }: Props) => {
   const { updateMaintenanceItem } = useMaintenanceItem(taskData.id);
 
   const handleUpdateTask = async (data: TaskFormValues) => {
-    // TODO: タスク更新処理を実装する
-    await updateMaintenanceItem.mutateAsync(data);
+    const payload = {
+      ...data,
+      icon: data.icon?.trim() ? data.icon : null,
+      memo: data.memo?.trim() ? data.memo : null,
+    };
+    await updateMaintenanceItem.mutateAsync(payload);
   };
 
   const defaultFormValues: TaskFormValues = {
