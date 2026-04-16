@@ -19,7 +19,7 @@ CREATE POLICY "Users can insert their own logs" ON public.maintenance_logs
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update their own logs" ON public.maintenance_logs
-  FOR UPDATE USING (auth.uid() = user_id);
+  FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete their own logs" ON public.maintenance_logs
   FOR DELETE USING (auth.uid() = user_id);
