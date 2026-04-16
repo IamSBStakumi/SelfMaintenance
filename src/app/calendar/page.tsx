@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Calendar from "@/components/Calendar/Calendar";
+import Calendar from "@/components/Calendar";
 import Header from "@/components/Header";
 import { startOfMonth, endOfMonth, isSameDay, format } from "date-fns";
 import { ja } from "date-fns/locale";
