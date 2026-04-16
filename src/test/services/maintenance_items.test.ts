@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   getMaintenanceItems,
   getMaintenanceItemById,
@@ -54,6 +54,10 @@ describe("src/services/maintenance_items", () => {
       data: { user: { id: "test-user-id" } },
       error: null,
     });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   /**
@@ -238,8 +242,6 @@ describe("src/services/maintenance_items", () => {
         last_completed_at: mockNow.toISOString(),
       });
       expect(result).toEqual(mockUpdatedData);
-
-      vi.useRealTimers();
     });
   });
 
