@@ -23,3 +23,7 @@ CREATE POLICY "Users can update their own logs" ON public.maintenance_logs
 
 CREATE POLICY "Users can delete their own logs" ON public.maintenance_logs
   FOR DELETE USING (auth.uid() = user_id);
+
+-- 4. パフォーマンス向上・検索最適化のためのインデックス作成
+CREATE INDEX idx_maintenance_logs_user_id_completed_at ON public.maintenance_logs (user_id, completed_at DESC);
+CREATE INDEX idx_maintenance_logs_item_id ON public.maintenance_logs (item_id);
