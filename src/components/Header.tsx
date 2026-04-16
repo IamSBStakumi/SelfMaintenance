@@ -29,7 +29,7 @@ const Header = () => {
           <li>
             <Link
               href="/dashboard"
-              className={`block px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${getNavLinkClass("/dashboard")}`}
+              className={`${getNavLinkClass("/dashboard")}`}
             >
               ダッシュボード
             </Link>
@@ -37,7 +37,7 @@ const Header = () => {
           <li>
             <Link
               href="/calendar"
-              className={`block px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${getNavLinkClass("/calendar")}`}
+              className={`${getNavLinkClass("/calendar")}`}
             >
               カレンダー
             </Link>
