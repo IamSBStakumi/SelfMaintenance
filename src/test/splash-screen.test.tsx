@@ -146,15 +146,16 @@ describe("SplashScreen", () => {
     expect(animationDiv).toHaveClass("opacity-100");
   });
 
-  test("コンポーネントがアンマウントされた際、タイマーが適切にクリアされ予期せぬ遷移が起きないこと", () => {
+  test("コンポーネントがアンマウントされた際、タイマーが適切にクリアされ予期せぬ遷移が起きないこと", async () => {
     const { unmount } = render(<SplashScreen />);
 
     // 2.5秒経過する前にアンマウントする
     unmount();
 
     // 2.5秒経過させる
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(2500);
+      await Promise.resolve();
     });
 
     // アンマウント時にタイマーがクリアされていれば、遷移処理は発火しない
