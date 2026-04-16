@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Calendar from "@/components/Calendar/Calendar";
 import Header from "@/components/Header";
 import { startOfMonth, endOfMonth, isSameDay, format } from "date-fns";
@@ -26,9 +26,14 @@ export default function CalendarPage() {
     setSelectedDate(date);
   };
 
-  const selectedLogs = selectedDate
-    ? logs.filter((log) => isSameDay(new Date(log.completed_at), selectedDate))
-    : [];
+  const selectedLogs = logs.filter((log) =>
+    isSameDay(new Date(log.completed_at), selectedDate),
+  );
+
+  const itemMap = useMemo(
+    () => new Map(items.map((item) => [item.id, item])),
+    [items],
+  );
 
   return (
     <div className="min-h-screen bg-lavender p-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100">
@@ -68,7 +73,7 @@ export default function CalendarPage() {
             ) : selectedLogs.length > 0 ? (
               <div className="bg-white dark:bg-zinc-800 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-700 divide-y divide-zinc-100 dark:divide-zinc-700 overflow-hidden">
                 {selectedLogs.map((log) => {
-                  const item = items.find((i) => i.id === log.item_id);
+                  const item = itemMap.get(log.item_id);
                   return (
                     <div
                       key={log.id}
