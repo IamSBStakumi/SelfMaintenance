@@ -16,3 +16,17 @@ export type InsertMaintenanceItem = Omit<
 >;
 
 export type UpdateMaintenanceItem = Partial<InsertMaintenanceItem>;
+
+export interface MaintenanceLog {
+  id: string;
+  item_id: string;
+  user_id: string;
+  completed_at: string;
+  notes: string | null;
+  created_at: string;
+}
+
+export type InsertMaintenanceLog = Omit<
+  MaintenanceLog,
+  "id" | "user_id" | "created_at"
+>;
