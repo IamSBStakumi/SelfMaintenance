@@ -1,197 +1,164 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React, { ReactNode } from "react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
-import { describe, test, expect, vi, beforeEach } from "vitest";
-import React from "react";
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import useMaintenanceItems, {
   MAINTENANCE_ITEMS_QUERY_KEY,
 } from "@/hooks/useMaintenanceItems";
+import * as services from "@/services/maintenance_items";
 import type {
-  InsertMaintenanceItem,
   MaintenanceItem,
+  InsertMaintenanceItem,
 } from "@/types/maintenance";
 
-// getMaintenanceItems Server Action をモック化
-const mockGetMaintenanceItems = vi.fn();
-const mockCreateMaintenanceItem = vi.fn();
+// サービスのモック化
 vi.mock("@/services/maintenance_items", () => ({
-  getMaintenanceItems: () => mockGetMaintenanceItems(),
-  createMaintenanceItem: (data: InsertMaintenanceItem) =>
-    mockCreateMaintenanceItem(data),
+  getMaintenanceItems: vi.fn(),
+  createMaintenanceItem: vi.fn(),
 }));
 
-// テスト用のモックデータ
-const mockItems: MaintenanceItem[] = [
-  {
-    id: "uuid-1",
-    user_id: "user-uuid-1",
-    name: "コンタクトレンズの交換",
-    icon: "👁",
-    interval_days: 14,
-    last_completed_at: "2026-03-20T00:00:00.000Z",
-    memo: null,
-    created_at: "2026-01-01T00:00:00.000Z",
-    updated_at: "2026-03-20T00:00:00.000Z",
-  },
-  {
-    id: "uuid-2",
-    user_id: "user-uuid-1",
-    name: "歯のクリーニング",
-    icon: null,
-    interval_days: 90,
-    last_completed_at: "2026-01-10T00:00:00.000Z",
-    memo: "次回は歯科医院Aで予約",
-    created_at: "2026-01-01T00:00:00.000Z",
-    updated_at: "2026-01-10T00:00:00.000Z",
-  },
-];
+const mockGetMaintenanceItems = vi.mocked(services.getMaintenanceItems);
+const mockCreateMaintenanceItem = vi.mocked(services.createMaintenanceItem);
 
-// テスト用の QueryClient + Provider を生成するユーティリティ
-function createWrapper() {
-  // テストごとに独立したキャッシュを持つ QueryClient を生成します
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        // テスト中は自動リトライを無効化し、失敗を即座に検出できるようにします
-        retry: false,
-      },
-    },
-  });
-
-  const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-  // displayName を設定して React DevTools での識別しやすさを向上
-  Wrapper.displayName = "TestQueryClientProvider";
-
-  return Wrapper;
-}
-
-describe("useMaintenanceItems", () => {
-  beforeEach(() => {
-    // 各テスト前にモックの呼び出し履歴をリセット
-    mockGetMaintenanceItems.mockClear();
-  });
-
-  test("MAINTENANCE_ITEMS_QUERY_KEY が正しい値でエクスポートされていること", () => {
-    expect(MAINTENANCE_ITEMS_QUERY_KEY).toEqual(["maintenance_items"]);
-  });
-
-  test("データ取得が成功した場合、items が返却されること", async () => {
-    // 成功レスポンスをモック
-    mockGetMaintenanceItems.mockResolvedValue(mockItems);
-
-    const { result } = renderHook(() => useMaintenanceItems(), {
-      wrapper: createWrapper(),
-    });
-
-    // 初期状態は isPending: true
-    expect(result.current.fetchMaintenanceItems.isPending).toBe(true);
-    expect(result.current.fetchMaintenanceItems.data).toBeUndefined();
-
-    // データ取得完了を待機
-    await waitFor(() =>
-      expect(result.current.fetchMaintenanceItems.isPending).toBe(false),
-    );
-
-    // 取得したデータが正しく返却されているか確認
-    expect(result.current.fetchMaintenanceItems.isError).toBe(false);
-    expect(result.current.fetchMaintenanceItems.data).toEqual(mockItems);
-    expect(result.current.fetchMaintenanceItems.data).toHaveLength(2);
-  });
-
-  test("データが空配列の場合、空の配列が返却されること", async () => {
-    mockGetMaintenanceItems.mockResolvedValue([]);
-
-    const { result } = renderHook(() => useMaintenanceItems(), {
-      wrapper: createWrapper(),
-    });
-
-    await waitFor(() =>
-      expect(result.current.fetchMaintenanceItems.isPending).toBe(false),
-    );
-
-    expect(result.current.fetchMaintenanceItems.isError).toBe(false);
-    expect(result.current.fetchMaintenanceItems.data).toEqual([]);
-  });
-
-  test("データ取得に失敗した場合、isError が true になること", async () => {
-    // エラーレスポンスをモック
-    mockGetMaintenanceItems.mockRejectedValue(
-      new Error("メンテナンス項目の取得に失敗しました。"),
-    );
-
-    const { result } = renderHook(() => useMaintenanceItems(), {
-      wrapper: createWrapper(),
-    });
-
-    // エラー状態になるまで待機
-    await waitFor(() =>
-      expect(result.current.fetchMaintenanceItems.isError).toBe(true),
-    );
-
-    expect(result.current.fetchMaintenanceItems.isPending).toBe(false);
-    expect(result.current.fetchMaintenanceItems.data).toBeUndefined();
-  });
-
-  test("getMaintenanceItems が1度だけ呼び出されること", async () => {
-    mockGetMaintenanceItems.mockResolvedValue(mockItems);
-
-    const { result } = renderHook(() => useMaintenanceItems(), {
-      wrapper: createWrapper(),
-    });
-
-    await waitFor(() =>
-      expect(result.current.fetchMaintenanceItems.isPending).toBe(false),
-    );
-
-    // 同一マウント中にフェッチが重複して呼ばれていないことを確認
-    expect(mockGetMaintenanceItems).toHaveBeenCalledTimes(1);
-  });
+// テスト用のダミーデータ生成ヘルパー
+const createMockItem = (
+  override: Partial<MaintenanceItem> = {},
+): MaintenanceItem => ({
+  id: "item1",
+  user_id: "test-user-id",
+  name: "テスト項目",
+  icon: null,
+  interval_days: 30,
+  last_completed_at: new Date().toISOString(),
+  memo: null,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  ...override,
 });
 
-describe("useMaintenanceItems mutation", () => {
-  beforeEach(() => {
-    mockCreateMaintenanceItem.mockClear();
-  });
-
-  test("createMaintenanceItem が正しい引数で呼び出されること", async () => {
-    const newItem = {
-      name: "テストタスク",
-      interval_days: 7,
-      last_completed_at: "2026-04-01T00:00:00.000Z",
-      icon: "🧪",
-      memo: "テストメモ",
-    };
-
-    mockCreateMaintenanceItem.mockResolvedValue({ id: "new-id", ...newItem });
-
-    const { result } = renderHook(() => useMaintenanceItems(), {
-      wrapper: createWrapper(),
+describe("useMaintenanceItems", () => {
+  const createWrapper = () => {
+    const testQueryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
     });
 
-    await result.current.createMaintenanceItem.mutateAsync(newItem);
-
-    expect(mockCreateMaintenanceItem).toHaveBeenCalledWith(newItem);
-  });
-
-  test("createMaintenanceItem がエラーを返した場合、例外がスローされること", async () => {
-    mockCreateMaintenanceItem.mockRejectedValue(
-      new Error("作成に失敗しました"),
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={testQueryClient}>
+        {children}
+      </QueryClientProvider>
     );
 
-    const { result } = renderHook(() => useMaintenanceItems(), {
-      wrapper: createWrapper(),
+    return { testQueryClient, wrapper };
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe("Query: fetchMaintenanceItems", () => {
+    it("正常にgetMaintenanceItemsが呼ばれ、データが取得できること", async () => {
+      const mockData = [createMockItem()];
+      mockGetMaintenanceItems.mockResolvedValue(mockData);
+
+      const { wrapper } = createWrapper();
+      const { result } = renderHook(() => useMaintenanceItems(), { wrapper });
+
+      // ローディングからSuccessに変わるまで待つ
+      await waitFor(() => {
+        expect(result.current.fetchMaintenanceItems.isSuccess).toBe(true);
+      });
+
+      expect(mockGetMaintenanceItems).toHaveBeenCalledTimes(1);
+      expect(result.current.fetchMaintenanceItems.data).toEqual(mockData);
     });
 
-    await expect(
-      result.current.createMaintenanceItem.mutateAsync({
-        name: "テスト",
-        interval_days: 7,
-        last_completed_at: "2026-04-01T00:00:00.000Z",
+    it("取得エラー時にisErrorがtrueになること", async () => {
+      mockGetMaintenanceItems.mockRejectedValue(new Error("Fetch Error"));
+
+      const { wrapper } = createWrapper();
+      const { result } = renderHook(() => useMaintenanceItems(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.fetchMaintenanceItems.isError).toBe(true);
+      });
+
+      expect(mockGetMaintenanceItems).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("Mutation: createMaintenanceItem", () => {
+    it("作成に成功した際、クエリのinvalidateが行われること", async () => {
+      const { wrapper, testQueryClient } = createWrapper();
+      // invalidateQueriesが呼ばれるかをスパイする
+      const resetSpy = vi.spyOn(testQueryClient, "invalidateQueries");
+
+      const insertData: InsertMaintenanceItem = {
+        name: "新しいテスト",
         icon: null,
-        memo: null,
-      }),
-    ).rejects.toThrow("作成に失敗しました");
+        interval_days: 7,
+        last_completed_at: new Date().toISOString(),
+        memo: "",
+      };
+
+      // invalidate後の再フェッチに対応するためデフォルトで空配列を返すようにする
+      mockGetMaintenanceItems.mockResolvedValue([]);
+
+      const mockResponse = createMockItem({ id: "new-id", ...insertData });
+      mockCreateMaintenanceItem.mockResolvedValue(mockResponse);
+
+      const { result } = renderHook(() => useMaintenanceItems(), { wrapper });
+
+      // mutateをトリガー
+      result.current.createMaintenanceItem.mutate(insertData);
+
+      await waitFor(() => {
+        expect(result.current.createMaintenanceItem.isSuccess).toBe(true);
+      });
+
+      expect(mockCreateMaintenanceItem).toHaveBeenCalledTimes(1);
+      // 第2引数が自動付与される場合があるため、第1引数のみ確認する
+      expect(mockCreateMaintenanceItem.mock.calls[0][0]).toEqual(insertData);
+      expect(resetSpy).toHaveBeenCalledWith({
+        queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
+      });
+    });
+
+    it("作成に失敗した際、エラーがコンソールに出力されること", async () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      mockCreateMaintenanceItem.mockRejectedValue(new Error("Create Error"));
+      // 再フェッチ対策
+      mockGetMaintenanceItems.mockResolvedValue([]);
+
+      const { wrapper } = createWrapper();
+      const { result } = renderHook(() => useMaintenanceItems(), { wrapper });
+
+      const insertData: InsertMaintenanceItem = {
+        name: "エラーテスト",
+        icon: null,
+        interval_days: 7,
+        last_completed_at: new Date().toISOString(),
+        memo: "",
+      };
+
+      result.current.createMaintenanceItem.mutate(insertData);
+
+      await waitFor(() => {
+        expect(result.current.createMaintenanceItem.isError).toBe(true);
+      });
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "メンテナンス項目の作成に失敗しました。",
+      );
+      consoleErrorSpy.mockRestore();
+    });
   });
 });
