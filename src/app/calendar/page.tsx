@@ -20,7 +20,10 @@ export default function CalendarPage() {
     endDateStr,
   );
   const { fetchMaintenanceItems } = useMaintenanceItems();
-  const items = fetchMaintenanceItems.data || [];
+  const items = useMemo(
+    () => fetchMaintenanceItems.data || [],
+    [fetchMaintenanceItems.data],
+  );
 
   const handleDayClick = (date: Date) => {
     setSelectedDate(date);
