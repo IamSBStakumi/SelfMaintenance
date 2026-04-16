@@ -6,6 +6,13 @@ import { usePathname } from "next/navigation";
 const Header = () => {
   const pathname = usePathname();
 
+  const getNavLinkClass = (href: string) =>
+    `block px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${
+      pathname === href
+        ? "bg-zinc-800 text-white shadow-md dark:bg-zinc-200 dark:text-zinc-900"
+        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+    }`;
+
   return (
     <header className="max-w-4xl mx-auto mb-8 mt-8 w-full px-4 text-center">
       <div className="flex flex-col items-center">
@@ -22,11 +29,7 @@ const Header = () => {
           <li>
             <Link
               href="/dashboard"
-              className={`block px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${
-                pathname === "/dashboard"
-                  ? "bg-zinc-800 text-white shadow-md dark:bg-zinc-200 dark:text-zinc-900"
-                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700"
-              }`}
+              className={`block px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${getNavLinkClass("/dashboard")}`}
             >
               ダッシュボード
             </Link>
@@ -34,11 +37,7 @@ const Header = () => {
           <li>
             <Link
               href="/calendar"
-              className={`block px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${
-                pathname === "/calendar"
-                  ? "bg-zinc-800 text-white shadow-md dark:bg-zinc-200 dark:text-zinc-900"
-                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700"
-              }`}
+              className={`block px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${getNavLinkClass("/calendar")}`}
             >
               カレンダー
             </Link>
