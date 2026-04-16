@@ -5,6 +5,7 @@ import {
   InsertMaintenanceItem,
   MaintenanceItem,
   UpdateMaintenanceItem,
+  MaintenanceLog,
 } from "@/types/maintenance";
 
 const normalizeAndValidateId = (id: string) => {
@@ -154,9 +155,66 @@ export async function updateMaintenanceItem(
 export async function updateMaintenanceItemNextCycle(
   id: string,
 ): Promise<MaintenanceItem> {
-  return updateMaintenanceItem(id, {
-    last_completed_at: new Date().toISOString(),
+  const normalizedId = normalizeAndValidateId(id);
+  const now = new Date().toISOString();
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error("認証が必要です。");
+  }
+
+  const updatedItem = await updateMaintenanceItem(normalizedId, {
+    last_completed_at: now,
   });
+
+  const { error: logError } = await supabase.from("maintenance_logs").insert({
+    item_id: normalizedId,
+    user_id: user.id,
+    completed_at: now,
+  });
+
+  if (logError) {
+    console.error("Error creating maintenance log:", logError);
+  }
+
+  return updatedItem;
+}
+
+/**
+ * 指定した期間内のメンテナンスログを取得します。
+ */
+export async function getMaintenanceLogs(
+  startDate: string,
+  endDate: string,
+): Promise<MaintenanceLog[]> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error("認証に失敗しました。ログインしているか確認してください。");
+  }
+
+  const { data, error } = await supabase
+    .from("maintenance_logs")
+    .select("*")
+    .eq("user_id", user.id)
+    .gte("completed_at", startDate)
+    .lte("completed_at", endDate)
+    .order("completed_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching maintenance logs:", error);
+    throw new Error("メンテナンス履歴の取得に失敗しました。");
+  }
+
+  return (data as MaintenanceLog[]) || [];
 }
 
 /**
