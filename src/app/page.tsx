@@ -63,6 +63,7 @@ export default function SplashScreen() {
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-4"
         }`}
+        data-testid="splash-screen-content"
       >
         {/* アプリロゴの代替モック */}
         <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-linear-to-br from-indigo-500 to-purple-600 shadow-2xl shadow-indigo-500/20">

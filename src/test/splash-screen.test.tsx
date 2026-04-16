@@ -131,9 +131,9 @@ describe("SplashScreen", () => {
   });
 
   test("50ms経過後にmountedステートが切り替わり、アニメーション用クラスが付与されること", () => {
-    const { container } = render(<SplashScreen />);
+    render(<SplashScreen />);
 
-    const animationDiv = container.querySelector(".transition-all");
+    const animationDiv = screen.getByTestId("splash-screen-content");
 
     // マウント直後はアニメーション前のクラスを持つ
     expect(animationDiv).toHaveClass("opacity-0");
