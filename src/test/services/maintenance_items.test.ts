@@ -129,6 +129,18 @@ describe("src/services/maintenance_items", () => {
       });
       expect(result).toEqual(mockData);
     });
+
+    it("DB取得時にエラーが発生した場合、エラーがスローされること", async () => {
+      const chain = createMockChain<MaintenanceItem[]>({
+        data: null,
+        error: new Error("DB Error"),
+      });
+      mockFrom.mockReturnValue(chain);
+
+      await expect(getMaintenanceItems()).rejects.toThrow(
+        "メンテナンス項目の取得に失敗しました。",
+      );
+    });
   });
 
   describe("getMaintenanceItemById", () => {
@@ -154,6 +166,18 @@ describe("src/services/maintenance_items", () => {
       expect(chain.eq).toHaveBeenCalledWith("user_id", "test-user-id");
       expect(chain.single).toHaveBeenCalled();
       expect(result).toEqual(mockData);
+    });
+
+    it("DB取得時にエラーが発生した場合、エラーがスローされること", async () => {
+      const chain = createMockChain<MaintenanceItem>({
+        data: null,
+        error: new Error("DB Error"),
+      });
+      mockFrom.mockReturnValue(chain);
+
+      await expect(getMaintenanceItemById("item1")).rejects.toThrow(
+        "メンテナンス項目の取得に失敗しました。",
+      );
     });
   });
 
@@ -198,6 +222,18 @@ describe("src/services/maintenance_items", () => {
       expect(chain.single).toHaveBeenCalled();
       expect(result).toEqual(createdData);
     });
+
+    it("DB作成時にエラーが発生した場合、エラーがスローされること", async () => {
+      const chain = createMockChain<MaintenanceItem>({
+        data: null,
+        error: new Error("DB Error"),
+      });
+      mockFrom.mockReturnValue(chain);
+
+      await expect(createMaintenanceItem(validInsertData)).rejects.toThrow(
+        "項目の作成に失敗しました。",
+      );
+    });
   });
 
   describe("updateMaintenanceItem", () => {
@@ -218,6 +254,18 @@ describe("src/services/maintenance_items", () => {
       expect(chain.select).toHaveBeenCalled();
       expect(chain.single).toHaveBeenCalled();
       expect(result).toEqual(mockUpdatedData);
+    });
+
+    it("DB更新時にエラーが発生した場合、エラーがスローされること", async () => {
+      const chain = createMockChain<MaintenanceItem>({
+        data: null,
+        error: new Error("DB Error"),
+      });
+      mockFrom.mockReturnValue(chain);
+
+      await expect(
+        updateMaintenanceItem("item1", { name: "更新エラー" }),
+      ).rejects.toThrow("項目の更新に失敗しました。");
     });
   });
 
@@ -257,6 +305,18 @@ describe("src/services/maintenance_items", () => {
       expect(chain.delete).toHaveBeenCalled();
       expect(chain.eq).toHaveBeenCalledWith("id", "item1");
       expect(chain.eq).toHaveBeenCalledWith("user_id", "test-user-id");
+    });
+
+    it("DB削除時にエラーが発生した場合、エラーがスローされること", async () => {
+      const chain = createMockChain<null>({
+        data: null,
+        error: new Error("DB Error"),
+      });
+      mockFrom.mockReturnValue(chain);
+
+      await expect(deleteMaintenanceItem("item1")).rejects.toThrow(
+        "項目の削除に失敗しました。",
+      );
     });
   });
 });
