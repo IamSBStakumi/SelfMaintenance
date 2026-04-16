@@ -299,7 +299,7 @@ describe("src/services/maintenance_items", () => {
       const chain = createMockChain<null>({ data: null, error: null });
       mockFrom.mockReturnValue(chain);
 
-      await expect(deleteMaintenanceItem("item1")).resolves.not.toThrow();
+      await deleteMaintenanceItem("item1");
 
       expect(mockFrom).toHaveBeenCalledWith("maintenance_items");
       expect(chain.delete).toHaveBeenCalled();
