@@ -29,10 +29,10 @@ const createMockItem = (
   name: "テスト項目",
   icon: null,
   interval_days: 30,
-  last_completed_at: new Date().toISOString(),
+  last_completed_at: "2024-01-01T00:00:00.000Z",
   memo: null,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
+  created_at: "2024-01-01T00:00:00.000Z",
+  updated_at: "2024-01-01T00:00:00.000Z",
   ...override,
 });
 
