@@ -11,5 +11,7 @@ export const useMaintenanceLogs = (startDate: string, endDate: string) => {
     queryKey: MAINTENANCE_LOGS_QUERY_KEY(startDate, endDate),
     queryFn: () => getMaintenanceLogs(startDate, endDate),
     enabled: !!startDate && !!endDate,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
   });
 };
