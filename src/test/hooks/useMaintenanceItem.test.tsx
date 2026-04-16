@@ -47,6 +47,8 @@ const createMockItem = (
 });
 
 describe("useMaintenanceItem", () => {
+  const queryClients: QueryClient[] = [];
+
   const createWrapper = () => {
     const testQueryClient = new QueryClient({
       defaultOptions: {
@@ -54,6 +56,7 @@ describe("useMaintenanceItem", () => {
         mutations: { retry: false },
       },
     });
+    queryClients.push(testQueryClient);
 
     const wrapper = ({ children }: { children: ReactNode }) => (
       <QueryClientProvider client={testQueryClient}>
@@ -65,10 +68,12 @@ describe("useMaintenanceItem", () => {
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   afterEach(() => {
+    queryClients.forEach((client) => client.clear());
+    queryClients.length = 0;
     vi.restoreAllMocks();
   });
 
