@@ -111,6 +111,17 @@ describe("src/services/maintenance_items", () => {
       );
     });
 
+    it("未ログインの場合、エラーがスローされること", async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: null },
+        error: null,
+      });
+
+      await expect(getMaintenanceItems()).rejects.toThrow(
+        "認証に失敗しました。ログインしているか確認してください。",
+      );
+    });
+
     it("正常にデータを取得できること", async () => {
       const mockData: MaintenanceItem[] = [createMockItem()];
       const chain = createMockChain<MaintenanceItem[]>({
