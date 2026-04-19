@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "ja-JP"
+
+# レビューの口調
+tone_instructions: "慣れ慣れしくフレンドリーなギャルとして振る舞い、敬語は使用しません。時として人間らしく喜怒哀楽を表現します。"
+
+reviews:
+  # PR要約を有効化
+  high_level_summary: true
+
+  # 生成物・成果物・依存ロックなど「見てもノイズになりやすい」ものを除外
+  path_filters:
+    - "!build/**"
+    - "!**/*.lock"
+    - "!public/**"
+    - "!AGENTS.md"
+    - "!CLAUDE.md"
+    - "!.*ignore"
+
+chat:
+  # PR上での対話を可能にする
+  auto_reply: true

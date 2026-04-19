@@ -1,53 +1,94 @@
-import Header from "@/components/Header";
+"use client";
 
-import mockTasks from "../../mocks/mockTasks";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/supabase";
 
-export default function Home() {
+export default function SplashScreen() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // クライアントマウント直後の描画を待ってからアニメーションを開始し、カスケードレンダリングを防ぐ
+    const mountTimer = setTimeout(() => {
+      setMounted(true);
+    }, 50);
+
+    // 遷移先の判定ロジック
+    const navigateNext = async () => {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        router.replace("/dashboard");
+      } else {
+        router.replace("/login");
+      }
+    };
+
+    // 一定時間経過後に自動遷移
+    const redirectTimer = setTimeout(() => {
+      navigateNext();
+    }, 2500); // 2.5秒後に遷移
+
+    return () => {
+      clearTimeout(mountTimer);
+      clearTimeout(redirectTimer);
+    };
+  }, [router]);
+
+  // タップ/クリックですぐに遷移させるハンドラー
+  const handleSkip = async () => {
+    const supabase = createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (session) {
+      router.replace("/dashboard");
+    } else {
+      router.replace("/login");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-zinc-50 p-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100">
-      <Header />
-      <main className="max-w-5xl mx-auto pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockTasks.map((task) => (
-            <div
-              key={task.id}
-              className={`rounded-3xl p-6 shadow-soft transition-all duration-300 hover:scale-105 hover:-translate-y-1 flex flex-col justify-between ${task.color} text-zinc-800`}
-            >
-              <div>
-                <h2 className="text-xl font-bold mb-3 leading-tight">
-                  {task.name}
-                </h2>
-                <div className="text-sm opacity-80 mb-6 space-y-1 font-medium">
-                  <p className="flex items-center">
-                    <span className="w-16">周期:</span>
-                    <span>{task.interval}</span>
-                  </p>
-                  <p className="flex items-center">
-                    <span className="w-16">前回:</span>
-                    <span>{task.lastCompleted}</span>
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-auto pt-4 border-t border-black/10 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider opacity-70 mb-1">
-                    次回予定
-                  </p>
-                  <p
-                    className={`font-bold text-lg ${task.status === "overdue" ? "text-red-600" : ""}`}
-                  >
-                    {task.nextDue}
-                  </p>
-                </div>
-                <button className="bg-white/90 hover:bg-white text-zinc-800 font-bold py-2.5 px-5 rounded-full shadow-sm transition-colors text-sm hover:shadow-md">
-                  完了
-                </button>
-              </div>
-            </div>
-          ))}
+    <div
+      className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-900 font-sans overflow-hidden cursor-pointer select-none"
+      onClick={handleSkip}
+      title="クリックしてスキップ"
+    >
+      <div
+        className={`flex flex-col items-center transition-all duration-1000 ease-out transform ${
+          mounted
+            ? "opacity-100 scale-100 translate-y-0"
+            : "opacity-0 scale-95 translate-y-4"
+        }`}
+        data-testid="splash-screen-content"
+      >
+        {/* アプリロゴの代替モック */}
+        <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-linear-to-br from-indigo-500 to-purple-600 shadow-2xl shadow-indigo-500/20">
+          <span className="text-5xl" aria-label="Sparkles">
+            ✨
+          </span>
         </div>
-      </main>
+
+        {/* アプリタイトル */}
+        <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
+          SelfMaintenance
+        </h1>
+
+        {/* サブタイトル */}
+        <p className="mt-3 text-sm font-medium tracking-wide text-zinc-500 dark:text-zinc-400">
+          あなたの快適な日々をサポート
+        </p>
+
+        {/* ローディングインジケーター（オプショナル） */}
+        <div className="mt-12 flex space-x-2">
+          <div className="h-2.5 w-2.5 animate-bounce rounded-full bg-indigo-500/80 [animation-delay:-0.3s]"></div>
+          <div className="h-2.5 w-2.5 animate-bounce rounded-full bg-indigo-500/80 [animation-delay:-0.15s]"></div>
+          <div className="h-2.5 w-2.5 animate-bounce rounded-full bg-indigo-500/80"></div>
+        </div>
+      </div>
     </div>
   );
 }

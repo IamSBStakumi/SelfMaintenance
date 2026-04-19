@@ -16,7 +16,14 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
-  ...storybook.configs["flat/recommended"]
+  ...storybook.configs["flat/recommended"],
+  {
+    settings: {
+      react: {
+        version: "19.2.5",
+      },
+    },
+  },
 ]);
 
 export default eslintConfig;
