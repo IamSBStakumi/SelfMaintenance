@@ -1,4 +1,4 @@
-# ベースイメージとして軽量な alpine を使用し、Node.js 22を指定
+# ベースイメージとして軽量な alpine を使用し、Node.js 24.15.0を指定
 FROM node:24.15.0-alpine
 
 # Next.js等のネイティブモジュール互換性のために libc6-compat をインストール
