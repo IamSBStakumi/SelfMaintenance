@@ -1,0 +1,19 @@
+# Next.jsのビルドキャッシュやnode_modulesを無視
+node_modules
+.next
+
+# Docker関連
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Git
+.git
+
+# ドキュメント類
+.anti_docs
+
+# AI
+.gemini
+AGENTS.md
+CLAUDE.md
