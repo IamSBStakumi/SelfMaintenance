@@ -116,7 +116,7 @@ yarn dev
 yarn test
 
 # E2Eテスト(実装予定)
-yarn test:e2e
+未実装(package.jsonに実行コマンドを記載する予定)
 
 # カバレッジレポート
 yarn test:coverage
