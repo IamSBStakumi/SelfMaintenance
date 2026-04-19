@@ -94,7 +94,7 @@ docker compose up -d --build
 ```
 
 - アプリケーション: [http://localhost:3000](http://localhost:3000)
-- **注意**: ホスト側で Supabase が起動している必要があります (`npx supabase start`)。
+- **注意**: ホスト側で Supabase が起動している必要があります (`yarn supabase start`)。
 - `network_mode: host` を使用しているため、設定情報の変更なしでローカルの Supabase と連携可能です。
 
 ##### B. ローカル環境で直接起動する場合
