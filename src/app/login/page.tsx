@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/supabase";
 import Button from "@/components/ui/Button";
 import GoogleIcon from "@/components/icons/GoogleIcon";
@@ -33,19 +34,19 @@ export default function LoginPage() {
         <div className="mt-8 text-center text-xs text-zinc-500 dark:text-zinc-400">
           <p>ログインまたは登録することで、</p>
           <p className="mt-1">
-            <a
+            <Link
               href="#"
               className="underline hover:text-zinc-700 dark:hover:text-zinc-300"
             >
               利用規約
-            </a>
+            </Link>
             と
-            <a
+            <Link
               href="#"
               className="underline hover:text-zinc-700 dark:hover:text-zinc-300"
             >
               プライバシーポリシー
-            </a>
+            </Link>
             に同意したものとみなされます。
           </p>
         </div>
