@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { toast } from "react-toastify";
 import { createClient } from "@/lib/supabase/supabase";
 import Button from "@/components/ui/Button";
 import GoogleIcon from "@/components/icons/GoogleIcon";
@@ -18,9 +19,11 @@ export default function LoginPage() {
       });
       if (error) {
         console.error("Error signing in with Google:", error);
+        toast.error("Google認証に失敗しました");
       }
     } catch (error) {
       console.error("Unexpected error:", error);
+      toast.error("予期せぬエラーが発生しました");
     }
   };
 
