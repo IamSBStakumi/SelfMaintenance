@@ -97,7 +97,9 @@ interface UserResponse {}
 ### コンポーネント
 
 ```tsx
-export function UserCard() {}
+const UserCard = () => {};
+
+export default UserCard;
 ```
 
 - PascalCase
