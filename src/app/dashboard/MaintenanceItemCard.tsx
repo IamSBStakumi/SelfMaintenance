@@ -1,5 +1,6 @@
 import { addDays, format, isBefore, isToday } from "date-fns";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import useMaintenanceItem from "@/hooks/useMaintenanceItem";
 import { MaintenanceItem } from "@/types/maintenance";
 import getCardColor from "@/utils/getCardColor";
@@ -22,8 +23,8 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
     try {
       await updateMaintenanceItemNextCycle.mutateAsync();
     } catch (error) {
-      // TODO: ユーザー向けの通知ロジックを実装する
       console.error("タスクの完了に失敗しました。", error);
+      toast.error("タスクの完了に失敗しました。");
     }
   };
 
