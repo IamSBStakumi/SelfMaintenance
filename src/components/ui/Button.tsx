@@ -1,6 +1,4 @@
-type Props = React.ComponentProps<"button"> & {
-  children: React.ReactNode;
-};
+type Props = React.ComponentProps<"button">;
 
 const Button = ({ onClick, children, ...props }: Props) => {
   return (
