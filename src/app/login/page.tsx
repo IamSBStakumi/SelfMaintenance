@@ -44,6 +44,7 @@ export default function LoginPage() {
         <div className="mt-8 text-center text-xs text-zinc-500 dark:text-zinc-400">
           <p>ログインまたは登録することで、</p>
           <p className="mt-1">
+            {/* TODO: 利用規約ページを作成後に href="/terms" に変更 */}
             <Link
               href="#"
               className="underline hover:text-zinc-700 dark:hover:text-zinc-300"
@@ -51,6 +52,7 @@ export default function LoginPage() {
               利用規約
             </Link>
             と
+            {/* TODO: プライバシーポリシーページを作成後に href="/privacy" に変更 */}
             <Link
               href="#"
               className="underline hover:text-zinc-700 dark:hover:text-zinc-300"
