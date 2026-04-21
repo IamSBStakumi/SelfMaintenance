@@ -8,7 +8,7 @@ const ToastProvider = ({ children }: { children: React.ReactNode }) => {
     <>
       {children}
       <ToastContainer
-        toastClassName={"rounded-lg min-w-96 text-center"}
+        toastClassName={"rounded-lg w-[calc(100vw-2rem)] max-w-md text-center"}
         position="bottom-center"
         autoClose={3000}
         hideProgressBar={false}
