@@ -50,7 +50,7 @@ export default function Calendar({
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={prevMonth}
-          className="p-2 hover:bg-zinc-100 rounded-full transition-colors active:scale-95"
+          className="p-2 hover:bg-zinc-100 rounded-full transition-colors active:scale-95 cursor-pointer"
           aria-label="前の月"
         >
           <svg
@@ -72,7 +72,7 @@ export default function Calendar({
         </span>
         <button
           onClick={nextMonth}
-          className="p-2 hover:bg-zinc-100 rounded-full transition-colors active:scale-95"
+          className="p-2 hover:bg-zinc-100 rounded-full transition-colors active:scale-95 cursor-pointer"
           aria-label="次の月"
         >
           <svg

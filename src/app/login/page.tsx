@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { toast } from "react-toastify";
 import { createClient } from "@/lib/supabase/supabase";
 import Button from "@/components/ui/Button";
 import GoogleIcon from "@/components/icons/GoogleIcon";
@@ -7,13 +9,22 @@ import LoginHeader from "./LoginHeader";
 
 export default function LoginPage() {
   const handleGoogleLogin = async () => {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) {
+        console.error("Error signing in with Google:", error);
+        toast.error("Google認証に失敗しました");
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("予期せぬエラーが発生しました");
+    }
   };
 
   return (
@@ -33,19 +44,21 @@ export default function LoginPage() {
         <div className="mt-8 text-center text-xs text-zinc-500 dark:text-zinc-400">
           <p>ログインまたは登録することで、</p>
           <p className="mt-1">
-            <a
+            {/* TODO: 利用規約ページを作成後に href="/terms" に変更 */}
+            <Link
               href="#"
               className="underline hover:text-zinc-700 dark:hover:text-zinc-300"
             >
               利用規約
-            </a>
+            </Link>
             と
-            <a
+            {/* TODO: プライバシーポリシーページを作成後に href="/privacy" に変更 */}
+            <Link
               href="#"
               className="underline hover:text-zinc-700 dark:hover:text-zinc-300"
             >
               プライバシーポリシー
-            </a>
+            </Link>
             に同意したものとみなされます。
           </p>
         </div>
