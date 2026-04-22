@@ -1,3 +1,5 @@
+"use client";
+
 import { addDays, format, isBefore, isToday } from "date-fns";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
