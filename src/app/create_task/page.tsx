@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { parseISO, startOfDay } from "date-fns";
+import { toast } from "react-toastify";
 import useMaintenanceItems from "@/hooks/useMaintenanceItems";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
 
@@ -10,18 +11,23 @@ export default function CreateTaskPage() {
   const { createMaintenanceItem } = useMaintenanceItems();
 
   const handleCreateSubmit = async (data: TaskFormValues) => {
-    // APIへ送信する処理
-    await createMaintenanceItem.mutateAsync({
-      name: data.name,
-      icon: data.icon || null,
-      interval_days: data.interval_days,
-      last_completed_at: startOfDay(
-        parseISO(data.last_completed_at),
-      ).toISOString(),
-      memo: data.memo || null,
-    });
-    // 成功時にダッシュボードへリダイレクト
-    router.push("/dashboard");
+    try {
+      // APIへ送信する処理
+      await createMaintenanceItem.mutateAsync({
+        name: data.name,
+        icon: data.icon || null,
+        interval_days: data.interval_days,
+        last_completed_at: startOfDay(
+          parseISO(data.last_completed_at),
+        ).toISOString(),
+        memo: data.memo || null,
+      });
+      // 成功時にダッシュボードへリダイレクト
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("タスクの作成に失敗しました。", error);
+      toast.error("タスクの作成に失敗しました。");
+    }
   };
 
   const defaultFormValues: TaskFormValues = {
@@ -39,7 +45,7 @@ export default function CreateTaskPage() {
         <header className="mb-12 flex items-center justify-between mt-8">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors group"
+            className="flex items-center gap-2 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors group cursor-pointer"
           >
             <span className="text-xl group-hover:-translate-x-1 transition-transform">
               ←
