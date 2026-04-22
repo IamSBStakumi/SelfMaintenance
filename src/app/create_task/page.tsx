@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { parseISO, startOfDay } from "date-fns";
 import useMaintenanceItems from "@/hooks/useMaintenanceItems";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
+import Button from "@/components/ui/Button";
 
 export default function CreateTaskPage() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function CreateTaskPage() {
         <header className="mb-12 flex items-center justify-between mt-8">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors group"
+            className="flex items-center gap-2 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors group cursor-pointer"
           >
             <span className="text-xl group-hover:-translate-x-1 transition-transform">
               ←
