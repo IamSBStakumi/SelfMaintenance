@@ -1,6 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/proxy";
 
+const PROTECTED_ROUTES = [
+  "/dashboard",
+  "/mypage",
+  "/calendar",
+  "/create_task",
+  "/task",
+];
+
 /**
  * Next.js v16 Proxy
  * リクエスト実行前に認証状態をチェックし、必要に応じてリダイレクトを行います。
@@ -14,23 +22,16 @@ export async function proxy(request: NextRequest) {
     const { data } = await supabase.auth.getUser();
     user = data.user;
   } catch (error) {
+    // 取得失敗時は安全側に倒し、user を null として扱う（保護ルートへのアクセスをブロック）
     console.error("getUser failed: ", error);
   }
 
-  const url = request.nextUrl.clone();
-  const { pathname } = url;
+  const { pathname } = request.nextUrl;
 
   // 保護されたルートの判定
-  const protectedRoutes = [
-    "/dashboard",
-    "/mypage",
-    "/calendar",
-    "/create_task",
-    "/task",
-  ];
   const matchesRoute = (route: string) =>
     pathname === route || pathname.startsWith(`${route}/`);
-  const isProtectedRoute = protectedRoutes.some(matchesRoute);
+  const isProtectedRoute = PROTECTED_ROUTES.some(matchesRoute);
 
   // 認証関連ページの判定
   const isAuthRoute = matchesRoute("/login");
@@ -54,9 +55,7 @@ export async function proxy(request: NextRequest) {
     );
     res.response.cookies
       .getAll()
-      .forEach((cookie) =>
-        redirectResponse.cookies.set(cookie.name, cookie.value),
-      );
+      .forEach((cookie) => redirectResponse.cookies.set(cookie));
 
     return redirectResponse;
   }
