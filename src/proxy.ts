@@ -9,9 +9,13 @@ export async function proxy(request: NextRequest) {
   const { supabase, res } = createClient(request);
 
   // 現在のユーザー情報を取得
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch (error) {
+    console.error("getUser failed: ", error);
+  }
 
   const url = request.nextUrl.clone();
   const { pathname } = url;
