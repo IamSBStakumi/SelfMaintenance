@@ -70,6 +70,6 @@ export const config = {
      * - favicon.ico (ファビコン)
      * - images (パブリック画像)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|images).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|images|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|json|woff2?|ttf|eot)$).*)",
   ],
 };
