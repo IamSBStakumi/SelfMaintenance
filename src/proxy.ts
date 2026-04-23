@@ -45,7 +45,16 @@ export async function proxy(request: NextRequest) {
 
   // ログイン済みでログイン画面、またはトップ（スプラッシュ）にアクセスした場合、ダッシュボードへリダイレクト
   if (user && (isAuthRoute || pathname === "/")) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const redirectResponse = NextResponse.redirect(
+      new URL("/dashboard", request.url),
+    );
+    res.response.cookies
+      .getAll()
+      .forEach((cookie) =>
+        redirectResponse.cookies.set(cookie.name, cookie.value),
+      );
+
+    return redirectResponse;
   }
 
   return res.response;
