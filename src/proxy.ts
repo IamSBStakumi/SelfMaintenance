@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/proxy";
  * リクエスト実行前に認証状態をチェックし、必要に応じてリダイレクトを行います。
  */
 export async function proxy(request: NextRequest) {
-  const { supabase, response } = createClient(request);
+  const { supabase, res } = createClient(request);
 
   // 現在のユーザー情報を取得
   const {
@@ -33,7 +33,14 @@ export async function proxy(request: NextRequest) {
 
   // 未ログインで保護されたページにアクセスした場合、ログイン画面へリダイレクト
   if (!user && isProtectedRoute) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    const redirectResponse = NextResponse.redirect(
+      new URL("/login", request.url),
+    );
+    res.response.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value);
+    });
+
+    return redirectResponse;
   }
 
   // ログイン済みでログイン画面、またはトップ（スプラッシュ）にアクセスした場合、ダッシュボードへリダイレクト
@@ -41,7 +48,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  return response;
+  return res.response;
 }
 
 export const config = {
