@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import Header from "@/components/Header";
 import Button from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/supabase";
@@ -29,8 +30,14 @@ export default function MyPage() {
   }, [supabase]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("ログアウトに失敗しました。", error);
+      toast.error("ログアウトに失敗しました。");
+
+      return;
+    }
+    router.replace("/login");
   };
 
   if (loading) {
