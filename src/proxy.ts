@@ -28,12 +28,12 @@ export async function proxy(request: NextRequest) {
     "/create_task",
     "/task",
   ];
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route),
-  );
+  const matchesRoute = (route: string) =>
+    pathname === route || pathname.startsWith(`${route}/`);
+  const isProtectedRoute = protectedRoutes.some(matchesRoute);
 
   // 認証関連ページの判定
-  const isAuthRoute = pathname.startsWith("/login");
+  const isAuthRoute = matchesRoute("/login");
 
   // 未ログインで保護されたページにアクセスした場合、ログイン画面へリダイレクト
   if (!user && isProtectedRoute) {
@@ -41,7 +41,7 @@ export async function proxy(request: NextRequest) {
       new URL("/login", request.url),
     );
     res.response.cookies.getAll().forEach((cookie) => {
-      redirectResponse.cookies.set(cookie.name, cookie.value);
+      redirectResponse.cookies.set(cookie);
     });
 
     return redirectResponse;
