@@ -42,6 +42,11 @@ const Header = () => {
               カレンダー
             </Link>
           </li>
+          <li>
+            <Link href="/mypage" className={`${getNavLinkClass("/mypage")}`}>
+              マイページ
+            </Link>
+          </li>
         </ul>
       </nav>
     </header>
