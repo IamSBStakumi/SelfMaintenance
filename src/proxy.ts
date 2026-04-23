@@ -17,12 +17,16 @@ export async function proxy(request: NextRequest) {
   const { pathname } = url;
 
   // 保護されたルートの判定
-  const isProtectedRoute =
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/mypage") ||
-    pathname.startsWith("/calendar") ||
-    pathname.startsWith("/create_task") ||
-    pathname.startsWith("/task");
+  const protectedRoutes = [
+    "/dashboard",
+    "/mypage",
+    "/calendar",
+    "/create_task",
+    "/task",
+  ];
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
 
   // 認証関連ページの判定
   const isAuthRoute = pathname.startsWith("/login");
