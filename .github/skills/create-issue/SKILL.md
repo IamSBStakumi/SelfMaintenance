@@ -5,7 +5,7 @@ description: |
   「issueつくって」「issue書いて」「issue案つくって」などで発火。
 ---
 
-# コードレビュールール
+# Issue作成ルール
 
 このスキルは `self-maintenance` プロジェクト（Next.js v16 / React 19 / TypeScript）において、GitHub Issueとして使用するMarkdownファイルを作成する際に従うべきルールを定義します。
 
