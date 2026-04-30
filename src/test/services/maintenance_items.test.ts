@@ -323,6 +323,8 @@ describe("src/services/maintenance_items", () => {
 
       const result = await updateMaintenanceItemNextCycle("item1");
 
+      expect(mockFrom).toHaveBeenNthCalledWith(1, "maintenance_items");
+      expect(mockFrom).toHaveBeenNthCalledWith(2, "maintenance_logs");
       expect(chain.update).toHaveBeenCalledWith({
         last_completed_at: mockNow.toISOString(),
       });
@@ -354,6 +356,9 @@ describe("src/services/maintenance_items", () => {
         .mockImplementation(() => {});
 
       const result = await updateMaintenanceItemNextCycle("item1");
+
+      expect(mockFrom).toHaveBeenNthCalledWith(1, "maintenance_items");
+      expect(mockFrom).toHaveBeenNthCalledWith(2, "maintenance_logs");
 
       // ログ作成エラーは内部でのみ処理され、戻り値には影響しない
       expect(result).toEqual(mockUpdatedData);
