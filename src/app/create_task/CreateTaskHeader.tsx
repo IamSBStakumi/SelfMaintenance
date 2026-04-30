@@ -12,6 +12,7 @@ const CreateTaskHeader = () => {
   return (
     <header className="mb-12 flex items-center justify-between mt-8">
       <button
+        type="button"
         onClick={() => router.back()}
         className="flex items-center gap-2 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors group cursor-pointer"
       >
