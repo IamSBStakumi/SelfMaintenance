@@ -1,6 +1,5 @@
 import { format } from "date-fns";
-import { MaintenanceItem } from "@/types/maintenance";
-import { MaintenanceLog } from "@/types/maintenance";
+import { MaintenanceItem, MaintenanceLog } from "@/types/maintenance";
 
 type Props = {
   /** 表示するログデータ */
