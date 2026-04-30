@@ -44,7 +44,7 @@ export default function CalendarPage() {
         <CalendarHeader />
 
         <div className="flex flex-col lg:flex-row gap-8">
-          <div className="w-full lg:w-[60%] shrink-0 animate-fade-in-up">
+          <div className="w-full lg:w-[60%] shrink-0">
             <Calendar
               logs={logs}
               onDayClick={setSelectedDate}

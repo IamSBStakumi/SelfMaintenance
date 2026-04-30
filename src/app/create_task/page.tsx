@@ -5,6 +5,7 @@ import { parseISO, startOfDay } from "date-fns";
 import { toast } from "react-toastify";
 import useMaintenanceItems from "@/hooks/useMaintenanceItems";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
+import CreateTaskHeader from "./CreateTaskHeader";
 
 export default function CreateTaskPage() {
   const router = useRouter();
@@ -41,22 +42,7 @@ export default function CreateTaskPage() {
   return (
     <div className="min-h-screen bg-zinc-50 p-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 flex flex-col items-center">
       <div className="max-w-2xl w-full">
-        {/* ヘッダーセクション */}
-        <header className="mb-12 flex items-center justify-between mt-8">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors group cursor-pointer"
-          >
-            <span className="text-xl group-hover:-translate-x-1 transition-transform">
-              ←
-            </span>
-            <span className="font-medium">戻る</span>
-          </button>
-          <h1 className="text-2xl font-bold tracking-tight">
-            タスクの新規登録
-          </h1>
-          <div className="w-16" /> {/* バランス用スペーサー */}
-        </header>
+        <CreateTaskHeader />
 
         {/* フォームカード */}
         <main
