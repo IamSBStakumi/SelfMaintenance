@@ -61,8 +61,8 @@ export default function CalendarPage() {
             isItemsLoading={fetchMaintenanceItems.isLoading}
             isLogsError={isLogsError}
             isItemsError={fetchMaintenanceItems.isError}
-            logsError={logsError as Error | null}
-            itemsError={fetchMaintenanceItems.error as Error | null}
+            logsError={logsError}
+            itemsError={fetchMaintenanceItems.error}
           />
         </div>
       </main>
