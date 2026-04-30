@@ -98,10 +98,10 @@ describe("src/services/maintenance_items", () => {
     name: "テスト項目",
     icon: null,
     interval_days: 30,
-    last_completed_at: new Date().toISOString(),
+    last_completed_at: "2026-04-15T10:00:00Z",
     memo: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2026-04-15T10:00:00Z",
+    updated_at: "2026-04-15T10:00:00Z",
     ...override,
   });
 
@@ -203,7 +203,7 @@ describe("src/services/maintenance_items", () => {
       name: "テスト作成",
       icon: null,
       interval_days: 10,
-      last_completed_at: new Date().toISOString(),
+      last_completed_at: "2026-04-15T10:00:00Z",
       memo: "メモ",
     };
 
@@ -309,11 +309,11 @@ describe("src/services/maintenance_items", () => {
 
     test("last_completed_atが現在時刻で更新されること", async () => {
       vi.useFakeTimers();
-      const mockNow = new Date("2026-04-16T12:00:00Z");
+      const mockNow = "2026-04-16T12:00:00.000Z";
       vi.setSystemTime(mockNow);
 
       const mockUpdatedData = createMockItem({
-        last_completed_at: mockNow.toISOString(),
+        last_completed_at: mockNow,
       });
       const chain = createMockChain<MaintenanceItem>({
         data: mockUpdatedData,
@@ -326,18 +326,18 @@ describe("src/services/maintenance_items", () => {
       expect(mockFrom).toHaveBeenNthCalledWith(1, "maintenance_items");
       expect(mockFrom).toHaveBeenNthCalledWith(2, "maintenance_logs");
       expect(chain.update).toHaveBeenCalledWith({
-        last_completed_at: mockNow.toISOString(),
+        last_completed_at: mockNow,
       });
       expect(result).toEqual(mockUpdatedData);
     });
 
     test("メンテナンスログの作成に失敗した場合でも更新結果が返されること", async () => {
       vi.useFakeTimers();
-      const mockNow = new Date("2026-04-30T12:00:00Z");
+      const mockNow = "2026-04-30T12:00:00Z";
       vi.setSystemTime(mockNow);
 
       const mockUpdatedData = createMockItem({
-        last_completed_at: mockNow.toISOString(),
+        last_completed_at: mockNow,
       });
       // 1回目: maintenance_items の update 用チェーン（成功）
       const itemChain = createMockChain<MaintenanceItem>({
@@ -439,7 +439,7 @@ describe("src/services/maintenance_items", () => {
           user_id: "test-user-id",
           completed_at: "2026-04-15T10:00:00Z",
           notes: null,
-          created_at: new Date().toISOString(),
+          created_at: "2026-04-15T10:00:00Z",
         },
       ];
       const chain = createMockChain<MaintenanceLog[]>({
