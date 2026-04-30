@@ -333,7 +333,7 @@ describe("src/services/maintenance_items", () => {
 
     test("メンテナンスログの作成に失敗した場合でも更新結果が返されること", async () => {
       vi.useFakeTimers();
-      const mockNow = "2026-04-30T12:00:00Z";
+      const mockNow = "2026-04-30T12:00:00.000Z";
       vi.setSystemTime(mockNow);
 
       const mockUpdatedData = createMockItem({
