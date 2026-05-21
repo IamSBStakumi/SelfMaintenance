@@ -1,54 +1,54 @@
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+このバージョンには破壊的変更があります。API、規約、ファイル構成が学習済みの知識と異なる可能性があります。コードを書く前に、`node_modules/next/dist/docs/` にある関連ガイドを読み、非推奨の通知に必ず従ってください。
 <!-- END:nextjs-agent-rules -->
 
-## 1. Code Review Language
+## 1. コードレビューの言語
 
-- **All code reviews must be conducted in Japanese (日本語).**
-- This includes review comments, suggestions, and explanations.
+- **すべてのコードレビューは日本語で行ってください。**
+- レビューコメント、提案、説明もすべて日本語で記述してください。
 
-## 2. Review Focus Areas
+## 2. レビュー時の重点確認項目
 
-When reviewing code, please pay attention to the following:
+コードレビューでは、以下の観点を特に確認してください。
 
-### 2.1. Security
+### 2.1. セキュリティ
 
-- Check for common vulnerabilities (XSS, CSRF, SQL Injection, etc.)
-- Verify proper authentication and authorization
-- Ensure sensitive data is handled securely
+- 一般的な脆弱性（XSS、CSRF、SQLインジェクションなど）がないか確認する
+- 認証・認可が適切に実装されているか確認する
+- 機密情報が安全に扱われているか確認する
 
-### 2.2. Performance
+### 2.2. パフォーマンス
 
-- Check for inefficient queries or loops
-- Verify proper caching strategies
-- Ensure optimal data fetching
+- 非効率なクエリやループがないか確認する
+- キャッシュ戦略が適切か確認する
+- データ取得が最適化されているか確認する
 
-### 2.3. Maintainability
+### 2.3. 保守性
 
-- Check for code readability and clarity
-- Verify proper naming conventions
-- Ensure proper modularity and separation of concerns
+- コードが読みやすく、意図が明確か確認する
+- 命名規則が適切か確認する
+- モジュール分割と関心の分離が適切か確認する
 
-### 2.4. Best Practices
+### 2.4. ベストプラクティス
 
-- Check for adherence to React/Next.js best practices
-- Verify proper TypeScript usage
-- Ensure proper error handling
+- React / Next.js のベストプラクティスに沿っているか確認する
+- TypeScript が適切に使われているか確認する
+- エラーハンドリングが適切か確認する
 
-## 3. Review Process
+## 3. レビュープロセス
 
-1. Understand the code changes
-2. Check for security issues
-3. Check for performance issues
-4. Check for maintainability issues
-5. Check for best practices
-6. Provide constructive feedback in Japanese
+1. コード変更の内容を理解する
+2. セキュリティ上の問題を確認する
+3. パフォーマンス上の問題を確認する
+4. 保守性の問題を確認する
+5. ベストプラクティスに沿っているか確認する
+6. 建設的なフィードバックを日本語で提供する
 
-## 4. Output Format
+## 4. 出力形式
 
-- Use Japanese for all review comments
-- Provide specific examples when suggesting improvements
-- Be constructive and helpful
-- Use markdown for formatting
+- すべてのレビューコメントは日本語で記述する
+- 改善提案を行う場合は、具体例を示す
+- 建設的で役に立つ内容にする
+- Markdown を使用して読みやすく整形する
