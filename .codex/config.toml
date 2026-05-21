@@ -1,0 +1,14 @@
+model = "gpt-5-codex"
+# モデルの推論にかける努力のレベルを設定（例: "low", "medium", "high"）。高いほど、より複雑なタスクに対してより多くのリソースを割り当てる
+model_reasoning_effort = "medium"
+# モデル側が必要だと判断したときだけ確認を出す
+approval_policy = "on-request"
+# 作業ディレクトリは編集できるが、無制限にはしない
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+# 依存追加や外部取得を勝手にさせにくいように、作業ディレクトリは編集できるが、無制限にはしない
+network_access = false
+
+[features]
+multi_agent = true
