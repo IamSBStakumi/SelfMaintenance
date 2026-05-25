@@ -30,7 +30,7 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' blob: data: https:",
+  `img-src 'self' blob: data: ${getSupabaseSources().join(" ")}`,
   "font-src 'self' data:",
   `connect-src ${connectSources.join(" ")}`,
   "object-src 'none'",
