@@ -48,15 +48,15 @@ END $$;
 CREATE INDEX IF NOT EXISTS idx_maintenance_items_user_id_created_at
   ON public.maintenance_items (user_id, created_at DESC);
 
+-- 複合外部キーを支援し、item_id 検索もインデックスで処理できるようにする。
+CREATE INDEX IF NOT EXISTS idx_maintenance_logs_item_id_user_id
+  ON public.maintenance_logs (item_id, user_id);
+
 -- item_id のみの外部キーを、所有者を含む複合外部キーへ置き換える。
 ALTER TABLE public.maintenance_logs
   DROP CONSTRAINT IF EXISTS maintenance_logs_item_id_fkey;
 
 DROP INDEX IF EXISTS public.idx_maintenance_logs_item_id;
-
--- 複合外部キーを支援し、item_id 検索もインデックスで処理できるようにする。
-CREATE INDEX IF NOT EXISTS idx_maintenance_logs_item_id_user_id
-  ON public.maintenance_logs (item_id, user_id);
 
 DO $$
 BEGIN
