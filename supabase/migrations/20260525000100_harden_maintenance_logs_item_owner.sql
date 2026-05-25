@@ -9,8 +9,8 @@ BEGIN
   WHERE logs.user_id <> items.user_id;
 
   IF mismatched_logs_count > 0 THEN
-    RAISE WARNING
-      'Found % maintenance_logs rows with mismatched user_id and item owner. The new trigger will protect future writes. Review existing rows manually.',
+    RAISE EXCEPTION
+      'ユーザーIDとアイテムの所有者が一致しない maintenance_logs が % 件見つかりました。不整合を解消してからマイグレーションを再実行してください。',
       mismatched_logs_count;
   END IF;
 END $$;
@@ -30,7 +30,7 @@ BEGIN
     WHERE items.id = NEW.item_id
       AND items.user_id = NEW.user_id
   ) THEN
-    RAISE EXCEPTION 'maintenance_logs.item_id must belong to maintenance_logs.user_id'
+    RAISE EXCEPTION 'メンテナンスログのアイテムIDは、ログのユーザーIDに属している必要があります'
       USING ERRCODE = 'foreign_key_violation';
   END IF;
 
