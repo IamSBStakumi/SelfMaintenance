@@ -1,3 +1,4 @@
+-- 既存ログの item_id と user_id が一致しない場合は、制約変更前に中断する。
 DO $$
 DECLARE
   mismatched_logs_count bigint;
@@ -5,42 +6,67 @@ BEGIN
   SELECT count(*)
   INTO mismatched_logs_count
   FROM public.maintenance_logs AS logs
-  JOIN public.maintenance_items AS items ON items.id = logs.item_id
-  WHERE logs.user_id <> items.user_id;
+  WHERE NOT EXISTS (
+    SELECT 1
+    FROM public.maintenance_items AS items
+    WHERE items.id = logs.item_id
+      AND items.user_id = logs.user_id
+  );
 
   IF mismatched_logs_count > 0 THEN
     RAISE EXCEPTION
-      'ユーザーIDとアイテムの所有者が一致しない maintenance_logs が % 件見つかりました。不整合を解消してからマイグレーションを再実行してください。',
+      'item_id が user_id に属していない maintenance_logs が % 件あります。複合外部キーを追加する前に、対象行を修正または削除してください。',
       mismatched_logs_count;
   END IF;
 END $$;
 
-CREATE INDEX IF NOT EXISTS idx_maintenance_items_user_id_created_at
-  ON public.maintenance_items (user_id, created_at DESC);
-
-CREATE OR REPLACE FUNCTION public.ensure_maintenance_log_item_owner()
-RETURNS trigger
-LANGUAGE plpgsql
-SET search_path = public
-AS $$
+-- maintenance_logs(item_id, user_id) から複合外部キーを張るために必要。
+DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1
-    FROM public.maintenance_items AS items
-    WHERE items.id = NEW.item_id
-      AND items.user_id = NEW.user_id
+    FROM pg_constraint
+    WHERE conname = 'maintenance_items_id_user_id_key'
+      AND conrelid = 'public.maintenance_items'::regclass
   ) THEN
-    RAISE EXCEPTION 'メンテナンスログのアイテムIDは、ログのユーザーIDに属している必要があります'
-      USING ERRCODE = 'foreign_key_violation';
+    ALTER TABLE public.maintenance_items
+      ADD CONSTRAINT maintenance_items_id_user_id_key UNIQUE (id, user_id);
   END IF;
+END $$;
 
-  RETURN NEW;
-END;
-$$;
+-- getMaintenanceItems(): WHERE user_id = ? ORDER BY created_at DESC を支援する。
+CREATE INDEX IF NOT EXISTS idx_maintenance_items_user_id_created_at
+  ON public.maintenance_items (user_id, created_at DESC);
 
-DROP TRIGGER IF EXISTS enforce_maintenance_log_item_owner ON public.maintenance_logs;
+-- item_id のみの外部キーを、所有者を含む複合外部キーへ置き換える。
+ALTER TABLE public.maintenance_logs
+  DROP CONSTRAINT IF EXISTS maintenance_logs_item_id_fkey;
 
-CREATE TRIGGER enforce_maintenance_log_item_owner
-BEFORE INSERT OR UPDATE OF item_id, user_id ON public.maintenance_logs
-FOR EACH ROW
-EXECUTE FUNCTION public.ensure_maintenance_log_item_owner();
+DROP INDEX IF EXISTS public.idx_maintenance_logs_item_id;
+
+-- 複合外部キーを支援し、item_id 検索もインデックスで処理できるようにする。
+CREATE INDEX IF NOT EXISTS idx_maintenance_logs_item_id_user_id
+  ON public.maintenance_logs (item_id, user_id);
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'maintenance_logs_item_id_user_id_fkey'
+      AND conrelid = 'public.maintenance_logs'::regclass
+  ) THEN
+    ALTER TABLE public.maintenance_logs
+      ADD CONSTRAINT maintenance_logs_item_id_user_id_fkey
+      FOREIGN KEY (item_id, user_id)
+      REFERENCES public.maintenance_items(id, user_id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE;
+  END IF;
+END $$;
+
+COMMENT ON CONSTRAINT maintenance_items_id_user_id_key ON public.maintenance_items
+  IS 'maintenance_logs から所有者を含む外部キーを張るための制約。';
+
+COMMENT ON CONSTRAINT maintenance_logs_item_id_user_id_fkey ON public.maintenance_logs
+  IS '各メンテナンスログが同じユーザーのメンテナンス項目のみを参照することを保証する制約。';
