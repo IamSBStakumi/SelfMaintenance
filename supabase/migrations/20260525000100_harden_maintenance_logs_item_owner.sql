@@ -52,6 +52,10 @@ CREATE INDEX IF NOT EXISTS idx_maintenance_items_user_id_created_at
 CREATE INDEX IF NOT EXISTS idx_maintenance_logs_item_id_user_id
   ON public.maintenance_logs (item_id, user_id);
 
+-- maintenance_logs の user_id と completed_at での検索も支援する。
+CREATE INDEX IF NOT EXISTS idx_maintenance_logs_user_id_completed_at
+  ON public.maintenance_logs (user_id, completed_at DESC);
+
 -- item_id のみの外部キーを、所有者を含む複合外部キーへ置き換える。
 ALTER TABLE public.maintenance_logs
   DROP CONSTRAINT IF EXISTS maintenance_logs_item_id_fkey;
