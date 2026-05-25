@@ -62,6 +62,10 @@ ALTER TABLE public.maintenance_logs
 
 DROP INDEX IF EXISTS public.idx_maintenance_logs_item_id;
 
+-- 既存行の検証は冒頭の事前チェックで行い、外部キー自体は NOT VALID で短時間に追加する。
+-- 大きなテーブルで制約を厳密に VALIDATE したい場合は、低負荷時間帯に以下を別マイグレーションで実行する。
+-- ALTER TABLE public.maintenance_logs
+--   VALIDATE CONSTRAINT maintenance_logs_item_id_user_id_fkey;
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -77,8 +81,6 @@ BEGIN
       ON DELETE CASCADE
       ON UPDATE CASCADE
       NOT VALID;
-    ALTER TABLE public.maintenance_logs
-      VALIDATE CONSTRAINT maintenance_logs_item_id_user_id_fkey;
   END IF;
 END $$;
 
@@ -86,4 +88,4 @@ COMMENT ON CONSTRAINT maintenance_items_id_user_id_key ON public.maintenance_ite
   IS 'maintenance_logs から所有者を含む外部キーを張るための制約。';
 
 COMMENT ON CONSTRAINT maintenance_logs_item_id_user_id_fkey ON public.maintenance_logs
-  IS '各メンテナンスログが同じユーザーのメンテナンス項目のみを参照することを保証する制約。';
+  IS '各メンテナンスログが同じユーザーのメンテナンス項目のみを参照することを新規書き込み時に保証する制約。';
