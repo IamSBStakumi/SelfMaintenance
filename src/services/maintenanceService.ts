@@ -5,33 +5,13 @@ import {
   maintenanceTaskSchema,
   maintenanceTaskUpdateSchema,
 } from "@/utils/schemas/maintenanceTask";
+import formatValidationError from "@/utils/formatValidationError";
 import {
   InsertMaintenanceItem,
   MaintenanceItem,
   UpdateMaintenanceItem,
   MaintenanceLog,
 } from "@/types/maintenance";
-
-const formatValidationError = (error: unknown) => {
-  if (
-    error &&
-    typeof error === "object" &&
-    "issues" in error &&
-    Array.isArray(error.issues)
-  ) {
-    const firstIssue = error.issues[0];
-    if (
-      firstIssue &&
-      typeof firstIssue === "object" &&
-      "message" in firstIssue &&
-      typeof firstIssue.message === "string"
-    ) {
-      return firstIssue.message;
-    }
-  }
-
-  return "入力内容を確認してください。";
-};
 
 const validateMaintenanceTask = (data: InsertMaintenanceItem) => {
   const validationResult = maintenanceTaskSchema.safeParse(data);
