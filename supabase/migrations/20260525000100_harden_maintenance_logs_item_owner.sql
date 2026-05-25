@@ -73,6 +73,8 @@ BEGIN
       ON DELETE CASCADE
       ON UPDATE CASCADE
       NOT VALID;
+    ALTER TABLE public.maintenance_logs
+      VALIDATE CONSTRAINT maintenance_logs_item_id_user_id_fkey;
   END IF;
 END $$;
 
