@@ -21,8 +21,9 @@ const optionalText = (maxLength: number, message: string) =>
     .optional()
     .nullable()
     .transform((value) => {
-      const trimmedValue = value?.trim();
-      return trimmedValue ? trimmedValue : null;
+      if (value === undefined) return undefined;
+
+      return value?.trim() || null;
     });
 
 export const maintenanceTaskSchema = z.object({

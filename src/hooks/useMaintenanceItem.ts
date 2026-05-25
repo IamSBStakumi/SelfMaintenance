@@ -6,7 +6,7 @@ import {
   getMaintenanceItemById,
   updateMaintenanceItem,
   updateMaintenanceItemNextCycle,
-} from "@/utils/maintenance_items";
+} from "@/service/maintenanceService";
 import { UpdateMaintenanceItem } from "@/types/maintenance";
 import { MAINTENANCE_ITEMS_QUERY_KEY } from "./useMaintenanceItems";
 

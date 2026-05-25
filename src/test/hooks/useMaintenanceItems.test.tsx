@@ -5,14 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import useMaintenanceItems, {
   MAINTENANCE_ITEMS_QUERY_KEY,
 } from "@/hooks/useMaintenanceItems";
-import * as services from "@/utils/maintenance_items";
+import * as services from "@/service/maintenanceService";
 import type {
   MaintenanceItem,
   InsertMaintenanceItem,
 } from "@/types/maintenance";
 
 // サービスのモック化
-vi.mock("@/utils/maintenance_items", () => ({
+vi.mock("@/service/maintenanceService", () => ({
   getMaintenanceItems: vi.fn(),
   createMaintenanceItem: vi.fn(),
 }));

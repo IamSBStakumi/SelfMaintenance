@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, act, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import SplashScreen from "@/app/page";
 
@@ -23,7 +24,7 @@ vi.mock("@/lib/supabase/supabase", () => ({
 describe("SplashScreen", () => {
   beforeEach(() => {
     // タイマーをフェイクに変更し、モック履歴をクリア
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.useFakeTimers();
     mockReplace.mockClear();
     mockGetSession.mockClear();
 
@@ -32,8 +33,10 @@ describe("SplashScreen", () => {
   });
 
   afterEach(() => {
-    // クリーンアップ
-    vi.runOnlyPendingTimers();
+    // テスト外でタイマー由来のstate更新を発火させない
+    act(() => {
+      vi.clearAllTimers();
+    });
     vi.useRealTimers();
   });
 
@@ -69,18 +72,20 @@ describe("SplashScreen", () => {
   });
 
   test("画面がクリック・タップされたとき即座に /login へ遷移すること", async () => {
+    vi.useRealTimers();
+    const user = userEvent.setup();
     render(<SplashScreen />);
 
     // 画面全体（親コンテナ）の要素を取得してクリックを発火
     const skipContainer = screen.getByTitle("クリックしてスキップ");
 
     // クリックイベントとそれに伴う非同期処理の完了を待機
-    await act(async () => {
-      fireEvent.click(skipContainer);
-    });
+    await user.click(skipContainer);
 
     // タイマーを待たずに即座に遷移関数が呼ばれたことを確認
-    expect(mockReplace).toHaveBeenCalledWith("/login");
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith("/login");
+    });
     expect(mockReplace).toHaveBeenCalledTimes(1);
   });
 
@@ -111,6 +116,8 @@ describe("SplashScreen", () => {
   });
 
   test("セッションが確立している場合、画面がクリック・タップされたとき即座に /dashboard へ遷移すること", async () => {
+    vi.useRealTimers();
+    const user = userEvent.setup();
     mockGetSession.mockResolvedValue({
       data: { session: {} },
       error: null,
@@ -121,12 +128,12 @@ describe("SplashScreen", () => {
     const skipContainer = screen.getByTitle("クリックしてスキップ");
 
     // クリックイベントとそれに伴う非同期処理の完了を待機
-    await act(async () => {
-      fireEvent.click(skipContainer);
-    });
+    await user.click(skipContainer);
 
     // タイマーを待たずに即座に遷移関数が呼ばれたことを確認
-    expect(mockReplace).toHaveBeenCalledWith("/dashboard");
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith("/dashboard");
+    });
     expect(mockReplace).toHaveBeenCalledTimes(1);
   });
 

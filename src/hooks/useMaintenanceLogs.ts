@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getMaintenanceLogs } from "@/utils/maintenance_items";
+import { getMaintenanceLogs } from "@/service/maintenanceService";
 
 export const MAINTENANCE_LOGS_QUERY_KEY = (
   startDate: string,
