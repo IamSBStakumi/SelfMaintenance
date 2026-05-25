@@ -3,8 +3,6 @@ ALTER TABLE public.maintenance_items
 
 ALTER TABLE public.maintenance_logs
   DROP CONSTRAINT maintenance_logs_item_id_fkey;
-
-ALTER TABLE public.maintenance_logs
   ADD CONSTRAINT maintenance_logs_item_id_user_id_fkey
   FOREIGN KEY (item_id, user_id)
   REFERENCES public.maintenance_items(id, user_id)
