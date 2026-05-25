@@ -71,7 +71,7 @@ BEGIN
       FOREIGN KEY (item_id, user_id)
       REFERENCES public.maintenance_items(id, user_id)
       ON DELETE CASCADE
-      ON UPDATE CASCADE;
+      ON UPDATE CASCADE
       NOT VALID;
   END IF;
 END $$;
