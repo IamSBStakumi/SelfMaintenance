@@ -1,4 +1,14 @@
 -- 既存ログの item_id と user_id が一致しない場合は、制約変更前に中断する。
+-- 不整合が見つかった場合は、以下のクエリで対象行を確認してから修正または削除する。
+-- SELECT
+--   logs.id,
+--   logs.item_id,
+--   logs.user_id,
+--   items.user_id AS correct_user_id
+-- FROM public.maintenance_logs AS logs
+-- LEFT JOIN public.maintenance_items AS items ON items.id = logs.item_id
+-- WHERE items.id IS NULL
+--    OR items.user_id <> logs.user_id;
 DO $$
 DECLARE
   mismatched_logs_count bigint;
