@@ -7,7 +7,7 @@ import {
   updateMaintenanceItemNextCycle,
   getMaintenanceLogs,
   deleteMaintenanceItem,
-} from "@/service/maintenanceService";
+} from "@/services/maintenanceService";
 import type {
   MaintenanceItem,
   InsertMaintenanceItem,

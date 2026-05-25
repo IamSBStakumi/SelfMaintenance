@@ -6,7 +6,7 @@ import useMaintenanceItem, {
   MAINTENANCE_ITEM_QUERY_KEY,
 } from "@/hooks/useMaintenanceItem";
 import { MAINTENANCE_ITEMS_QUERY_KEY } from "@/hooks/useMaintenanceItems";
-import * as services from "@/service/maintenanceService";
+import * as services from "@/services/maintenanceService";
 import type {
   MaintenanceItem,
   UpdateMaintenanceItem,
@@ -19,7 +19,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 // サービスのモック化
-vi.mock("@/service/maintenanceService", () => ({
+vi.mock("@/services/maintenanceService", () => ({
   getMaintenanceItemById: vi.fn(),
   updateMaintenanceItem: vi.fn(),
   updateMaintenanceItemNextCycle: vi.fn(),
