@@ -10,28 +10,37 @@ BEGIN
 
   IF mismatched_logs_count > 0 THEN
     RAISE WARNING
-      'Found % maintenance_logs rows with mismatched user_id and item owner. The new foreign key is added as NOT VALID and will protect future writes. Review existing rows before validating the constraint.',
+      'Found % maintenance_logs rows with mismatched user_id and item owner. The new trigger will protect future writes. Review existing rows manually.',
       mismatched_logs_count;
   END IF;
 END $$;
 
-ALTER TABLE public.maintenance_items
-  ADD CONSTRAINT maintenance_items_id_user_id_key UNIQUE (id, user_id);
-
 CREATE INDEX IF NOT EXISTS idx_maintenance_items_user_id_created_at
   ON public.maintenance_items (user_id, created_at DESC);
 
-ALTER TABLE public.maintenance_logs
-  DROP CONSTRAINT maintenance_logs_item_id_fkey;
+CREATE OR REPLACE FUNCTION public.ensure_maintenance_log_item_owner()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM public.maintenance_items AS items
+    WHERE items.id = NEW.item_id
+      AND items.user_id = NEW.user_id
+  ) THEN
+    RAISE EXCEPTION 'maintenance_logs.item_id must belong to maintenance_logs.user_id'
+      USING ERRCODE = 'foreign_key_violation';
+  END IF;
 
-DROP INDEX IF EXISTS public.idx_maintenance_logs_item_id;
+  RETURN NEW;
+END;
+$$;
 
-CREATE INDEX IF NOT EXISTS idx_maintenance_logs_item_id_user_id
-  ON public.maintenance_logs (item_id, user_id);
+DROP TRIGGER IF EXISTS enforce_maintenance_log_item_owner ON public.maintenance_logs;
 
-ALTER TABLE public.maintenance_logs
-  ADD CONSTRAINT maintenance_logs_item_id_user_id_fkey
-  FOREIGN KEY (item_id, user_id)
-  REFERENCES public.maintenance_items(id, user_id)
-  ON DELETE CASCADE
-  NOT VALID;
+CREATE TRIGGER enforce_maintenance_log_item_owner
+BEFORE INSERT OR UPDATE OF item_id, user_id ON public.maintenance_logs
+FOR EACH ROW
+EXECUTE FUNCTION public.ensure_maintenance_log_item_owner();
