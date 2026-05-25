@@ -2,26 +2,33 @@
 
 import { useRouter } from "next/navigation";
 import { parseISO, startOfDay } from "date-fns";
+import { toast } from "react-toastify";
 import useMaintenanceItems from "@/hooks/useMaintenanceItems";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
+import CreateTaskHeader from "./CreateTaskHeader";
 
 export default function CreateTaskPage() {
   const router = useRouter();
   const { createMaintenanceItem } = useMaintenanceItems();
 
   const handleCreateSubmit = async (data: TaskFormValues) => {
-    // APIへ送信する処理
-    await createMaintenanceItem.mutateAsync({
-      name: data.name,
-      icon: data.icon || null,
-      interval_days: data.interval_days,
-      last_completed_at: startOfDay(
-        parseISO(data.last_completed_at),
-      ).toISOString(),
-      memo: data.memo || null,
-    });
-    // 成功時にダッシュボードへリダイレクト
-    router.push("/dashboard");
+    try {
+      // APIへ送信する処理
+      await createMaintenanceItem.mutateAsync({
+        name: data.name,
+        icon: data.icon || null,
+        interval_days: data.interval_days,
+        last_completed_at: startOfDay(
+          parseISO(data.last_completed_at),
+        ).toISOString(),
+        memo: data.memo || null,
+      });
+      // 成功時にダッシュボードへリダイレクト
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("タスクの作成に失敗しました。", error);
+      toast.error("タスクの作成に失敗しました。");
+    }
   };
 
   const defaultFormValues: TaskFormValues = {
@@ -35,22 +42,7 @@ export default function CreateTaskPage() {
   return (
     <div className="min-h-screen bg-zinc-50 p-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 flex flex-col items-center">
       <div className="max-w-2xl w-full">
-        {/* ヘッダーセクション */}
-        <header className="mb-12 flex items-center justify-between mt-8">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors group"
-          >
-            <span className="text-xl group-hover:-translate-x-1 transition-transform">
-              ←
-            </span>
-            <span className="font-medium">戻る</span>
-          </button>
-          <h1 className="text-2xl font-bold tracking-tight">
-            タスクの新規登録
-          </h1>
-          <div className="w-16" /> {/* バランス用スペーサー */}
-        </header>
+        <CreateTaskHeader />
 
         {/* フォームカード */}
         <main

@@ -1,0 +1,26 @@
+services:
+  app:
+    # ビルドの設定
+    build:
+      context: . # カレントディレクトリをビルドのベースにする
+      dockerfile: Dockerfile # 使用するDockerfileの指定
+
+    container_name: self-maintenance-app # 起動するコンテナの名前
+
+    # ホストマシンのネットワークスタックを直接共有する
+    # これにより、コンテナ内からも 127.0.0.1 でホスト側の Supabase 等にアクセス可能になる
+    network_mode: host
+
+    volumes:
+      - .:/app # ローカルのソースコードをコンテナ内の /app に同期
+      - /app/node_modules # node_modules はコンテナ側のものを優先（ホスト側との競合防止）
+      - /app/.next # Next.js のビルドキャッシュもコンテナ側で管理
+
+    environment:
+      - NODE_ENV=development # 開発モードとして実行
+      # ファイル変更の監視をポーリング形式にする（Docker環境でホットリロードを確実に動かすため）
+      - WATCHPACK_POLLING=true
+
+    # コンテナを終了させずにインタラクティブにログを確認できる設定
+    tty: true
+    stdin_open: true

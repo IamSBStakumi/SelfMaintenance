@@ -7,3 +7,6 @@ src/__tests__/
 src/test/
 
 src/stories/
+
+# supabase
+supabase/*

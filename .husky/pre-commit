@@ -1,3 +1,12 @@
 #!/usr/bin/env sh
 
+# developおよびmainブランチへの直接コミットを制限
+case "$(git rev-parse --abbrev-ref HEAD)" in
+  main|develop)
+    echo "Error: develop または main ブランチへの直接コミットは禁止されています。"
+    echo "機能の開発は feature/xxx 等のブランチで行い、プルリクエストを作成してください。"
+    exit 1
+    ;;
+esac
+
 yarn lint-staged

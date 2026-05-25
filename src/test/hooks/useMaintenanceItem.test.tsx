@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import useMaintenanceItem, {
@@ -78,7 +78,7 @@ describe("useMaintenanceItem", () => {
   });
 
   describe("Query: fetchMaintenanceItem", () => {
-    it("正常にgetMaintenanceItemByIdが呼ばれ、データが取得できること", async () => {
+    test("正常にgetMaintenanceItemByIdが呼ばれ、データが取得できること", async () => {
       const mockData = createMockItem();
       mockGetMaintenanceItemById.mockResolvedValue(mockData);
 
@@ -96,7 +96,7 @@ describe("useMaintenanceItem", () => {
       expect(result.current.fetchMaintenanceItem.data).toEqual(mockData);
     });
 
-    it("空のIDを渡した場合はクエリがフェッチされない(enabled: false)こと", async () => {
+    test("空のIDを渡した場合はクエリがフェッチされない(enabled: false)こと", async () => {
       const { wrapper } = createWrapper();
       const { result } = renderHook(() => useMaintenanceItem(""), { wrapper });
 
@@ -106,7 +106,7 @@ describe("useMaintenanceItem", () => {
   });
 
   describe("Mutation: updateMaintenanceItem", () => {
-    it("更新が成功した際、クエリのinvalidateとルーターの遷移が行われること", async () => {
+    test("更新が成功した際、クエリのinvalidateとルーターの遷移が行われること", async () => {
       const { wrapper, testQueryClient } = createWrapper();
       const resetSpy = vi.spyOn(testQueryClient, "invalidateQueries");
 
@@ -136,7 +136,7 @@ describe("useMaintenanceItem", () => {
       expect(mockPush).toHaveBeenCalledWith("/dashboard");
     });
 
-    it("更新に失敗した際、エラーがコンソールに出力され、遷移しないこと", async () => {
+    test("更新に失敗した際、エラーがコンソールに出力され、遷移しないこと", async () => {
       const consoleErrorSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
@@ -162,7 +162,7 @@ describe("useMaintenanceItem", () => {
   });
 
   describe("Mutation: updateMaintenanceItemNextCycle", () => {
-    it("更新が成功した際、一覧と詳細の両方のクエリがinvalidateされること", async () => {
+    test("更新が成功した際、一覧と詳細の両方のクエリがinvalidateされること", async () => {
       const { wrapper, testQueryClient } = createWrapper();
       const resetSpy = vi.spyOn(testQueryClient, "invalidateQueries");
 
@@ -197,7 +197,7 @@ describe("useMaintenanceItem", () => {
       });
     });
 
-    it("更新に失敗した際、エラーがコンソールに出力されること", async () => {
+    test("更新に失敗した際、エラーがコンソールに出力されること", async () => {
       const consoleErrorSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});

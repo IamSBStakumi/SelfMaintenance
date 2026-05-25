@@ -1,15 +1,17 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   getMaintenanceItems,
   getMaintenanceItemById,
   createMaintenanceItem,
   updateMaintenanceItem,
   updateMaintenanceItemNextCycle,
+  getMaintenanceLogs,
   deleteMaintenanceItem,
 } from "@/services/maintenance_items";
 import type {
   MaintenanceItem,
   InsertMaintenanceItem,
+  MaintenanceLog,
 } from "@/types/maintenance";
 
 // モック用の定義
@@ -39,6 +41,8 @@ interface MockChain<T> {
   update: ReturnType<typeof vi.fn>;
   delete: ReturnType<typeof vi.fn>;
   eq: ReturnType<typeof vi.fn>;
+  gte: ReturnType<typeof vi.fn>;
+  lte: ReturnType<typeof vi.fn>;
   order: ReturnType<typeof vi.fn>;
   single: ReturnType<typeof vi.fn>;
   then: (resolve: (val: MockSupabaseResponse<T>) => void) => void;
@@ -73,6 +77,8 @@ describe("src/services/maintenance_items", () => {
       update: vi.fn(() => chain),
       delete: vi.fn(() => chain),
       eq: vi.fn(() => chain),
+      gte: vi.fn(() => chain),
+      lte: vi.fn(() => chain),
       order: vi.fn(() => chain),
       single: vi.fn(() => chain),
       then: (resolve: (val: MockSupabaseResponse<T>) => void) =>
@@ -92,15 +98,15 @@ describe("src/services/maintenance_items", () => {
     name: "テスト項目",
     icon: null,
     interval_days: 30,
-    last_completed_at: new Date().toISOString(),
+    last_completed_at: "2026-04-15T10:00:00Z",
     memo: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2026-04-15T10:00:00Z",
+    updated_at: "2026-04-15T10:00:00Z",
     ...override,
   });
 
   describe("getMaintenanceItems", () => {
-    it("認証エラーの場合、エラーがスローされること", async () => {
+    test("認証エラーの場合、エラーがスローされること", async () => {
       mockGetUser.mockResolvedValue({
         data: { user: null },
         error: new Error("Auth Error"),
@@ -111,7 +117,7 @@ describe("src/services/maintenance_items", () => {
       );
     });
 
-    it("未ログインの場合、エラーがスローされること", async () => {
+    test("未ログインの場合、エラーがスローされること", async () => {
       mockGetUser.mockResolvedValue({
         data: { user: null },
         error: null,
@@ -122,7 +128,7 @@ describe("src/services/maintenance_items", () => {
       );
     });
 
-    it("正常にデータを取得できること", async () => {
+    test("正常にデータを取得できること", async () => {
       const mockData: MaintenanceItem[] = [createMockItem()];
       const chain = createMockChain<MaintenanceItem[]>({
         data: mockData,
@@ -141,7 +147,7 @@ describe("src/services/maintenance_items", () => {
       expect(result).toEqual(mockData);
     });
 
-    it("DB取得時にエラーが発生した場合、エラーがスローされること", async () => {
+    test("DB取得時にエラーが発生した場合、エラーがスローされること", async () => {
       const chain = createMockChain<MaintenanceItem[]>({
         data: null,
         error: new Error("DB Error"),
@@ -155,13 +161,13 @@ describe("src/services/maintenance_items", () => {
   });
 
   describe("getMaintenanceItemById", () => {
-    it("不正なIDのとき、エラーがスローされること", async () => {
+    test("不正なIDのとき、エラーがスローされること", async () => {
       await expect(getMaintenanceItemById("  ")).rejects.toThrow(
         "指定されたIDは不正です。",
       );
     });
 
-    it("正常に指定したIDのデータを1件取得できること", async () => {
+    test("正常に指定したIDのデータを1件取得できること", async () => {
       const mockData = createMockItem();
       const chain = createMockChain<MaintenanceItem>({
         data: mockData,
@@ -179,7 +185,7 @@ describe("src/services/maintenance_items", () => {
       expect(result).toEqual(mockData);
     });
 
-    it("DB取得時にエラーが発生した場合、エラーがスローされること", async () => {
+    test("DB取得時にエラーが発生した場合、エラーがスローされること", async () => {
       const chain = createMockChain<MaintenanceItem>({
         data: null,
         error: new Error("DB Error"),
@@ -197,11 +203,11 @@ describe("src/services/maintenance_items", () => {
       name: "テスト作成",
       icon: null,
       interval_days: 10,
-      last_completed_at: new Date().toISOString(),
+      last_completed_at: "2026-04-15T10:00:00Z",
       memo: "メモ",
     };
 
-    it("未認証の場合、エラーがスローされること", async () => {
+    test("未認証の場合、エラーがスローされること", async () => {
       mockGetUser.mockResolvedValue({ data: { user: null }, error: null });
 
       await expect(createMaintenanceItem(validInsertData)).rejects.toThrow(
@@ -209,7 +215,7 @@ describe("src/services/maintenance_items", () => {
       );
     });
 
-    it("正常にデータを作成できること", async () => {
+    test("正常にデータを作成できること", async () => {
       const createdData = createMockItem({
         name: validInsertData.name,
         interval_days: validInsertData.interval_days,
@@ -234,7 +240,7 @@ describe("src/services/maintenance_items", () => {
       expect(result).toEqual(createdData);
     });
 
-    it("DB作成時にエラーが発生した場合、エラーがスローされること", async () => {
+    test("DB作成時にエラーが発生した場合、エラーがスローされること", async () => {
       const chain = createMockChain<MaintenanceItem>({
         data: null,
         error: new Error("DB Error"),
@@ -248,7 +254,13 @@ describe("src/services/maintenance_items", () => {
   });
 
   describe("updateMaintenanceItem", () => {
-    it("正常にデータを更新できること", async () => {
+    test("不正なIDのとき、エラーがスローされること", async () => {
+      await expect(
+        updateMaintenanceItem("  ", { name: "更新" }),
+      ).rejects.toThrow("指定されたIDは不正です。");
+    });
+
+    test("正常にデータを更新できること", async () => {
       const mockUpdatedData = createMockItem({ name: "更新後" });
       const chain = createMockChain<MaintenanceItem>({
         data: mockUpdatedData,
@@ -267,7 +279,7 @@ describe("src/services/maintenance_items", () => {
       expect(result).toEqual(mockUpdatedData);
     });
 
-    it("DB更新時にエラーが発生した場合、エラーがスローされること", async () => {
+    test("DB更新時にエラーが発生した場合、エラーがスローされること", async () => {
       const chain = createMockChain<MaintenanceItem>({
         data: null,
         error: new Error("DB Error"),
@@ -281,13 +293,27 @@ describe("src/services/maintenance_items", () => {
   });
 
   describe("updateMaintenanceItemNextCycle", () => {
-    it("last_completed_atが現在時刻で更新されること", async () => {
+    test("不正なIDのとき、エラーがスローされること", async () => {
+      await expect(updateMaintenanceItemNextCycle("  ")).rejects.toThrow(
+        "指定されたIDは不正です。",
+      );
+    });
+
+    test("未認証の場合、エラーがスローされること", async () => {
+      mockGetUser.mockResolvedValue({ data: { user: null }, error: null });
+
+      await expect(updateMaintenanceItemNextCycle("item1")).rejects.toThrow(
+        "認証が必要です。",
+      );
+    });
+
+    test("last_completed_atが現在時刻で更新されること", async () => {
       vi.useFakeTimers();
-      const mockNow = new Date("2026-04-16T12:00:00Z");
+      const mockNow = "2026-04-16T12:00:00.000Z";
       vi.setSystemTime(mockNow);
 
       const mockUpdatedData = createMockItem({
-        last_completed_at: mockNow.toISOString(),
+        last_completed_at: mockNow,
       });
       const chain = createMockChain<MaintenanceItem>({
         data: mockUpdatedData,
@@ -297,15 +323,62 @@ describe("src/services/maintenance_items", () => {
 
       const result = await updateMaintenanceItemNextCycle("item1");
 
+      expect(mockFrom).toHaveBeenNthCalledWith(1, "maintenance_items");
+      expect(mockFrom).toHaveBeenNthCalledWith(2, "maintenance_logs");
       expect(chain.update).toHaveBeenCalledWith({
-        last_completed_at: mockNow.toISOString(),
+        last_completed_at: mockNow,
       });
       expect(result).toEqual(mockUpdatedData);
+    });
+
+    test("メンテナンスログの作成に失敗した場合でも更新結果が返されること", async () => {
+      vi.useFakeTimers();
+      const mockNow = "2026-04-30T12:00:00.000Z";
+      vi.setSystemTime(mockNow);
+
+      const mockUpdatedData = createMockItem({
+        last_completed_at: mockNow,
+      });
+      // 1回目: maintenance_items の update 用チェーン（成功）
+      const itemChain = createMockChain<MaintenanceItem>({
+        data: mockUpdatedData,
+        error: null,
+      });
+      // 2回目: maintenance_logs の insert 用チェーン（失敗）
+      const logChain = createMockChain<null>({
+        data: null,
+        error: new Error("Log Error"),
+      });
+      mockFrom.mockReturnValueOnce(itemChain).mockReturnValueOnce(logChain);
+
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
+      const result = await updateMaintenanceItemNextCycle("item1");
+
+      expect(mockFrom).toHaveBeenNthCalledWith(1, "maintenance_items");
+      expect(mockFrom).toHaveBeenNthCalledWith(2, "maintenance_logs");
+
+      // ログ作成エラーは内部でのみ処理され、戻り値には影響しない
+      expect(result).toEqual(mockUpdatedData);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Error creating maintenance log:",
+        expect.any(Error),
+      );
+
+      consoleSpy.mockRestore();
     });
   });
 
   describe("deleteMaintenanceItem", () => {
-    it("正常にデータを削除できること", async () => {
+    test("不正なIDのとき、エラーがスローされること", async () => {
+      await expect(deleteMaintenanceItem("  ")).rejects.toThrow(
+        "指定されたIDは不正です。",
+      );
+    });
+
+    test("正常にデータを削除できること", async () => {
       // 成功時はnullが返る
       const chain = createMockChain<null>({ data: null, error: null });
       mockFrom.mockReturnValue(chain);
@@ -318,7 +391,7 @@ describe("src/services/maintenance_items", () => {
       expect(chain.eq).toHaveBeenCalledWith("user_id", "test-user-id");
     });
 
-    it("DB削除時にエラーが発生した場合、エラーがスローされること", async () => {
+    test("DB削除時にエラーが発生した場合、エラーがスローされること", async () => {
       const chain = createMockChain<null>({
         data: null,
         error: new Error("DB Error"),
@@ -328,6 +401,88 @@ describe("src/services/maintenance_items", () => {
       await expect(deleteMaintenanceItem("item1")).rejects.toThrow(
         "項目の削除に失敗しました。",
       );
+    });
+  });
+
+  describe("getMaintenanceLogs", () => {
+    test("認証エラーの場合、エラーがスローされること", async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: null },
+        error: new Error("Auth Error"),
+      });
+
+      await expect(
+        getMaintenanceLogs("2026-01-01", "2026-12-31"),
+      ).rejects.toThrow(
+        "認証に失敗しました。ログインしているか確認してください。",
+      );
+    });
+
+    test("未ログインの場合、エラーがスローされること", async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: null },
+        error: null,
+      });
+
+      await expect(
+        getMaintenanceLogs("2026-01-01", "2026-12-31"),
+      ).rejects.toThrow(
+        "認証に失敗しました。ログインしているか確認してください。",
+      );
+    });
+
+    test("正常に指定期間のログを取得できること", async () => {
+      const mockData: MaintenanceLog[] = [
+        {
+          id: "log1",
+          item_id: "item1",
+          user_id: "test-user-id",
+          completed_at: "2026-04-15T10:00:00Z",
+          notes: null,
+          created_at: "2026-04-15T10:00:00Z",
+        },
+      ];
+      const chain = createMockChain<MaintenanceLog[]>({
+        data: mockData,
+        error: null,
+      });
+      mockFrom.mockReturnValue(chain);
+
+      const result = await getMaintenanceLogs("2026-04-01", "2026-04-30");
+
+      expect(mockFrom).toHaveBeenCalledWith("maintenance_logs");
+      expect(chain.select).toHaveBeenCalledWith("*");
+      expect(chain.eq).toHaveBeenCalledWith("user_id", "test-user-id");
+      expect(chain.gte).toHaveBeenCalledWith("completed_at", "2026-04-01");
+      expect(chain.lte).toHaveBeenCalledWith("completed_at", "2026-04-30");
+      expect(chain.order).toHaveBeenCalledWith("completed_at", {
+        ascending: false,
+      });
+      expect(result).toEqual(mockData);
+    });
+
+    test("データが存在しない場合、空配列を返すこと", async () => {
+      const chain = createMockChain<MaintenanceLog[]>({
+        data: null,
+        error: null,
+      });
+      mockFrom.mockReturnValue(chain);
+
+      const result = await getMaintenanceLogs("2026-04-01", "2026-04-30");
+
+      expect(result).toEqual([]);
+    });
+
+    test("DB取得時にエラーが発生した場合、エラーがスローされること", async () => {
+      const chain = createMockChain<MaintenanceLog[]>({
+        data: null,
+        error: new Error("DB Error"),
+      });
+      mockFrom.mockReturnValue(chain);
+
+      await expect(
+        getMaintenanceLogs("2026-04-01", "2026-04-30"),
+      ).rejects.toThrow("メンテナンス履歴の取得に失敗しました。");
     });
   });
 });

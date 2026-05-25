@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import useMaintenanceItems, {
@@ -63,7 +63,7 @@ describe("useMaintenanceItems", () => {
   });
 
   describe("Query: fetchMaintenanceItems", () => {
-    it("正常にgetMaintenanceItemsが呼ばれ、データが取得できること", async () => {
+    test("正常にgetMaintenanceItemsが呼ばれ、データが取得できること", async () => {
       const mockData = [createMockItem()];
       mockGetMaintenanceItems.mockResolvedValue(mockData);
 
@@ -79,7 +79,7 @@ describe("useMaintenanceItems", () => {
       expect(result.current.fetchMaintenanceItems.data).toEqual(mockData);
     });
 
-    it("取得エラー時にisErrorがtrueになること", async () => {
+    test("取得エラー時にisErrorがtrueになること", async () => {
       mockGetMaintenanceItems.mockRejectedValue(new Error("Fetch Error"));
 
       const { wrapper } = createWrapper();
@@ -94,7 +94,7 @@ describe("useMaintenanceItems", () => {
   });
 
   describe("Mutation: createMaintenanceItem", () => {
-    it("作成に成功した際、クエリのinvalidateが行われること", async () => {
+    test("作成に成功した際、クエリのinvalidateが行われること", async () => {
       const { wrapper, testQueryClient } = createWrapper();
       // invalidateQueriesが呼ばれるかをスパイする
       const resetSpy = vi.spyOn(testQueryClient, "invalidateQueries");
@@ -130,7 +130,7 @@ describe("useMaintenanceItems", () => {
       });
     });
 
-    it("作成に失敗した際、エラーがコンソールに出力されること", async () => {
+    test("作成に失敗した際、エラーがコンソールに出力されること", async () => {
       const consoleErrorSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
