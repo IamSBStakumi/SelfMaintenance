@@ -1,4 +1,6 @@
-const formatValidationError = (error: unknown) => {
+import { ZodError } from "zod";
+
+const formatValidationError = (error: ZodError) => {
   if (
     error &&
     typeof error === "object" &&
