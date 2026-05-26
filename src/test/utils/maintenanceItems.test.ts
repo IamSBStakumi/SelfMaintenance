@@ -295,6 +295,15 @@ describe("src/services/maintenance_items", () => {
       ).rejects.toThrow("指定されたIDは不正です。");
     });
 
+    test("更新項目が空の場合、DBへアクセスせずにエラーがスローされること", async () => {
+      await expect(updateMaintenanceItem("item1", {})).rejects.toThrow(
+        "更新する項目を指定してください。",
+      );
+
+      expect(mockGetUser).not.toHaveBeenCalled();
+      expect(mockFrom).not.toHaveBeenCalled();
+    });
+
     test("入力値が不正な場合、DBへアクセスせずにエラーがスローされること", async () => {
       await expect(
         updateMaintenanceItem("item1", { interval_days: 0 }),
