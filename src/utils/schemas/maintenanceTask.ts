@@ -7,12 +7,20 @@ export const maintenanceTaskLimits = {
   intervalDaysMax: 36500,
 } as const;
 
+const isoDateSchema = z.iso.date();
+const isoDateTimeSchema = z.iso.datetime({ offset: true });
+
 const requiredDateString = z
   .string()
   .min(1, "前回の実施日を入力してください。")
-  .refine((value) => !Number.isNaN(Date.parse(value)), {
-    message: "前回の実施日には有効な日付を入力してください。",
-  });
+  .refine(
+    (value) =>
+      isoDateSchema.safeParse(value).success ||
+      isoDateTimeSchema.safeParse(value).success,
+    {
+      message: "前回の実施日には有効な日付を入力してください。",
+    },
+  );
 
 const optionalText = (maxLength: number, message: string) =>
   z
