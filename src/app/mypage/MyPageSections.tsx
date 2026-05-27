@@ -19,7 +19,7 @@ const MyPageSections = ({ user }: { user: User | null | undefined }) => {
         </div>
       </section>
 
-      <section className="bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-zinc-200 dark:border-zinc-700/50">
+      {/* <section className="bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-zinc-200 dark:border-zinc-700/50">
         <h2 className="text-2xl font-bold mb-6 text-zinc-800 dark:text-zinc-100 border-l-4 border-mint pl-4">
           通知設定
         </h2>
@@ -33,11 +33,11 @@ const MyPageSections = ({ user }: { user: User | null | undefined }) => {
             </p>
           </div>
           <div className="relative inline-block w-12 h-6 rounded-full bg-zinc-200 dark:bg-zinc-700 cursor-pointer transition-colors duration-200 ease-in-out">
-            {/* トグルのUI（モック） */}
+            {/* トグルのUI（モック） 
             <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm" />
           </div>
         </div>
-      </section>
+      </section> */}
     </>
   );
 };
