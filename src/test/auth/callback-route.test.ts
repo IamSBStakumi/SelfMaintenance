@@ -71,6 +71,23 @@ describe("auth callback route", () => {
         resolveRedirectOrigin("https://preview-self-maintenance.vercel.app"),
       ).toBe("https://preview-self-maintenance.vercel.app");
     });
+
+    test("許可オリジン未設定の本番環境では失敗する", () => {
+      delete process.env.APP_ORIGIN;
+
+      expect(() => resolveRedirectOrigin("https://evil.example.com")).toThrow(
+        "No allowed redirect origins configured.",
+      );
+    });
+
+    test("許可オリジン未設定でも開発環境のローカルオリジンは許可する", () => {
+      delete process.env.APP_ORIGIN;
+      vi.stubEnv("NODE_ENV", "development");
+
+      expect(resolveRedirectOrigin("http://localhost:3000")).toBe(
+        "http://localhost:3000",
+      );
+    });
   });
 
   test("x-forwarded-hostをリダイレクト先に使わない", async () => {

@@ -60,7 +60,11 @@ export function resolveRedirectOrigin(requestOrigin: string) {
     return requestOrigin;
   }
 
-  return allowedOrigins[0] ?? requestOrigin;
+  if (allowedOrigins.length === 0) {
+    throw new Error("No allowed redirect origins configured.");
+  }
+
+  return allowedOrigins[0];
 }
 
 export function resolveRedirectPath(next: string | null) {
@@ -88,6 +92,7 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(new URL(next, redirectOrigin));
     }
+    console.error("Auth code exchange failed:", error);
   }
 
   // return the user to an error page with instructions
