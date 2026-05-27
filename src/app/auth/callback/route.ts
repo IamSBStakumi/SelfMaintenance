@@ -30,7 +30,7 @@ function normalizeOrigin(value: string | undefined) {
 }
 
 function getAllowedRedirectOrigins() {
-  return [
+  const origins = [
     process.env.APP_ORIGIN,
     process.env.NEXT_PUBLIC_SITE_URL,
     process.env.VERCEL_URL,
@@ -39,6 +39,8 @@ function getAllowedRedirectOrigins() {
     .flatMap((value) => value?.split(",") ?? [])
     .map((value) => normalizeOrigin(value.trim()))
     .filter((origin): origin is string => origin !== null);
+
+  return Array.from(new Set(origins));
 }
 
 function isLocalOrigin(origin: string) {
