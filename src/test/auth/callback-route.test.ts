@@ -48,6 +48,27 @@ describe("auth callback route", () => {
         "/dashboard",
       );
     });
+
+    test("相対パスとクエリ文字列を許可する", () => {
+      expect(resolveRedirectPath("/dashboard?tab=tasks")).toBe(
+        "/dashboard?tab=tasks",
+      );
+    });
+
+    test("外部URLと危険な相対URLをデフォルトへ戻す", () => {
+      expect(resolveRedirectPath("https://evil.example.com")).toBe(
+        "/dashboard",
+      );
+      expect(resolveRedirectPath("//evil.example.com/path")).toBe("/dashboard");
+      expect(resolveRedirectPath("/\\evil.example.com/path")).toBe(
+        "/dashboard",
+      );
+    });
+
+    test("nullや空文字の場合はデフォルトへ戻す", () => {
+      expect(resolveRedirectPath(null)).toBe("/dashboard");
+      expect(resolveRedirectPath("")).toBe("/dashboard");
+    });
   });
 
   describe("resolveRedirectOrigin", () => {
