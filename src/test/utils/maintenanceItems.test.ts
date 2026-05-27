@@ -7,7 +7,7 @@ import {
   updateMaintenanceItemNextCycle,
   getMaintenanceLogs,
   deleteMaintenanceItem,
-} from "@/services/maintenance_items";
+} from "@/services/maintenanceService";
 import type {
   MaintenanceItem,
   InsertMaintenanceItem,
@@ -215,6 +215,18 @@ describe("src/services/maintenance_items", () => {
       );
     });
 
+    test("入力値が不正な場合、DBへアクセスせずにエラーがスローされること", async () => {
+      await expect(
+        createMaintenanceItem({
+          ...validInsertData,
+          name: "   ",
+        }),
+      ).rejects.toThrow("タスク名を入力してください。");
+
+      expect(mockGetUser).not.toHaveBeenCalled();
+      expect(mockFrom).not.toHaveBeenCalled();
+    });
+
     test("正常にデータを作成できること", async () => {
       const createdData = createMockItem({
         name: validInsertData.name,
@@ -240,6 +252,29 @@ describe("src/services/maintenance_items", () => {
       expect(result).toEqual(createdData);
     });
 
+    test("作成時に入力値が正規化されること", async () => {
+      const chain = createMockChain<MaintenanceItem>({
+        data: createMockItem({ name: "テスト作成" }),
+        error: null,
+      });
+      mockFrom.mockReturnValue(chain);
+
+      await createMaintenanceItem({
+        ...validInsertData,
+        name: "  テスト作成  ",
+        icon: " ",
+        memo: "",
+      });
+
+      expect(chain.insert).toHaveBeenCalledWith({
+        ...validInsertData,
+        name: "テスト作成",
+        icon: null,
+        memo: null,
+        user_id: "test-user-id",
+      });
+    });
+
     test("DB作成時にエラーが発生した場合、エラーがスローされること", async () => {
       const chain = createMockChain<MaintenanceItem>({
         data: null,
@@ -258,6 +293,24 @@ describe("src/services/maintenance_items", () => {
       await expect(
         updateMaintenanceItem("  ", { name: "更新" }),
       ).rejects.toThrow("指定されたIDは不正です。");
+    });
+
+    test("更新項目が空の場合、DBへアクセスせずにエラーがスローされること", async () => {
+      await expect(updateMaintenanceItem("item1", {})).rejects.toThrow(
+        "更新する項目を指定してください。",
+      );
+
+      expect(mockGetUser).not.toHaveBeenCalled();
+      expect(mockFrom).not.toHaveBeenCalled();
+    });
+
+    test("入力値が不正な場合、DBへアクセスせずにエラーがスローされること", async () => {
+      await expect(
+        updateMaintenanceItem("item1", { interval_days: 0 }),
+      ).rejects.toThrow("周期には1以上の数値を入力してください。");
+
+      expect(mockGetUser).not.toHaveBeenCalled();
+      expect(mockFrom).not.toHaveBeenCalled();
     });
 
     test("正常にデータを更新できること", async () => {

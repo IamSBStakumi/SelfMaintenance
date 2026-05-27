@@ -1,22 +1,15 @@
 "use client";
 
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import {
+  maintenanceTaskFormSchema,
+  MaintenanceTaskFormValues,
+} from "@/utils/schemas/maintenanceTask";
 
-export const taskSchema = z.object({
-  name: z.string().trim().min(1, "タスク名を入力してください。"),
-  icon: z.string().max(2, "アイコンは2文字以内で入力してください。").optional(),
-  interval_days: z
-    .number({ error: "周期には数値を入力してください。" })
-    .int("周期には整数を入力してください。")
-    .min(1, "周期には1以上の数値を入力してください。"),
-  last_completed_at: z.string().min(1, "前回の実施日を入力してください。"),
-  memo: z.string().optional(),
-});
-
-export type TaskFormValues = z.infer<typeof taskSchema>;
+export const taskSchema = maintenanceTaskFormSchema;
+export type TaskFormValues = MaintenanceTaskFormValues;
 
 interface TaskFormProps {
   defaultValues: TaskFormValues;
@@ -36,7 +29,7 @@ export default function TaskForm({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<TaskFormValues>({
-    resolver: zodResolver(taskSchema),
+    resolver: zodResolver(maintenanceTaskFormSchema),
     defaultValues,
   });
 

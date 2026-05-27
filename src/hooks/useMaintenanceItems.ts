@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getMaintenanceItems,
   createMaintenanceItem,
-} from "@/services/maintenance_items";
+} from "@/services/maintenanceService";
 
 // クエリキーを定数として公開し、invalidateQueries 等で外部から参照できるようにします
 export const MAINTENANCE_ITEMS_QUERY_KEY = ["maintenance_items"] as const;
