@@ -12,7 +12,7 @@ export default function DashboardPage() {
   const { data: items, isPending, isError } = fetchMaintenanceItems;
 
   return (
-    <div className="min-h-screen bg-lavender p-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100">
+    <div className="min-h-screen bg-lavender px-4 py-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 sm:p-6">
       <Header />
       <main className="max-w-5xl mx-auto pb-20">
         <DashboardHeader />

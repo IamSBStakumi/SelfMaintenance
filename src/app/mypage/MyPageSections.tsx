@@ -3,8 +3,8 @@ import { User } from "@supabase/supabase-js";
 const MyPageSections = ({ user }: { user: User | null | undefined }) => {
   return (
     <>
-      <section className="bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-zinc-200 dark:border-zinc-700/50">
-        <h2 className="text-2xl font-bold mb-6 text-zinc-800 dark:text-zinc-100 border-l-4 border-soft-pink pl-4">
+      <section className="bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md rounded-3xl p-5 shadow-sm border border-zinc-200 dark:border-zinc-700/50 sm:p-8">
+        <h2 className="text-xl font-bold mb-6 text-zinc-800 dark:text-zinc-100 border-l-4 border-soft-pink pl-4 sm:text-2xl">
           プロフィール
         </h2>
         <div className="space-y-6">
@@ -12,7 +12,7 @@ const MyPageSections = ({ user }: { user: User | null | undefined }) => {
             <label className="text-sm font-medium text-zinc-500 dark:text-zinc-400 block mb-1">
               メールアドレス
             </label>
-            <p className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
+            <p className="break-words text-base font-semibold text-zinc-800 dark:text-zinc-100 sm:text-lg">
               {user?.email || "未設定"}
             </p>
           </div>

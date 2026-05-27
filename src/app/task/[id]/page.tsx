@@ -12,8 +12,8 @@ const TaskPage = () => {
   const { data: taskData, isPending, isError } = fetchMaintenanceItem;
 
   return (
-    <div className="min-h-screen bg-zinc-50 p-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100">
-      <main className="max-w-5xl mx-auto pb-20">
+    <div className="min-h-screen bg-zinc-50 px-4 py-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 sm:p-6">
+      <main className="max-w-2xl mx-auto pb-20">
         {/* ローディング中 */}
         {isPending && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

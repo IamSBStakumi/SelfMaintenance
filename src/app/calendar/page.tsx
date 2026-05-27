@@ -38,12 +38,12 @@ export default function CalendarPage() {
   );
 
   return (
-    <div className="min-h-screen bg-lavender p-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100">
+    <div className="min-h-screen bg-lavender px-4 py-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 sm:p-6">
       <Header />
       <main className="max-w-5xl mx-auto pb-20">
         <CalendarHeader />
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           <div className="w-full lg:w-[60%] shrink-0">
             <Calendar
               logs={logs}

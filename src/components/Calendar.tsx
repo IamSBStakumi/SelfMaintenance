@@ -46,8 +46,8 @@ export default function Calendar({
   const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
 
   return (
-    <div className="w-full bg-white rounded-2xl shadow-sm p-4 sm:p-6 border border-zinc-100 flex flex-col animate-fade-in-up">
-      <div className="flex justify-between items-center mb-6">
+    <div className="w-full bg-white rounded-2xl shadow-sm p-3 sm:p-6 border border-zinc-100 flex flex-col animate-fade-in-up">
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
         <button
           onClick={prevMonth}
           className="p-2 hover:bg-zinc-100 rounded-full transition-colors active:scale-95 cursor-pointer"
@@ -67,7 +67,7 @@ export default function Calendar({
             />
           </svg>
         </button>
-        <span className="text-lg font-bold text-zinc-800 tracking-wide">
+        <span className="text-base font-bold text-zinc-800 tracking-wide sm:text-lg">
           {format(currentDate, dateFormat, { locale: ja })}
         </span>
         <button
@@ -102,7 +102,7 @@ export default function Calendar({
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1 sm:gap-2">
+      <div className="grid grid-cols-7 gap-0.5 sm:gap-2">
         {daysInCalendar.map((day, idx) => {
           const isCurrentMonth = isSameMonth(day, monthStart);
           const isTodayDay = isToday(day);
@@ -118,7 +118,7 @@ export default function Calendar({
               disabled={!isCurrentMonth}
               className={`
                 aspect-square flex flex-col items-center justify-center relative cursor-pointer
-                rounded-xl transition-all sm:text-base text-sm outline-none focus:ring-2 focus:ring-indigo-500
+                rounded-lg transition-all text-xs outline-none focus:ring-2 focus:ring-indigo-500 sm:rounded-xl sm:text-base
                 ${!isCurrentMonth ? "text-zinc-300 opacity-50" : "text-zinc-700 hover:bg-indigo-50 active:scale-95"}
                 ${isTodayDay ? "font-bold text-indigo-700 bg-indigo-50 ring-1 ring-indigo-200" : ""}
                 ${dayLogs.length > 0 ? "font-medium" : ""}

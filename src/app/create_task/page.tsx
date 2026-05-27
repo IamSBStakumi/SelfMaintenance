@@ -40,7 +40,7 @@ export default function CreateTaskPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 p-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 flex flex-col items-center">
+    <div className="min-h-screen bg-zinc-50 px-4 py-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 flex flex-col items-center sm:p-6">
       <div className="max-w-2xl w-full">
         <CreateTaskHeader />
 
@@ -49,7 +49,7 @@ export default function CreateTaskPage() {
           className={`
             bg-white/70 dark:bg-zinc-800/50 backdrop-blur-xl
             border border-white/20 dark:border-zinc-700/30
-            rounded-3xl p-8 shadow-2xl shadow-indigo-500/5
+            rounded-3xl p-5 shadow-2xl shadow-indigo-500/5 sm:p-8
             transition-all duration-500 transform
           `}
         >
