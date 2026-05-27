@@ -25,7 +25,7 @@ const Header = () => {
       </div>
 
       <nav className="mt-4 -mx-4 overflow-x-auto px-4">
-        <ul className="mx-auto flex w-max max-w-full bg-white/50 dark:bg-zinc-800/50 backdrop-blur-md rounded-full shadow-sm p-1.5 border border-zinc-200 dark:border-zinc-700/50 gap-1">
+        <ul className="mx-auto flex w-max bg-white/50 dark:bg-zinc-800/50 backdrop-blur-md rounded-full shadow-sm p-1.5 border border-zinc-200 dark:border-zinc-700/50 gap-1">
           <li>
             <Link
               href="/dashboard"
