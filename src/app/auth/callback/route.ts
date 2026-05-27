@@ -2,33 +2,93 @@ import { NextResponse } from "next/server";
 // The client you created from the Server-Side Auth instructions
 import { createClient } from "@/lib/supabase/server";
 
+const DEFAULT_REDIRECT_PATH = "/dashboard";
+const AUTH_CODE_ERROR_PATH = "/auth/auth-code-error";
+const LOCALHOST_HOSTNAMES = new Set(["localhost", "127.0.0.1", "::1"]);
+
+function normalizeOrigin(value: string | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const url = new URL(
+      value.startsWith("http://") || value.startsWith("https://")
+        ? value
+        : `https://${value}`,
+    );
+
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return null;
+    }
+
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
+
+function getAllowedRedirectOrigins() {
+  return [
+    process.env.APP_ORIGIN,
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.VERCEL_URL,
+    process.env.ALLOWED_REDIRECT_ORIGINS,
+  ]
+    .flatMap((value) => value?.split(",") ?? [])
+    .map((value) => normalizeOrigin(value.trim()))
+    .filter((origin): origin is string => origin !== null);
+}
+
+function isLocalOrigin(origin: string) {
+  try {
+    return LOCALHOST_HOSTNAMES.has(new URL(origin).hostname);
+  } catch {
+    return false;
+  }
+}
+
+export function resolveRedirectOrigin(requestOrigin: string) {
+  const allowedOrigins = getAllowedRedirectOrigins();
+
+  if (allowedOrigins.includes(requestOrigin)) {
+    return requestOrigin;
+  }
+
+  if (process.env.NODE_ENV === "development" && isLocalOrigin(requestOrigin)) {
+    return requestOrigin;
+  }
+
+  return allowedOrigins[0] ?? requestOrigin;
+}
+
+export function resolveRedirectPath(next: string | null) {
+  if (!next || !next.startsWith("/") || next.startsWith("//")) {
+    return DEFAULT_REDIRECT_PATH;
+  }
+
+  try {
+    const url = new URL(next, "https://example.com");
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return DEFAULT_REDIRECT_PATH;
+  }
+}
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  // if "next" is in param, use it as the redirect URL
-  let next = searchParams.get("next") ?? "/dashboard";
-  if (!next.startsWith("/")) {
-    // if "next" is not a relative URL, use the default
-    next = "/dashboard";
-  }
+  const redirectOrigin = resolveRedirectOrigin(origin);
+  const next = resolveRedirectPath(searchParams.get("next"));
 
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      const forwardedHost = request.headers.get("x-forwarded-host"); // original origin before load balancer
-      const isLocalEnv = process.env.NODE_ENV === "development";
-      if (isLocalEnv) {
-        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-        return NextResponse.redirect(`${origin}${next}`);
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      } else {
-        return NextResponse.redirect(`${origin}${next}`);
-      }
+      return NextResponse.redirect(new URL(next, redirectOrigin));
     }
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  return NextResponse.redirect(new URL(AUTH_CODE_ERROR_PATH, redirectOrigin));
 }
