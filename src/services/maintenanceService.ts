@@ -2,11 +2,34 @@
 
 import { createClient } from "@/lib/supabase/server";
 import {
+  maintenanceTaskSchema,
+  maintenanceTaskUpdateSchema,
+} from "@/utils/schemas/maintenanceTask";
+import formatValidationError from "@/utils/formatValidationError";
+import {
   InsertMaintenanceItem,
   MaintenanceItem,
   UpdateMaintenanceItem,
   MaintenanceLog,
 } from "@/types/maintenance";
+
+const validateMaintenanceTask = (data: InsertMaintenanceItem) => {
+  const validationResult = maintenanceTaskSchema.safeParse(data);
+  if (!validationResult.success) {
+    throw new Error(formatValidationError(validationResult.error));
+  }
+
+  return validationResult.data;
+};
+
+const validateMaintenanceTaskUpdate = (data: UpdateMaintenanceItem) => {
+  const validationResult = maintenanceTaskUpdateSchema.safeParse(data);
+  if (!validationResult.success) {
+    throw new Error(formatValidationError(validationResult.error));
+  }
+
+  return validationResult.data;
+};
 
 const normalizeAndValidateId = (id: string) => {
   const normalizedId = id?.trim();
@@ -89,6 +112,7 @@ export async function getMaintenanceItemById(
 export async function createMaintenanceItem(
   data: InsertMaintenanceItem,
 ): Promise<MaintenanceItem> {
+  const validatedData = validateMaintenanceTask(data);
   const supabase = await createClient();
 
   const {
@@ -101,7 +125,7 @@ export async function createMaintenanceItem(
   const { data: insertedData, error } = await supabase
     .from("maintenance_items")
     .insert({
-      ...data,
+      ...validatedData,
       user_id: user.id,
     })
     .select()
@@ -123,6 +147,7 @@ export async function updateMaintenanceItem(
   data: UpdateMaintenanceItem,
 ): Promise<MaintenanceItem> {
   const normalizedId = normalizeAndValidateId(id);
+  const validatedData = validateMaintenanceTaskUpdate(data);
 
   const supabase = await createClient();
 
@@ -135,7 +160,7 @@ export async function updateMaintenanceItem(
 
   const { data: updatedData, error } = await supabase
     .from("maintenance_items")
-    .update(data)
+    .update(validatedData)
     .eq("id", normalizedId)
     .eq("user_id", user.id) // 所有者チェックを追加
     .select()
