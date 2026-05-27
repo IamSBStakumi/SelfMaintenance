@@ -44,7 +44,7 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
         if (e.target !== e.currentTarget) return;
         if (e.key === "Enter") handleCardClick();
       }}
-      className={`rounded-3xl p-5 shadow-soft transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 flex flex-col justify-between sm:p-6 sm:hover:scale-105 ${color} text-zinc-800 cursor-pointer`}
+      className={`rounded-3xl p-5 shadow-soft transition-all duration-300 sm:hover:scale-[1.02] hover:-translate-y-1 flex flex-col justify-between sm:p-6 sm:hover:scale-105 ${color} text-zinc-800 cursor-pointer`}
     >
       <div>
         {/* アイコンが設定されている場合は表示 */}
