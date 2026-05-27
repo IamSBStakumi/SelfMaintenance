@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 const DEFAULT_REDIRECT_PATH = "/dashboard";
 const AUTH_CODE_ERROR_PATH = "/auth/auth-code-error";
 const LOCALHOST_HOSTNAMES = new Set(["localhost", "127.0.0.1", "::1"]);
+const SAFE_RELATIVE_PATH_PATTERN = /^\/(?![/\\])/;
 
 function normalizeOrigin(value: string | undefined) {
   if (!value) {
@@ -63,7 +64,7 @@ export function resolveRedirectOrigin(requestOrigin: string) {
 }
 
 export function resolveRedirectPath(next: string | null) {
-  if (!next || !next.startsWith("/") || next.startsWith("//")) {
+  if (!next || !SAFE_RELATIVE_PATH_PATTERN.test(next)) {
     return DEFAULT_REDIRECT_PATH;
   }
 

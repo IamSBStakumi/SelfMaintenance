@@ -39,11 +39,14 @@ describe("auth callback route", () => {
       );
     });
 
-    test("外部URLとプロトコル相対URLをデフォルトへ戻す", () => {
+    test("外部URLと危険な相対URLをデフォルトへ戻す", () => {
       expect(resolveRedirectPath("https://evil.example.com")).toBe(
         "/dashboard",
       );
       expect(resolveRedirectPath("//evil.example.com/path")).toBe("/dashboard");
+      expect(resolveRedirectPath("/\\evil.example.com/path")).toBe(
+        "/dashboard",
+      );
     });
   });
 
