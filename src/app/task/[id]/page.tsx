@@ -2,6 +2,8 @@
 
 import { useParams } from "next/navigation";
 import useMaintenanceItem from "@/hooks/useMaintenanceItem";
+import TaskFormHeader from "@/components/TaskFormHeader";
+import TaskFormFooter from "@/components/TaskFormFooter";
 import TaskContent from "./TaskContent";
 
 const TaskPage = () => {
@@ -13,6 +15,8 @@ const TaskPage = () => {
 
   return (
     <div className="min-h-screen bg-zinc-50 px-4 py-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 sm:p-6">
+      <TaskFormHeader headingText="タスク更新" />
+
       <main className="max-w-2xl mx-auto pb-20">
         {/* ローディング中 */}
         {isPending && (
@@ -40,6 +44,8 @@ const TaskPage = () => {
           <TaskContent taskData={taskData} />
         )}
       </main>
+
+      <TaskFormFooter />
     </div>
   );
 };

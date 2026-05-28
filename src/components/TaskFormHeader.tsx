@@ -2,11 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-/**
- * タスク新規登録ページのヘッダーコンポーネント
- * 「戻る」ボタンとページタイトルを表示します。
- */
-const CreateTaskHeader = () => {
+const TaskFormHeader = ({ headingText }: { headingText: string }) => {
   const router = useRouter();
 
   return (
@@ -22,10 +18,10 @@ const CreateTaskHeader = () => {
         <span className="font-medium">戻る</span>
       </button>
       <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
-        タスクの新規登録
+        {headingText}
       </h1>
     </header>
   );
 };
 
-export default CreateTaskHeader;
+export default TaskFormHeader;
