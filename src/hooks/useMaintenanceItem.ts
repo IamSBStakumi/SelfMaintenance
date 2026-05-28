@@ -36,7 +36,7 @@ const useMaintenanceItem = (id: string) => {
       router.push("/dashboard");
     },
     onError: () => {
-      console.error("メンテナンス項目の更新に失敗しました。");
+      console.error("定期タスクの更新に失敗しました。");
     },
   });
 
@@ -51,7 +51,7 @@ const useMaintenanceItem = (id: string) => {
       });
     },
     onError: () => {
-      console.error("メンテナンス項目の更新に失敗しました。");
+      console.error("定期タスクの更新に失敗しました。");
     },
   });
 

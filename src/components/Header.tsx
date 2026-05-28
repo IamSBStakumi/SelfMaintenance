@@ -17,10 +17,10 @@ const Header = () => {
     <header className="max-w-4xl mx-auto mb-6 mt-6 w-full px-4 text-center sm:mb-8 sm:mt-8">
       <div className="flex flex-col items-center">
         <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight text-zinc-800 dark:text-zinc-100">
-          Self Maintenance
+          メグループ
         </h1>
         <p className="text-zinc-500 dark:text-zinc-400 max-w-xl mb-6 text-sm md:text-base">
-          個人の周期的なタスクを一元管理し、日々のコンディションを最適に保つためのサポートアプリ
+          忘れがちな定期タスクを一元管理し、次にやるタイミングを見逃さないための自己管理アプリ
         </p>
       </div>
 

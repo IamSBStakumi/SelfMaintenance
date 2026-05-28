@@ -41,7 +41,7 @@ export default function DashboardPage() {
         {!isPending && !isError && items?.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 text-center gap-3">
             <p className="text-zinc-500 dark:text-zinc-400 text-lg">
-              メンテナンス項目がまだありません。
+              定期タスクがまだありません。
             </p>
             <p className="text-zinc-400 dark:text-zinc-500 text-sm">
               最初のタスクを追加してみましょう。

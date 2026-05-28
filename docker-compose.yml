@@ -5,7 +5,7 @@ services:
       context: . # カレントディレクトリをビルドのベースにする
       dockerfile: Dockerfile # 使用するDockerfileの指定
 
-    container_name: self-maintenance-app # 起動するコンテナの名前
+    container_name: megloop-app # 起動するコンテナの名前
 
     # ホストマシンのネットワークスタックを直接共有する
     # これにより、コンテナ内からも 127.0.0.1 でホスト側の Supabase 等にアクセス可能になる
