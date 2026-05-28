@@ -43,7 +43,7 @@ export default function CreateTaskPage() {
   return (
     <div className="min-h-screen bg-zinc-50 px-4 py-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 flex flex-col items-center sm:p-6">
       <div className="max-w-2xl w-full">
-        <TaskFormHeader headingText="タスクの新規登録" />
+        <TaskFormHeader headingText="タスク新規登録" />
 
         {/* フォームカード */}
         <main
