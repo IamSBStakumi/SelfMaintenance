@@ -44,7 +44,7 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
         if (e.target !== e.currentTarget) return;
         if (e.key === "Enter") handleCardClick();
       }}
-      className={`rounded-3xl p-6 shadow-soft transition-all duration-300 hover:scale-105 hover:-translate-y-1 flex flex-col justify-between ${color} text-zinc-800 cursor-pointer`}
+      className={`rounded-3xl p-5 shadow-soft transition-all duration-300 sm:hover:scale-[1.02] hover:-translate-y-1 flex flex-col justify-between sm:p-6 sm:hover:scale-105 ${color} text-zinc-800 cursor-pointer`}
     >
       <div>
         {/* アイコンが設定されている場合は表示 */}
@@ -70,7 +70,7 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
         </div>
       </div>
 
-      <div className="mt-auto pt-4 border-t border-black/10 flex items-center justify-between">
+      <div className="mt-auto pt-4 border-t border-black/10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider opacity-70 mb-1">
             次回予定
@@ -80,7 +80,7 @@ const MaintenanceItemCard = ({ item }: { item: MaintenanceItem }) => {
           </p>
         </div>
         <button
-          className={`bg-white/90 hover:bg-white text-zinc-800 font-bold py-2.5 px-5 rounded-full shadow-sm transition-colors text-sm hover:shadow-md active:scale-95 ${updateMaintenanceItemNextCycle.isPending ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+          className={`w-full bg-white/90 hover:bg-white text-zinc-800 font-bold py-2.5 px-5 rounded-full shadow-sm transition-colors text-sm hover:shadow-md active:scale-95 sm:w-auto ${updateMaintenanceItemNextCycle.isPending ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           aria-label={`${item.name}を完了にする`}
           onClick={handleCompleteTask}
           disabled={updateMaintenanceItemNextCycle.isPending}
