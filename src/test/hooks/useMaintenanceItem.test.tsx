@@ -155,7 +155,7 @@ describe("useMaintenanceItem", () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "メンテナンス項目の更新に失敗しました。",
+        "定期タスクの更新に失敗しました。",
       );
       expect(mockPush).not.toHaveBeenCalled();
     });
@@ -220,7 +220,7 @@ describe("useMaintenanceItem", () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "メンテナンス項目の更新に失敗しました。",
+        "定期タスクの更新に失敗しました。",
       );
       consoleErrorSpy.mockRestore();
     });

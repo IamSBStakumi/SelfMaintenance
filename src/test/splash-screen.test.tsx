@@ -44,9 +44,9 @@ describe("SplashScreen", () => {
     render(<SplashScreen />);
 
     // タイトルとサブタイトルが表示されているか確認
-    expect(screen.getByText("SelfMaintenance")).toBeInTheDocument();
+    expect(screen.getByText("メグループ")).toBeInTheDocument();
     expect(
-      screen.getByText("あなたの快適な日々をサポート"),
+      screen.getByText("忘れがちな定期タスクを、ちょうどよく巡らせる"),
     ).toBeInTheDocument();
   });
 

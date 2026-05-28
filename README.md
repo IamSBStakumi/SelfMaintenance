@@ -1,10 +1,9 @@
-# SelfMaintenance
+# メグループ
 
 [![CI](https://github.com/IamSBStakumi/SelfMaintenance/actions/workflows/ci.yml/badge.svg)](https://github.com/IamSBStakumi/SelfMaintenance/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 
-セルフメンテナンスをサポートするアプリ\
-個人のコンディションを最適に保ち、日々の気持ちを向上させる。
+忘れがちな定期タスクを、ちょうどよく巡らせる自己管理アプリ。
 
 具体的には以下の周期的なタスクを管理する
 
@@ -25,7 +24,7 @@
 
 美容室の予約やコンタクトレンズの交換など、定期的に行うべきタスクについて周期が乱れたり、最後にいつやったか忘れてしまうことがあったため。
 
-自分や部屋、生活についてのメンテナンスを管理・サポートすることを目的として開発している。
+自分や部屋、生活についての定期タスクを管理し、次にやるタイミングを忘れないことを目的として開発している。
 
 ## ✨ 主な機能
 

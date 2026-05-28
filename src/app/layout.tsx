@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Self Maintenance",
-  description: "自分自身を整えるためのメンテナンスタスク管理アプリ",
+  title: "メグループ",
+  description: "定期タスクを忘れずに続けるための自己管理アプリ",
 };
 
 export default function RootLayout({

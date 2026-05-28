@@ -156,7 +156,7 @@ describe("useMaintenanceItems", () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "メンテナンス項目の作成に失敗しました。",
+        "定期タスクの作成に失敗しました。",
       );
       consoleErrorSpy.mockRestore();
     });
