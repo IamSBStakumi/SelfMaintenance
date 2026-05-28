@@ -5,7 +5,8 @@ import { parseISO, startOfDay } from "date-fns";
 import { toast } from "react-toastify";
 import useMaintenanceItems from "@/hooks/useMaintenanceItems";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
-import CreateTaskHeader from "./CreateTaskHeader";
+import TaskFormHeader from "@/components/TaskFormHeader";
+import TaskFormFooter from "@/components/TaskFormFooter";
 
 export default function CreateTaskPage() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function CreateTaskPage() {
   return (
     <div className="min-h-screen bg-zinc-50 px-4 py-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 flex flex-col items-center sm:p-6">
       <div className="max-w-2xl w-full">
-        <CreateTaskHeader />
+        <TaskFormHeader headingText="タスクの新規登録" />
 
         {/* フォームカード */}
         <main
@@ -60,9 +61,7 @@ export default function CreateTaskPage() {
           />
         </main>
 
-        <footer className="mt-12 text-center text-zinc-400 text-sm">
-          <p>登録したタスクはダッシュボードでいつでも確認・編集できます。</p>
-        </footer>
+        <TaskFormFooter />
       </div>
     </div>
   );
