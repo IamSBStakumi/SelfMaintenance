@@ -79,6 +79,12 @@ cp .env.example .env.local
 
 アプリケーションを起動する前に、バックエンドの環境を立ち上げます。
 
+> **Supabase project_id について**
+>
+> `package.json` のパッケージ名は `megloop` ですが、`supabase/config.toml` の `project_id` は既存のローカル Supabase 開発環境との互換性を保つため、意図的に `self-maintenance` のままにしています。
+> この値は Supabase CLI が同一ホスト上のローカルプロジェクトを識別するための名前であり、ホスト済み Supabase プロジェクト名や本番データベースをリネームするものではありません。
+> 本番・プレビュー環境の接続先は `.env` / `.env.local` の `NEXT_PUBLIC_SUPABASE_URL` などで管理します。
+
 ```bash
 # Supabase ローカル開発環境の起動
 yarn supabase start
