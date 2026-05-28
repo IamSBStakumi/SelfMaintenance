@@ -7,10 +7,10 @@ const DashboardHeader = () => {
     <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-8 mt-4 bg-white/40 dark:bg-zinc-800/10 p-4 rounded-3xl backdrop-blur-md border border-white/20 dark:border-zinc-700/30 gap-4 sm:mb-10 sm:mt-6 sm:p-6">
       <div className="text-center md:text-left">
         <h2 className="text-lg font-bold tracking-tight sm:text-xl">
-          メンテナンス一覧
+          定期タスク一覧
         </h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          現在のタスク状況をチェックして、自分自身を整えましょう
+          現在のタスク状況をチェックして、次にやるタイミングを逃さないようにしましょう
         </p>
       </div>
       <button

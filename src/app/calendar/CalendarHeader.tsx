@@ -9,7 +9,7 @@ const CalendarHeader = () => {
         履歴カレンダー
       </h2>
       <p className="text-sm text-zinc-500 dark:text-zinc-400">
-        メンテナンスタスクの完了履歴を振り返りましょう。
+        定期タスクの完了履歴を振り返りましょう。
       </p>
     </div>
   );

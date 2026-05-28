@@ -1,4 +1,4 @@
-# SelfMaintenance — アーキテクチャ・ドキュメント
+# メグループ — アーキテクチャ・ドキュメント
 
 ## 1. システム全体アーキテクチャ
 
@@ -93,7 +93,7 @@ graph TD
 | ------------------- | ------------- | ------------------------------------------------- | ------------------------------ |
 | `id`                | `uuid`        | PK, `gen_random_uuid()`                           | レコード識別子                 |
 | `user_id`           | `uuid`        | NOT NULL, FK → `auth.users(id)` ON DELETE CASCADE | オーナーユーザー               |
-| `name`              | `text`        | NOT NULL                                          | メンテナンス項目名             |
+| `name`              | `text`        | NOT NULL                                          | 定期タスク名                   |
 | `icon`              | `text`        | nullable                                          | 絵文字アイコン                 |
 | `interval_days`     | `integer`     | NOT NULL                                          | 繰り返し間隔（日数）           |
 | `last_completed_at` | `timestamptz` | NOT NULL, default `now()`                         | 最終完了日時                   |

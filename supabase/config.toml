@@ -2,6 +2,8 @@
 # https://supabase.com/docs/guides/local-development/cli/config
 # A string used to distinguish different Supabase projects on the same host. Defaults to the
 # working directory name when running `supabase init`.
+# Keep this local Supabase CLI project identifier stable for existing dev environments.
+# The application package name is "megloop", but this id does not rename the hosted Supabase project.
 project_id = "self-maintenance"
 
 [api]

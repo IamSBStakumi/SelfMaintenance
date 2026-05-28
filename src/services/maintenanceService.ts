@@ -40,8 +40,8 @@ const normalizeAndValidateId = (id: string) => {
 };
 
 /**
- * ログインユーザーのすべてのメンテナンス項目を取得します。
- * @returns メンテナンス項目の配列
+ * ログインユーザーのすべての定期タスクを取得します。
+ * @returns 定期タスクの配列
  * @throws 認証エラーまたはデータベースエラーが発生した場合
  */
 export async function getMaintenanceItems(): Promise<MaintenanceItem[]> {
@@ -57,7 +57,7 @@ export async function getMaintenanceItems(): Promise<MaintenanceItem[]> {
     throw new Error("認証に失敗しました。ログインしているか確認してください。");
   }
 
-  // メンテナンス項目を取得
+  // 定期タスクを取得
   const { data, error } = await supabase
     .from("maintenance_items")
     .select("*")
@@ -66,14 +66,14 @@ export async function getMaintenanceItems(): Promise<MaintenanceItem[]> {
 
   if (error) {
     console.error("Error fetching maintenance items:", error);
-    throw new Error("メンテナンス項目の取得に失敗しました。");
+    throw new Error("定期タスクの取得に失敗しました。");
   }
 
   return (data as MaintenanceItem[]) || [];
 }
 
 /**
- * 指定したIDのメンテナンス項目を取得します。
+ * 指定したIDの定期タスクを取得します。
  */
 export async function getMaintenanceItemById(
   id: string,
@@ -100,14 +100,14 @@ export async function getMaintenanceItemById(
 
   if (error) {
     console.error("Error fetching maintenance item:", error);
-    throw new Error("メンテナンス項目の取得に失敗しました。");
+    throw new Error("定期タスクの取得に失敗しました。");
   }
 
   return data as MaintenanceItem;
 }
 
 /**
- * 新しいメンテナンス項目を登録します。
+ * 新しい定期タスクを登録します。
  */
 export async function createMaintenanceItem(
   data: InsertMaintenanceItem,
@@ -140,7 +140,7 @@ export async function createMaintenanceItem(
 }
 
 /**
- * 指定したIDのメンテナンス項目を更新します。
+ * 指定したIDの定期タスクを更新します。
  */
 export async function updateMaintenanceItem(
   id: string,
@@ -175,7 +175,7 @@ export async function updateMaintenanceItem(
 }
 
 /**
- * 指定したIDのメンテナンス項目を次の周期に更新します。
+ * 指定したIDの定期タスクを次の周期に更新します。
  */
 export async function updateMaintenanceItemNextCycle(
   id: string,
@@ -209,7 +209,7 @@ export async function updateMaintenanceItemNextCycle(
 }
 
 /**
- * 指定した期間内のメンテナンスログを取得します。
+ * 指定した期間内の完了履歴を取得します。
  */
 export async function getMaintenanceLogs(
   startDate: string,
@@ -236,14 +236,14 @@ export async function getMaintenanceLogs(
 
   if (error) {
     console.error("Error fetching maintenance logs:", error);
-    throw new Error("メンテナンス履歴の取得に失敗しました。");
+    throw new Error("完了履歴の取得に失敗しました。");
   }
 
   return (data as MaintenanceLog[]) || [];
 }
 
 /**
- * 指定したIDのメンテナンス項目を削除します。
+ * 指定したIDの定期タスクを削除します。
  */
 export async function deleteMaintenanceItem(id: string): Promise<void> {
   const normalizedId = normalizeAndValidateId(id);

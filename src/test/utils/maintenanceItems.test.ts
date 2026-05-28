@@ -155,7 +155,7 @@ describe("src/services/maintenance_items", () => {
       mockFrom.mockReturnValue(chain);
 
       await expect(getMaintenanceItems()).rejects.toThrow(
-        "メンテナンス項目の取得に失敗しました。",
+        "定期タスクの取得に失敗しました。",
       );
     });
   });
@@ -193,7 +193,7 @@ describe("src/services/maintenance_items", () => {
       mockFrom.mockReturnValue(chain);
 
       await expect(getMaintenanceItemById("item1")).rejects.toThrow(
-        "メンテナンス項目の取得に失敗しました。",
+        "定期タスクの取得に失敗しました。",
       );
     });
   });
@@ -384,7 +384,7 @@ describe("src/services/maintenance_items", () => {
       expect(result).toEqual(mockUpdatedData);
     });
 
-    test("メンテナンスログの作成に失敗した場合でも更新結果が返されること", async () => {
+    test("完了履歴の作成に失敗した場合でも更新結果が返されること", async () => {
       vi.useFakeTimers();
       const mockNow = "2026-04-30T12:00:00.000Z";
       vi.setSystemTime(mockNow);
@@ -535,7 +535,7 @@ describe("src/services/maintenance_items", () => {
 
       await expect(
         getMaintenanceLogs("2026-04-01", "2026-04-30"),
-      ).rejects.toThrow("メンテナンス履歴の取得に失敗しました。");
+      ).rejects.toThrow("完了履歴の取得に失敗しました。");
     });
   });
 });

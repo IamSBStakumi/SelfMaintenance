@@ -29,7 +29,7 @@ const MyPageSections = ({ user }: { user: User | null | undefined }) => {
               プッシュ通知
             </p>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              メンテナンス時期を通知します
+              定期タスクの時期を通知します
             </p>
           </div>
           <div className="relative inline-block w-12 h-6 rounded-full bg-zinc-200 dark:bg-zinc-700 cursor-pointer transition-colors duration-200 ease-in-out">
