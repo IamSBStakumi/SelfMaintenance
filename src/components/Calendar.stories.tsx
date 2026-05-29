@@ -6,24 +6,24 @@ const meta = {
   title: "Components/Calendar",
   component: Calendar,
   args: {
-    currentDate: new Date("2026-05-15T00:00:00.000Z"),
+    currentDate: new Date(2026, 4, 15),
     setCurrentDate: fn(),
     onDayClick: fn(),
     logs: [
       {
         id: "log-1",
         item_id: "item-1",
-        completed_at: "2026-05-03T09:00:00.000Z",
+        completed_at: new Date(2026, 4, 3, 9, 0, 0).toISOString(),
       },
       {
         id: "log-2",
         item_id: "item-2",
-        completed_at: "2026-05-15T12:00:00.000Z",
+        completed_at: new Date(2026, 4, 15, 12, 0, 0).toISOString(),
       },
       {
         id: "log-3",
         item_id: "item-3",
-        completed_at: "2026-05-15T18:00:00.000Z",
+        completed_at: new Date(2026, 4, 15, 18, 0, 0).toISOString(),
       },
     ],
   },

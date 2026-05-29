@@ -4,7 +4,7 @@ import { addMonths, subMonths } from "date-fns";
 import { describe, expect, test, vi } from "vitest";
 import Calendar from "@/components/Calendar";
 
-const currentDate = new Date("2026-05-15T00:00:00.000Z");
+const currentDate = new Date(2026, 4, 15);
 
 const getEnabledDayButton = (day: string) => {
   const button = screen
@@ -94,12 +94,12 @@ describe("Calendar", () => {
           {
             id: "log-1",
             item_id: "item-1",
-            completed_at: "2026-05-15T10:00:00.000Z",
+            completed_at: new Date(2026, 4, 15, 10, 0, 0).toISOString(),
           },
           {
             id: "log-2",
             item_id: "item-2",
-            completed_at: "2026-05-15T11:00:00.000Z",
+            completed_at: new Date(2026, 4, 15, 11, 0, 0).toISOString(),
           },
         ]}
         onDayClick={vi.fn()}
