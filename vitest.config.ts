@@ -8,6 +8,7 @@ const dirname =
   typeof __dirname !== "undefined"
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url));
+const coverageAllFiles = { all: true } as Record<string, unknown>;
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
@@ -16,10 +17,20 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   test: {
+    coverage: {
+      ...coverageAllFiles,
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/**/*.stories.{ts,tsx}",
+        "src/test/**",
+        "src/**/*.d.ts",
+      ],
+    },
     projects: [
       {
         extends: true,
         test: {
+          name: "unit",
           environment: "jsdom",
           setupFiles: ["./src/test/setup.ts"],
           globals: true,
