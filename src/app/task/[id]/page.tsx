@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import useMaintenanceItem from "@/hooks/useMaintenanceItem";
 import TaskFormWrapper from "@/components/TaskFormWrapper";
+import TaskFormCard from "@/components/TaskFormCard";
 import TaskFormHeader from "@/components/TaskFormHeader";
 import TaskFormFooter from "@/components/TaskFormFooter";
 import ErrorAlert from "@/components/ErrorAlert";
@@ -20,14 +21,7 @@ const TaskPage = () => {
     <TaskFormWrapper>
       <TaskFormHeader headingText="タスク更新" />
 
-      <main
-        className={`
-          bg-white/70 dark:bg-zinc-800/50 backdrop-blur-xl
-          border border-white/20 dark:border-zinc-700/30
-          rounded-3xl p-5 shadow-2xl shadow-indigo-500/5 sm:p-8
-          transition-all duration-500 transform
-        `}
-      >
+      <TaskFormCard>
         {/* ローディング中 */}
         {isPending && <Loading />}
 
@@ -38,7 +32,7 @@ const TaskPage = () => {
         {!isPending && !isError && taskData && (
           <TaskContent taskData={taskData} />
         )}
-      </main>
+      </TaskFormCard>
 
       <TaskFormFooter />
     </TaskFormWrapper>
