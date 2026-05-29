@@ -5,9 +5,9 @@ import useMaintenanceItem from "@/hooks/useMaintenanceItem";
 import TaskFormWrapper from "@/components/TaskFormWrapper";
 import TaskFormHeader from "@/components/TaskFormHeader";
 import TaskFormFooter from "@/components/TaskFormFooter";
+import ErrorAlert from "@/components/ErrorAlert";
 import TaskContent from "./TaskContent";
 import Loading from "./Loading";
-import ErrorAlert from "./ErrorAlert";
 
 const TaskPage = () => {
   const { id: taskId } = useParams<{ id: string }>();
