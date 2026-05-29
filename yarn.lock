@@ -2007,23 +2007,23 @@
   dependencies:
     "@rolldown/pluginutils" "^1.0.0"
 
-"@vitest/browser-playwright@4.1.2":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@vitest/browser-playwright/-/browser-playwright-4.1.2.tgz#0a7269cf635c44bf1310ddda2e28be4866caec9e"
-  integrity sha512-N0Z2HzMLvMR6k/tWPTS6Q/DaRscrkax/f2f9DIbNQr+Cd1l4W4wTf/I6S983PAMr0tNqqoTL+xNkLh9M5vbkLg==
+"@vitest/browser-playwright@4.1.7":
+  version "4.1.7"
+  resolved "https://registry.yarnpkg.com/@vitest/browser-playwright/-/browser-playwright-4.1.7.tgz#820a25be9c87a79c7e87637b79ff54072e31abf4"
+  integrity sha512-OlTlJej7YN6VwV7zJJoNeaCsctF+JXpzpZ4oBHUbrQFfIq+0KW2f07rprCLh9N/zRIZ0v4Mchn1QDDmWMUhPKw==
   dependencies:
-    "@vitest/browser" "4.1.2"
-    "@vitest/mocker" "4.1.2"
+    "@vitest/browser" "4.1.7"
+    "@vitest/mocker" "4.1.7"
     tinyrainbow "^3.1.0"
 
-"@vitest/browser@4.1.2":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@vitest/browser/-/browser-4.1.2.tgz#6d3026cc2a8d28b79a1e1a64b64009204cb4a787"
-  integrity sha512-CwdIf90LNf1Zitgqy63ciMAzmyb4oIGs8WZ40VGYrWkssQKeEKr32EzO8MKUrDPPcPVHFI9oQ5ni2Hp24NaNRQ==
+"@vitest/browser@4.1.7":
+  version "4.1.7"
+  resolved "https://registry.yarnpkg.com/@vitest/browser/-/browser-4.1.7.tgz#feb4a0446077341cbc9ae10ad31357a064061702"
+  integrity sha512-N2JFGfXoEGVAut+kHeru9dD4BUMq/q5xDvBARNl0tUsly3m5KglLOu8VO/6MkDfOlgxXTycojkt6gBKsuyR+IQ==
   dependencies:
     "@blazediff/core" "1.9.1"
-    "@vitest/mocker" "4.1.2"
-    "@vitest/utils" "4.1.2"
+    "@vitest/mocker" "4.1.7"
+    "@vitest/utils" "4.1.7"
     magic-string "^0.30.21"
     pngjs "^7.0.0"
     sirv "^3.0.2"
@@ -2068,15 +2068,6 @@
     "@vitest/utils" "4.1.7"
     chai "^6.2.2"
     tinyrainbow "^3.1.0"
-
-"@vitest/mocker@4.1.2":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@vitest/mocker/-/mocker-4.1.2.tgz#3f23523697f9ab9e851b58b2213c4ab6181aa0e6"
-  integrity sha512-Ize4iQtEALHDttPRCmN+FKqOl2vxTiNUhzobQFFt/BM1lRUTG7zRCLOykG/6Vo4E4hnUdfVLo5/eqKPukcWW7Q==
-  dependencies:
-    "@vitest/spy" "4.1.2"
-    estree-walker "^3.0.3"
-    magic-string "^0.30.21"
 
 "@vitest/mocker@4.1.7":
   version "4.1.7"
@@ -2132,11 +2123,6 @@
   integrity sha512-vAfasCOe6AIK70iP5UD11Ac4siNUNJ9i/9PZ3NKx07sG6sUxeag1LWdNrMWeKKYBLlzuK+Gn65Yd5nyL6ds+nw==
   dependencies:
     tinyspy "^4.0.3"
-
-"@vitest/spy@4.1.2":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@vitest/spy/-/spy-4.1.2.tgz#1f312cef5756256639b4c0614f74c8ad9a036ef9"
-  integrity sha512-DU4fBnbVCJGNBwVA6xSToNXrkZNSiw59H8tcuUspVMsBDBST4nfvsPsEHDHGtWRRnqBERBQu7TrTKskmjqTXKA==
 
 "@vitest/spy@4.1.7":
   version "4.1.7"
