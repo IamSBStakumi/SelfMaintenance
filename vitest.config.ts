@@ -8,7 +8,7 @@ const dirname =
   typeof __dirname !== "undefined"
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url));
-const coverageAllFiles = { all: true } as Record<string, unknown>;
+const coverageAllFiles = { all: true };
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
