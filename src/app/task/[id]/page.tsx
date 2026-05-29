@@ -6,9 +6,9 @@ import TaskFormWrapper from "@/components/TaskFormWrapper";
 import TaskFormCard from "@/components/TaskFormCard";
 import TaskFormHeader from "@/components/TaskFormHeader";
 import TaskFormFooter from "@/components/TaskFormFooter";
+import Loading from "@/components/Loading";
 import ErrorAlert from "@/components/ErrorAlert";
 import TaskContent from "./TaskContent";
-import Loading from "./Loading";
 
 const TaskPage = () => {
   const { id: taskId } = useParams<{ id: string }>();
