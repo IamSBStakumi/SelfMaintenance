@@ -42,6 +42,7 @@ jobs:
           cache: "yarn"
 
       - run: yarn install --frozen-lockfile
+      - run: yarn playwright install --with-deps chromium
       - run: yarn test --coverage
 
       # Codecovにカバレッジをアップロード（任意）
