@@ -12,6 +12,10 @@ import {
   UpdateMaintenanceItem,
   MaintenanceLog,
 } from "@/types/maintenance";
+import {
+  FREE_PLAN_LIMIT_MESSAGE,
+  FREE_PLAN_MAINTENANCE_ITEM_LIMIT,
+} from "@/constants/planLimits";
 
 const validateMaintenanceTask = (data: InsertMaintenanceItem) => {
   const validationResult = maintenanceTaskSchema.safeParse(data);
@@ -120,6 +124,20 @@ export async function createMaintenanceItem(
   } = await supabase.auth.getUser();
   if (!user) {
     throw new Error("認証が必要です。");
+  }
+
+  const { count, error: countError } = await supabase
+    .from("maintenance_items")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
+  if (countError) {
+    console.error("Error counting maintenance items:", countError);
+    throw new Error("定期タスク数の確認に失敗しました。");
+  }
+
+  if ((count ?? 0) >= FREE_PLAN_MAINTENANCE_ITEM_LIMIT) {
+    throw new Error(FREE_PLAN_LIMIT_MESSAGE);
   }
 
   const { data: insertedData, error } = await supabase
