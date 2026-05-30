@@ -7,7 +7,21 @@ AS $$
 DECLARE
   current_item_count integer;
   free_plan_item_limit constant integer := 3;
+  has_active_paid_plan boolean;
 BEGIN
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.user_profiles
+    WHERE user_id = NEW.user_id
+      AND plan = 'pro'
+      AND subscription_status IN ('active', 'trialing')
+  )
+  INTO has_active_paid_plan;
+
+  IF has_active_paid_plan THEN
+    RETURN NEW;
+  END IF;
+
   PERFORM pg_advisory_xact_lock(hashtextextended(NEW.user_id::text, 0));
 
   SELECT count(*)
@@ -33,4 +47,4 @@ FOR EACH ROW
 EXECUTE FUNCTION public.enforce_free_plan_maintenance_item_limit();
 
 COMMENT ON FUNCTION public.enforce_free_plan_maintenance_item_limit()
-  IS '無料版ユーザーの定期タスク登録数を3件までに制限する。';
+  IS '無料版ユーザーの定期タスク登録数を3件までに制限する。有効なproプランは制限しない。';

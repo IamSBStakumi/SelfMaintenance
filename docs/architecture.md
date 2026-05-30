@@ -19,6 +19,7 @@ graph TD
     end
 
     subgraph DBSchema["DB スキーマ (public)"]
+        ProfileTable["user_profiles\nuser_id · plan · subscription_status\nstripe_customer_id · stripe_subscription_id"]
         Table["maintenance_items\nid · user_id · name · icon\ninterval_days · last_completed_at · memo"]
         RLS["RLS ポリシー\nauth.uid() = user_id"]
     end
@@ -31,8 +32,10 @@ graph TD
     SupabaseSDK --> DB
     SupabaseSDK --> Realtime
     SupabaseSDK --> Storage
+    DB --> ProfileTable
     DB --> Table
     Table --> RLS
+    ProfileTable --> RLS
 ```
 
 ## 2. ディレクトリ構造
@@ -87,6 +90,23 @@ graph TD
 
 ## 3. Supabase データモデル
 
+### テーブル: `public.user_profiles`
+
+アプリユーザーのプラン・課金状態を管理するテーブルです。`auth.users` 作成時にトリガーで自動作成されます。
+
+| カラム名                 | 型            | 制約                                              | 説明                                     |
+| ------------------------ | ------------- | ------------------------------------------------- | ---------------------------------------- |
+| `user_id`                | `uuid`        | PK, FK → `auth.users(id)` ON DELETE CASCADE       | オーナーユーザー                         |
+| `plan`                   | `text`        | NOT NULL, default `free`, `free` / `pro`          | アプリ上のプラン                         |
+| `subscription_status`    | `text`        | nullable                                          | Stripe サブスクリプション状態            |
+| `stripe_customer_id`     | `text`        | nullable, UNIQUE                                  | Stripe Customer ID                       |
+| `stripe_subscription_id` | `text`        | nullable, UNIQUE                                  | Stripe Subscription ID                   |
+| `current_period_end`     | `timestamptz` | nullable                                          | 現在の課金期間終了日時                   |
+| `created_at`             | `timestamptz` | NOT NULL, default `now()`                         | 作成日時                                 |
+| `updated_at`             | `timestamptz` | NOT NULL, default `now()`                         | 更新日時（trigger で自動更新）           |
+
+`plan = 'pro'` かつ `subscription_status IN ('active', 'trialing')` の場合に有料ユーザーとして扱います。
+
 ### テーブル: `public.maintenance_items`
 
 | カラム名            | 型            | 制約                                              | 説明                           |
@@ -120,6 +140,12 @@ CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON public.maintenance_items
 FOR EACH ROW
 EXECUTE PROCEDURE handle_updated_at();
+
+-- 無料版ユーザーの定期タスク登録数を3件までに制限するトリガー
+CREATE TRIGGER enforce_free_plan_maintenance_item_limit
+BEFORE INSERT ON public.maintenance_items
+FOR EACH ROW
+EXECUTE FUNCTION public.enforce_free_plan_maintenance_item_limit();
 ```
 
 ## 4. 技術スタック

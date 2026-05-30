@@ -15,10 +15,12 @@ import type {
 vi.mock("@/services/maintenanceService", () => ({
   getMaintenanceItems: vi.fn(),
   createMaintenanceItem: vi.fn(),
+  getCurrentUserProfile: vi.fn(),
 }));
 
 const mockGetMaintenanceItems = vi.mocked(services.getMaintenanceItems);
 const mockCreateMaintenanceItem = vi.mocked(services.createMaintenanceItem);
+const mockGetCurrentUserProfile = vi.mocked(services.getCurrentUserProfile);
 
 // テスト用のダミーデータ生成ヘルパー
 const createMockItem = (
@@ -56,6 +58,16 @@ describe("useMaintenanceItems", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetCurrentUserProfile.mockResolvedValue({
+      user_id: "test-user-id",
+      plan: "free",
+      subscription_status: null,
+      stripe_customer_id: null,
+      stripe_subscription_id: null,
+      current_period_end: null,
+      created_at: "2024-01-01T00:00:00.000Z",
+      updated_at: "2024-01-01T00:00:00.000Z",
+    });
   });
 
   afterEach(() => {

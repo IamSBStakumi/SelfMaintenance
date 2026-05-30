@@ -12,15 +12,22 @@ import TaskFormFooter from "@/components/TaskFormFooter";
 import {
   FREE_PLAN_LIMIT_MESSAGE,
   FREE_PLAN_MAINTENANCE_ITEM_LIMIT,
+  isActivePaidSubscriptionStatus,
 } from "@/constants/planLimits";
 
 export default function CreateTaskPage() {
   const router = useRouter();
-  const { fetchMaintenanceItems, createMaintenanceItem } =
+  const { fetchMaintenanceItems, fetchUserProfile, createMaintenanceItem } =
     useMaintenanceItems();
   const { data: items, isPending } = fetchMaintenanceItems;
+  const { data: userProfile, isPending: isUserProfilePending } =
+    fetchUserProfile;
   const taskCount = items?.length ?? 0;
-  const hasReachedFreeLimit = taskCount >= FREE_PLAN_MAINTENANCE_ITEM_LIMIT;
+  const hasActivePaidPlan =
+    userProfile?.plan === "pro" &&
+    isActivePaidSubscriptionStatus(userProfile.subscription_status);
+  const hasReachedFreeLimit =
+    !hasActivePaidPlan && taskCount >= FREE_PLAN_MAINTENANCE_ITEM_LIMIT;
 
   const handleCreateSubmit = async (data: TaskFormValues) => {
     if (hasReachedFreeLimit) {
@@ -86,7 +93,8 @@ export default function CreateTaskPage() {
           <>
             <div className="mb-5 rounded-2xl bg-indigo-50 p-4 text-sm text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-200">
               無料版では{FREE_PLAN_MAINTENANCE_ITEM_LIMIT}
-              件まで登録できます。現在 {isPending ? "確認中" : `${taskCount}件`}
+              件まで登録できます。現在{" "}
+              {isPending || isUserProfilePending ? "確認中" : `${taskCount}件`}
               です。
             </div>
             <TaskForm

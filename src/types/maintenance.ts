@@ -30,3 +30,26 @@ export type InsertMaintenanceLog = Omit<
   MaintenanceLog,
   "id" | "user_id" | "created_at"
 >;
+
+export type UserPlan = "free" | "pro";
+
+export type SubscriptionStatus =
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "canceled"
+  | "unpaid"
+  | "incomplete"
+  | "incomplete_expired"
+  | "paused";
+
+export interface UserProfile {
+  user_id: string;
+  plan: UserPlan;
+  subscription_status: SubscriptionStatus | null;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  current_period_end: string | null;
+  created_at: string;
+  updated_at: string;
+}

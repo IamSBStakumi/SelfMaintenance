@@ -7,11 +7,16 @@ import {
 
 type DashboardHeaderProps = {
   taskCount: number;
+  hasActivePaidPlan: boolean;
 };
 
-const DashboardHeader = ({ taskCount }: DashboardHeaderProps) => {
+const DashboardHeader = ({
+  taskCount,
+  hasActivePaidPlan,
+}: DashboardHeaderProps) => {
   const router = useRouter();
-  const hasReachedFreeLimit = taskCount >= FREE_PLAN_MAINTENANCE_ITEM_LIMIT;
+  const hasReachedFreeLimit =
+    !hasActivePaidPlan && taskCount >= FREE_PLAN_MAINTENANCE_ITEM_LIMIT;
 
   return (
     <div className="mb-8 mt-4 space-y-4 sm:mb-10 sm:mt-6">
@@ -34,8 +39,14 @@ const DashboardHeader = ({ taskCount }: DashboardHeaderProps) => {
         </button>
       </div>
       <div className="rounded-2xl border border-indigo-100 bg-white/60 px-4 py-3 text-sm text-zinc-600 dark:border-indigo-900/40 dark:bg-zinc-800/40 dark:text-zinc-300">
-        無料版の登録数: {taskCount} / {FREE_PLAN_MAINTENANCE_ITEM_LIMIT}件
-        {hasReachedFreeLimit && (
+        {hasActivePaidPlan ? (
+          <span>有料プラン: タスク登録数の上限はありません。</span>
+        ) : (
+          <span>
+            無料版の登録数: {taskCount} / {FREE_PLAN_MAINTENANCE_ITEM_LIMIT}件
+          </span>
+        )}
+        {!hasActivePaidPlan && hasReachedFreeLimit && (
           <span className="mt-1 block text-indigo-600 dark:text-indigo-300">
             {FREE_PLAN_LIMIT_MESSAGE}
           </span>
