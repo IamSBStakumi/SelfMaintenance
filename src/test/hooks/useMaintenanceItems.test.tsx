@@ -4,6 +4,9 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import useMaintenanceItems, {
   MAINTENANCE_ITEMS_QUERY_KEY,
+  USER_PROFILE_QUERY_KEY,
+  useCreateMaintenanceItem,
+  useUserProfile,
 } from "@/hooks/useMaintenanceItems";
 import * as services from "@/services/maintenanceService";
 import type {
@@ -105,6 +108,20 @@ describe("useMaintenanceItems", () => {
     });
   });
 
+  describe("Query: useUserProfile", () => {
+    test("正常にgetCurrentUserProfileが呼ばれ、プロフィールが取得できること", async () => {
+      const { wrapper } = createWrapper();
+      const { result } = renderHook(() => useUserProfile(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(mockGetCurrentUserProfile).toHaveBeenCalledTimes(1);
+      expect(result.current.data?.plan).toBe("free");
+    });
+  });
+
   describe("Mutation: createMaintenanceItem", () => {
     test("作成に成功した際、クエリのinvalidateが行われること", async () => {
       const { wrapper, testQueryClient } = createWrapper();
@@ -140,6 +157,9 @@ describe("useMaintenanceItems", () => {
       expect(resetSpy).toHaveBeenCalledWith({
         queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
       });
+      expect(resetSpy).toHaveBeenCalledWith({
+        queryKey: USER_PROFILE_QUERY_KEY,
+      });
     });
 
     test("作成に失敗した際、エラーがコンソールに出力されること", async () => {
@@ -171,6 +191,33 @@ describe("useMaintenanceItems", () => {
         "定期タスクの作成に失敗しました。",
       );
       consoleErrorSpy.mockRestore();
+    });
+
+    test("作成専用hookはタスク一覧とプロフィールを取得しないこと", async () => {
+      const { wrapper } = createWrapper();
+      const { result } = renderHook(() => useCreateMaintenanceItem(), {
+        wrapper,
+      });
+
+      const insertData: InsertMaintenanceItem = {
+        name: "新しいテスト",
+        icon: null,
+        interval_days: 7,
+        last_completed_at: new Date().toISOString(),
+        memo: "",
+      };
+      const mockResponse = createMockItem({ id: "new-id", ...insertData });
+      mockCreateMaintenanceItem.mockResolvedValue(mockResponse);
+
+      result.current.mutate(insertData);
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(mockGetMaintenanceItems).not.toHaveBeenCalled();
+      expect(mockGetCurrentUserProfile).not.toHaveBeenCalled();
+      expect(mockCreateMaintenanceItem).toHaveBeenCalledTimes(1);
     });
   });
 });

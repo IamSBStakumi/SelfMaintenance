@@ -8,15 +8,18 @@ import {
 type DashboardHeaderProps = {
   taskCount: number;
   hasActivePaidPlan: boolean;
+  isLimitCheckPending: boolean;
 };
 
 const DashboardHeader = ({
   taskCount,
   hasActivePaidPlan,
+  isLimitCheckPending,
 }: DashboardHeaderProps) => {
   const router = useRouter();
   const hasReachedFreeLimit =
     !hasActivePaidPlan && taskCount >= FREE_PLAN_MAINTENANCE_ITEM_LIMIT;
+  const isCreateDisabled = isLimitCheckPending || hasReachedFreeLimit;
 
   return (
     <div className="mb-8 mt-4 space-y-4 sm:mb-10 sm:mt-6">
@@ -31,15 +34,17 @@ const DashboardHeader = ({
         </div>
         <button
           onClick={() => router.push("/create_task")}
-          disabled={hasReachedFreeLimit}
+          disabled={isCreateDisabled}
           className="bg-linear-to-r from-indigo-500 to-purple-600 hover:opacity-90 text-white font-bold py-3 px-6 rounded-2xl shadow-xl shadow-indigo-500/20 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 sm:px-8"
         >
           <span className="text-2xl leading-none">+</span>
-          <span>新規登録する</span>
+          <span>{isLimitCheckPending ? "確認中..." : "新規登録する"}</span>
         </button>
       </div>
       <div className="rounded-2xl border border-indigo-100 bg-white/60 px-4 py-3 text-sm text-zinc-600 dark:border-indigo-900/40 dark:bg-zinc-800/40 dark:text-zinc-300">
-        {hasActivePaidPlan ? (
+        {isLimitCheckPending ? (
+          <span>登録上限を確認しています。</span>
+        ) : hasActivePaidPlan ? (
           <span>有料プラン: タスク登録数の上限はありません。</span>
         ) : (
           <span>

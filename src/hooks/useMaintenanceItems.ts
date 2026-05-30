@@ -11,24 +11,18 @@ import {
 export const MAINTENANCE_ITEMS_QUERY_KEY = ["maintenance_items"] as const;
 export const USER_PROFILE_QUERY_KEY = ["user_profile"] as const;
 
-const useMaintenanceItems = () => {
-  const fetchMaintenanceItems = useQuery({
-    queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
-    queryFn: getMaintenanceItems,
-    gcTime: 1000 * 60 * 5,
-    staleTime: 1000 * 60 * 5,
-  });
-
-  const fetchUserProfile = useQuery({
+export const useUserProfile = () =>
+  useQuery({
     queryKey: USER_PROFILE_QUERY_KEY,
     queryFn: getCurrentUserProfile,
     gcTime: 1000 * 60 * 5,
     staleTime: 1000 * 60 * 5,
   });
 
+export const useCreateMaintenanceItem = () => {
   const queryClient = useQueryClient();
 
-  const createMaintenanceItemMutation = useMutation({
+  return useMutation({
     mutationFn: createMaintenanceItem,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MAINTENANCE_ITEMS_QUERY_KEY });
@@ -38,11 +32,19 @@ const useMaintenanceItems = () => {
       console.error("定期タスクの作成に失敗しました。");
     },
   });
+};
+
+const useMaintenanceItems = () => {
+  const fetchMaintenanceItems = useQuery({
+    queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
+    queryFn: getMaintenanceItems,
+    gcTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5,
+  });
 
   return {
     fetchMaintenanceItems,
-    fetchUserProfile,
-    createMaintenanceItem: createMaintenanceItemMutation,
+    createMaintenanceItem: useCreateMaintenanceItem(),
   };
 };
 
