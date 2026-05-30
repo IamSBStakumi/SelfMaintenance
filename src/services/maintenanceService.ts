@@ -15,6 +15,7 @@ import {
 } from "@/types/maintenance";
 import {
   FREE_PLAN_LIMIT_MESSAGE,
+  FREE_PLAN_LIMIT_PREFIX,
   FREE_PLAN_MAINTENANCE_ITEM_LIMIT,
   isActivePaidSubscriptionStatus,
 } from "@/constants/planLimits";
@@ -194,7 +195,7 @@ export async function createMaintenanceItem(
 
   if (error) {
     console.error("Error creating maintenance item:", error);
-    if (error.message?.includes("無料版で登録できるタスクは3件までです。")) {
+    if (error.message?.startsWith(FREE_PLAN_LIMIT_PREFIX)) {
       throw new Error(FREE_PLAN_LIMIT_MESSAGE);
     }
     throw new Error("項目の作成に失敗しました。");

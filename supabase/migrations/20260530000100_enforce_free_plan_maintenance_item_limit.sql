@@ -7,6 +7,8 @@ AS $$
 DECLARE
   current_item_count integer;
   free_plan_item_limit constant integer := 3;
+  free_plan_limit_prefix constant text := '無料版で登録できるタスクは3件までです。';
+  free_plan_limit_message constant text := free_plan_limit_prefix || '今後、上限を増やせるプランを提供予定です。';
   has_active_paid_plan boolean;
 BEGIN
   SELECT EXISTS (
@@ -30,7 +32,7 @@ BEGIN
   WHERE user_id = NEW.user_id;
 
   IF current_item_count >= free_plan_item_limit THEN
-    RAISE EXCEPTION '無料版で登録できるタスクは3件までです。今後、上限を増やせるプランを提供予定です。'
+    RAISE EXCEPTION '%', free_plan_limit_message
       USING ERRCODE = 'P0001';
   END IF;
 
