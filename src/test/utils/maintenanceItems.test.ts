@@ -341,6 +341,23 @@ describe("src/services/maintenance_items", () => {
         "項目の作成に失敗しました。",
       );
     });
+
+    test("DB側の無料版上限エラーは上限メッセージとしてスローされること", async () => {
+      const countChain = createMockChain<null>({
+        data: null,
+        error: null,
+        count: FREE_PLAN_MAINTENANCE_ITEM_LIMIT - 1,
+      });
+      const insertChain = createMockChain<MaintenanceItem>({
+        data: null,
+        error: new Error(FREE_PLAN_LIMIT_MESSAGE),
+      });
+      mockFrom.mockReturnValueOnce(countChain).mockReturnValueOnce(insertChain);
+
+      await expect(createMaintenanceItem(validInsertData)).rejects.toThrow(
+        FREE_PLAN_LIMIT_MESSAGE,
+      );
+    });
   });
 
   describe("updateMaintenanceItem", () => {

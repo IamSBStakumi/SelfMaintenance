@@ -151,6 +151,9 @@ export async function createMaintenanceItem(
 
   if (error) {
     console.error("Error creating maintenance item:", error);
+    if (error.message?.includes("無料版で登録できるタスクは3件までです。")) {
+      throw new Error(FREE_PLAN_LIMIT_MESSAGE);
+    }
     throw new Error("項目の作成に失敗しました。");
   }
 
