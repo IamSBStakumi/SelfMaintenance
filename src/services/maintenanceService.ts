@@ -11,7 +11,13 @@ import {
   MaintenanceItem,
   UpdateMaintenanceItem,
   MaintenanceLog,
+  UserProfile,
 } from "@/types/maintenance";
+import {
+  FREE_PLAN_LIMIT_MESSAGE,
+  FREE_PLAN_MAINTENANCE_ITEM_LIMIT,
+  isActivePaidSubscriptionStatus,
+} from "@/constants/planLimits";
 
 const validateMaintenanceTask = (data: InsertMaintenanceItem) => {
   const validationResult = maintenanceTaskSchema.safeParse(data);
@@ -38,6 +44,43 @@ const normalizeAndValidateId = (id: string) => {
   }
   return normalizedId;
 };
+
+const isActivePaidProfile = (profile: UserProfile) =>
+  profile.plan === "pro" &&
+  isActivePaidSubscriptionStatus(profile.subscription_status);
+
+const getUserProfileByUserId = async (
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<UserProfile> => {
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("user_id", userId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching user profile:", error);
+    throw new Error("ユーザープランの取得に失敗しました。");
+  }
+
+  return data as UserProfile;
+};
+
+export async function getCurrentUserProfile(): Promise<UserProfile> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error("認証に失敗しました。ログインしているか確認してください。");
+  }
+
+  return getUserProfileByUserId(supabase, user.id);
+}
 
 /**
  * ログインユーザーのすべての定期タスクを取得します。
@@ -122,6 +165,24 @@ export async function createMaintenanceItem(
     throw new Error("認証が必要です。");
   }
 
+  const userProfile = await getUserProfileByUserId(supabase, user.id);
+
+  if (!isActivePaidProfile(userProfile)) {
+    const { count, error: countError } = await supabase
+      .from("maintenance_items")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+
+    if (countError) {
+      console.error("Error counting maintenance items:", countError);
+      throw new Error("定期タスク数の確認に失敗しました。");
+    }
+
+    if ((count ?? 0) >= FREE_PLAN_MAINTENANCE_ITEM_LIMIT) {
+      throw new Error(FREE_PLAN_LIMIT_MESSAGE);
+    }
+  }
+
   const { data: insertedData, error } = await supabase
     .from("maintenance_items")
     .insert({
@@ -133,6 +194,9 @@ export async function createMaintenanceItem(
 
   if (error) {
     console.error("Error creating maintenance item:", error);
+    if (error.message?.includes("無料版で登録できるタスクは3件までです。")) {
+      throw new Error(FREE_PLAN_LIMIT_MESSAGE);
+    }
     throw new Error("項目の作成に失敗しました。");
   }
 

@@ -5,17 +5,30 @@ import PageContent from "./PageContent";
 import SkeletonCard from "./SkeletonCard";
 
 import Header from "@/components/Header";
-import useMaintenanceItems from "@/hooks/useMaintenanceItems";
+import useMaintenanceItems, {
+  useUserProfile,
+} from "@/hooks/useMaintenanceItems";
+import { isActivePaidSubscriptionStatus } from "@/constants/planLimits";
 
 export default function DashboardPage() {
   const { fetchMaintenanceItems } = useMaintenanceItems();
   const { data: items, isPending, isError } = fetchMaintenanceItems;
+  const { data: userProfile, isPending: isUserProfilePending } =
+    useUserProfile();
+  const hasActivePaidPlan =
+    userProfile?.plan === "pro" &&
+    isActivePaidSubscriptionStatus(userProfile.subscription_status);
+  const isLimitCheckPending = isPending || isUserProfilePending;
 
   return (
     <div className="min-h-screen bg-lavender px-4 py-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 sm:p-6">
       <Header />
       <main className="max-w-5xl mx-auto pb-20">
-        <DashboardHeader />
+        <DashboardHeader
+          taskCount={items?.length ?? 0}
+          hasActivePaidPlan={hasActivePaidPlan}
+          isLimitCheckPending={isLimitCheckPending}
+        />
         {/* ローディング中: スケルトンを3件分表示 */}
         {isPending && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
