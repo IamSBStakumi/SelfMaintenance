@@ -13,6 +13,4 @@ export const isActivePaidSubscriptionStatus = (
 ) =>
   status !== null &&
   status !== undefined &&
-  ACTIVE_PAID_SUBSCRIPTION_STATUSES.some(
-    (activeStatus) => activeStatus === status,
-  );
+  (ACTIVE_PAID_SUBSCRIPTION_STATUSES as readonly string[]).includes(status);
