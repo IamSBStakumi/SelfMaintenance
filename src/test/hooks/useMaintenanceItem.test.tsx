@@ -23,6 +23,7 @@ vi.mock("@/services/maintenanceService", () => ({
   getMaintenanceItemById: vi.fn(),
   updateMaintenanceItem: vi.fn(),
   updateMaintenanceItemNextCycle: vi.fn(),
+  deleteMaintenanceItem: vi.fn(),
 }));
 
 const mockGetMaintenanceItemById = vi.mocked(services.getMaintenanceItemById);
@@ -30,6 +31,7 @@ const mockUpdateMaintenanceItem = vi.mocked(services.updateMaintenanceItem);
 const mockUpdateMaintenanceItemNextCycle = vi.mocked(
   services.updateMaintenanceItemNextCycle,
 );
+const mockDeleteMaintenanceItem = vi.mocked(services.deleteMaintenanceItem);
 
 const createMockItem = (
   override: Partial<MaintenanceItem> = {},
@@ -222,6 +224,62 @@ describe("useMaintenanceItem", () => {
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         "定期タスクの更新に失敗しました。",
       );
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe("Mutation: deleteMaintenanceItem", () => {
+    test("削除が成功した際、一覧のinvalidateと詳細キャッシュ削除とルーターの遷移が行われること", async () => {
+      const { wrapper, testQueryClient } = createWrapper();
+      const invalidateSpy = vi.spyOn(testQueryClient, "invalidateQueries");
+      const removeSpy = vi.spyOn(testQueryClient, "removeQueries");
+
+      mockGetMaintenanceItemById.mockResolvedValue(createMockItem());
+      mockDeleteMaintenanceItem.mockResolvedValue(undefined);
+
+      const { result } = renderHook(() => useMaintenanceItem("item1"), {
+        wrapper,
+      });
+
+      result.current.deleteMaintenanceItem.mutate();
+
+      await waitFor(() => {
+        expect(result.current.deleteMaintenanceItem.isSuccess).toBe(true);
+      });
+
+      expect(mockDeleteMaintenanceItem).toHaveBeenCalledTimes(1);
+      expect(mockDeleteMaintenanceItem).toHaveBeenCalledWith("item1");
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
+      });
+      expect(removeSpy).toHaveBeenCalledWith({
+        queryKey: MAINTENANCE_ITEM_QUERY_KEY("item1"),
+      });
+      expect(mockPush).toHaveBeenCalledWith("/dashboard");
+    });
+
+    test("削除に失敗した際、エラーがコンソールに出力され、遷移しないこと", async () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      mockGetMaintenanceItemById.mockResolvedValue(createMockItem());
+      mockDeleteMaintenanceItem.mockRejectedValue(new Error("Delete Error"));
+
+      const { wrapper } = createWrapper();
+      const { result } = renderHook(() => useMaintenanceItem("item1"), {
+        wrapper,
+      });
+
+      result.current.deleteMaintenanceItem.mutate();
+
+      await waitFor(() => {
+        expect(result.current.deleteMaintenanceItem.isError).toBe(true);
+      });
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "定期タスクの削除に失敗しました。",
+      );
+      expect(mockPush).not.toHaveBeenCalled();
       consoleErrorSpy.mockRestore();
     });
   });
