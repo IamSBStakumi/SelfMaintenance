@@ -1,4 +1,4 @@
-model = "gpt-5-codex"
+model = "gpt-5.5"
 # モデルの推論にかける努力のレベルを設定（例: "low", "medium", "high"）。高いほど、より複雑なタスクに対してより多くのリソースを割り当てる
 model_reasoning_effort = "medium"
 # モデル側が必要だと判断したときだけ確認を出す

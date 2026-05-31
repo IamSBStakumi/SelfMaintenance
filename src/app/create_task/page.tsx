@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { parseISO, startOfDay } from "date-fns";
 import { toast } from "react-toastify";
-import useMaintenanceItems from "@/hooks/useMaintenanceItems";
+import { useCreateMaintenanceItem } from "@/hooks/useMaintenanceItems";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
 import TaskFormWrapper from "@/components/TaskFormWrapper";
 import TaskFormCard from "@/components/TaskFormCard";
@@ -12,7 +12,7 @@ import TaskFormFooter from "@/components/TaskFormFooter";
 
 export default function CreateTaskPage() {
   const router = useRouter();
-  const { createMaintenanceItem } = useMaintenanceItems();
+  const createMaintenanceItem = useCreateMaintenanceItem();
 
   const handleCreateSubmit = async (data: TaskFormValues) => {
     try {
@@ -30,7 +30,9 @@ export default function CreateTaskPage() {
       router.push("/dashboard");
     } catch (error) {
       console.error("タスクの作成に失敗しました。", error);
-      toast.error("タスクの作成に失敗しました。");
+      toast.error(
+        error instanceof Error ? error.message : "タスクの作成に失敗しました。",
+      );
     }
   };
 
