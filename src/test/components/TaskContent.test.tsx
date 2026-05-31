@@ -10,6 +10,11 @@ vi.mock("@/hooks/useMaintenanceItem", () => ({
   default: vi.fn(),
 }));
 
+const mockPush = vi.fn();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
 vi.mock("react-toastify", () => ({
   toast: {
     success: vi.fn(),
@@ -160,6 +165,7 @@ describe("TaskContent", () => {
       expect(deleteMutate).toHaveBeenCalledTimes(1);
     });
     expect(mockToast.success).toHaveBeenCalledWith("タスクを削除しました。");
+    expect(mockPush).toHaveBeenCalledWith("/dashboard");
     expect(
       screen.queryByRole("dialog", { name: "タスクを削除しますか？" }),
     ).not.toBeInTheDocument();
@@ -191,5 +197,6 @@ describe("TaskContent", () => {
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "タスクの削除に失敗しました。",
     );
+    expect(mockPush).not.toHaveBeenCalled();
   });
 });

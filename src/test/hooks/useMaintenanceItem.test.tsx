@@ -229,7 +229,7 @@ describe("useMaintenanceItem", () => {
   });
 
   describe("Mutation: deleteMaintenanceItem", () => {
-    test("削除が成功した際、一覧のinvalidateと詳細キャッシュ削除とルーターの遷移が行われること", async () => {
+    test("削除が成功した際、一覧のinvalidateと詳細キャッシュ削除が行われること", async () => {
       const { wrapper, testQueryClient } = createWrapper();
       const invalidateSpy = vi.spyOn(testQueryClient, "invalidateQueries");
       const removeSpy = vi.spyOn(testQueryClient, "removeQueries");
@@ -255,7 +255,7 @@ describe("useMaintenanceItem", () => {
       expect(removeSpy).toHaveBeenCalledWith({
         queryKey: MAINTENANCE_ITEM_QUERY_KEY("item1"),
       });
-      expect(mockPush).toHaveBeenCalledWith("/dashboard");
+      expect(mockPush).not.toHaveBeenCalled();
     });
 
     test("削除に失敗した際、エラーがコンソールに出力され、遷移しないこと", async () => {

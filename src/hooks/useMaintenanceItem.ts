@@ -65,7 +65,6 @@ const useMaintenanceItem = (id: string) => {
       queryClient.removeQueries({
         queryKey: MAINTENANCE_ITEM_QUERY_KEY(normalizedId),
       });
-      router.push("/dashboard");
     },
     onError: () => {
       console.error("定期タスクの削除に失敗しました。");

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import ConfirmModal from "@/components/ConfirmModal";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
@@ -11,6 +12,7 @@ type Props = {
 
 const TaskContent = ({ taskData }: Props) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const router = useRouter();
   const { updateMaintenanceItem, deleteMaintenanceItem } = useMaintenanceItem(
     taskData.id,
   );
@@ -35,6 +37,7 @@ const TaskContent = ({ taskData }: Props) => {
       onSuccess: () => {
         setIsDeleteModalOpen(false);
         toast.success("タスクを削除しました。");
+        router.push("/dashboard");
       },
       onError: () => {
         toast.error("タスクの削除に失敗しました。");
