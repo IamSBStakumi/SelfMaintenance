@@ -123,6 +123,37 @@ describe("TaskContent", () => {
     expect(deleteMutate).not.toHaveBeenCalled();
   });
 
+  test("Tabキーのフォーカスを削除確認モーダル内に閉じ込めること", async () => {
+    const user = userEvent.setup();
+    setupUseMaintenanceItemMock();
+
+    render(<TaskContent taskData={createMockItem()} />);
+
+    await user.click(
+      screen.getByRole("button", { name: "このタスクを削除する" }),
+    );
+
+    const dialog = screen.getByRole("dialog", {
+      name: "タスクを削除しますか？",
+    });
+    const cancelButton = screen.getByRole("button", { name: "キャンセル" });
+    const confirmButton = screen.getByRole("button", { name: "削除する" });
+
+    expect(dialog).toHaveFocus();
+
+    await user.tab();
+    expect(cancelButton).toHaveFocus();
+
+    await user.tab();
+    expect(confirmButton).toHaveFocus();
+
+    await user.tab();
+    expect(cancelButton).toHaveFocus();
+
+    await user.tab({ shift: true });
+    expect(confirmButton).toHaveFocus();
+  });
+
   test("削除中状態への更新ではフォーカスを元のボタンへ戻さないこと", async () => {
     const user = userEvent.setup();
     setupUseMaintenanceItemMock();
