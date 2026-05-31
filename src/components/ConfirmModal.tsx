@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useId } from "react";
 
 type ConfirmModalProps = {
   isOpen: boolean;
@@ -31,6 +31,8 @@ const ConfirmModal = ({
   onCancel,
 }: ConfirmModalProps) => {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const descriptionId = useId();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -120,19 +122,19 @@ const ConfirmModal = ({
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="confirm-modal-title"
-        aria-describedby="confirm-modal-description"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
         tabIndex={-1}
         className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900"
       >
         <h2
-          id="confirm-modal-title"
+          id={titleId}
           className="text-lg font-bold text-zinc-900 dark:text-zinc-100"
         >
           {title}
         </h2>
         <p
-          id="confirm-modal-description"
+          id={descriptionId}
           className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-300"
         >
           {description}
