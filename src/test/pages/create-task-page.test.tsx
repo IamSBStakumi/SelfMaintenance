@@ -91,16 +91,15 @@ describe("CreateTaskPage", () => {
     );
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledTimes(1);
+      expect(mutateAsync).toHaveBeenCalledWith({
+        name: "コンタクト交換",
+        icon: "👀",
+        interval_days: 14,
+        last_completed_at: startOfDay(parseISO("2026-05-01")).toISOString(),
+        memo: "右目から交換",
+      });
+      expect(mockPush).toHaveBeenCalledWith("/dashboard");
     });
-    expect(mutateAsync).toHaveBeenCalledWith({
-      name: "コンタクト交換",
-      icon: "👀",
-      interval_days: 14,
-      last_completed_at: startOfDay(parseISO("2026-05-01")).toISOString(),
-      memo: "右目から交換",
-    });
-    expect(mockPush).toHaveBeenCalledWith("/dashboard");
   });
 
   test("任意項目が空の場合はnullとして作成payloadに渡すこと", async () => {
