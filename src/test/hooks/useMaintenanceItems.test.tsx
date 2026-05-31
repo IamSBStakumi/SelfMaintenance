@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -9,10 +9,8 @@ import useMaintenanceItems, {
   useUserProfile,
 } from "@/hooks/useMaintenanceItems";
 import * as services from "@/services/maintenanceService";
-import type {
-  MaintenanceItem,
-  InsertMaintenanceItem,
-} from "@/types/maintenance";
+import { createMaintenanceItem } from "@/test/factories/maintenanceItemFactory";
+import type { InsertMaintenanceItem } from "@/types/maintenance";
 
 // サービスのモック化
 vi.mock("@/services/maintenanceService", () => ({
@@ -24,22 +22,6 @@ vi.mock("@/services/maintenanceService", () => ({
 const mockGetMaintenanceItems = vi.mocked(services.getMaintenanceItems);
 const mockCreateMaintenanceItem = vi.mocked(services.createMaintenanceItem);
 const mockGetCurrentUserProfile = vi.mocked(services.getCurrentUserProfile);
-
-// テスト用のダミーデータ生成ヘルパー
-const createMockItem = (
-  override: Partial<MaintenanceItem> = {},
-): MaintenanceItem => ({
-  id: "item1",
-  user_id: "test-user-id",
-  name: "テスト項目",
-  icon: null,
-  interval_days: 30,
-  last_completed_at: "2024-01-01T00:00:00.000Z",
-  memo: null,
-  created_at: "2024-01-01T00:00:00.000Z",
-  updated_at: "2024-01-01T00:00:00.000Z",
-  ...override,
-});
 
 describe("useMaintenanceItems", () => {
   const createWrapper = () => {
@@ -79,7 +61,7 @@ describe("useMaintenanceItems", () => {
 
   describe("Query: fetchMaintenanceItems", () => {
     test("正常にgetMaintenanceItemsが呼ばれ、データが取得できること", async () => {
-      const mockData = [createMockItem()];
+      const mockData = [createMaintenanceItem()];
       mockGetMaintenanceItems.mockResolvedValue(mockData);
 
       const { wrapper } = createWrapper();
@@ -139,7 +121,10 @@ describe("useMaintenanceItems", () => {
       // invalidate後の再フェッチに対応するためデフォルトで空配列を返すようにする
       mockGetMaintenanceItems.mockResolvedValue([]);
 
-      const mockResponse = createMockItem({ id: "new-id", ...insertData });
+      const mockResponse = createMaintenanceItem({
+        id: "new-id",
+        ...insertData,
+      });
       mockCreateMaintenanceItem.mockResolvedValue(mockResponse);
 
       const { result } = renderHook(() => useMaintenanceItems(), { wrapper });
@@ -206,7 +191,10 @@ describe("useMaintenanceItems", () => {
         last_completed_at: new Date().toISOString(),
         memo: "",
       };
-      const mockResponse = createMockItem({ id: "new-id", ...insertData });
+      const mockResponse = createMaintenanceItem({
+        id: "new-id",
+        ...insertData,
+      });
       mockCreateMaintenanceItem.mockResolvedValue(mockResponse);
 
       result.current.mutate(insertData);

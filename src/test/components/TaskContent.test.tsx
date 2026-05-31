@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import TaskContent from "@/app/task/[id]/TaskContent";
 import useMaintenanceItem from "@/hooks/useMaintenanceItem";
-import type { MaintenanceItem } from "@/types/maintenance";
+import { createMaintenanceItem } from "@/test/factories/maintenanceItemFactory";
 
 vi.mock("@/hooks/useMaintenanceItem", () => ({
   default: vi.fn(),
@@ -24,21 +24,6 @@ vi.mock("react-toastify", () => ({
 
 const mockUseMaintenanceItem = vi.mocked(useMaintenanceItem);
 const mockToast = vi.mocked(toast);
-
-const createMockItem = (
-  override: Partial<MaintenanceItem> = {},
-): MaintenanceItem => ({
-  id: "item1",
-  user_id: "test-user-id",
-  name: "テスト項目",
-  icon: null,
-  interval_days: 30,
-  last_completed_at: "2026-04-15T10:00:00Z",
-  memo: null,
-  created_at: "2026-04-15T10:00:00Z",
-  updated_at: "2026-04-15T10:00:00Z",
-  ...override,
-});
 
 const setupUseMaintenanceItemMock = ({
   deleteMutate = vi.fn().mockImplementation((_, options) => {
@@ -74,7 +59,7 @@ describe("TaskContent", () => {
   test("削除ボタンを表示すること", () => {
     setupUseMaintenanceItemMock();
 
-    render(<TaskContent taskData={createMockItem()} />);
+    render(<TaskContent taskData={createMaintenanceItem()} />);
 
     expect(
       screen.getByRole("button", { name: "このタスクを削除する" }),
@@ -85,7 +70,7 @@ describe("TaskContent", () => {
     const user = userEvent.setup();
     const { deleteMutate } = setupUseMaintenanceItemMock();
 
-    render(<TaskContent taskData={createMockItem()} />);
+    render(<TaskContent taskData={createMaintenanceItem()} />);
 
     const deleteButton = screen.getByRole("button", {
       name: "このタスクを削除する",
@@ -111,7 +96,7 @@ describe("TaskContent", () => {
     const user = userEvent.setup();
     const { deleteMutate } = setupUseMaintenanceItemMock();
 
-    render(<TaskContent taskData={createMockItem()} />);
+    render(<TaskContent taskData={createMaintenanceItem()} />);
 
     await user.click(
       screen.getByRole("button", { name: "このタスクを削除する" }),
@@ -128,7 +113,7 @@ describe("TaskContent", () => {
     const user = userEvent.setup();
     setupUseMaintenanceItemMock();
 
-    render(<TaskContent taskData={createMockItem()} />);
+    render(<TaskContent taskData={createMaintenanceItem()} />);
 
     await user.click(
       screen.getByRole("button", { name: "このタスクを削除する" }),
@@ -153,7 +138,9 @@ describe("TaskContent", () => {
     const user = userEvent.setup();
     setupUseMaintenanceItemMock();
 
-    const { rerender } = render(<TaskContent taskData={createMockItem()} />);
+    const { rerender } = render(
+      <TaskContent taskData={createMaintenanceItem()} />,
+    );
 
     const deleteButton = screen.getByRole("button", {
       name: "このタスクを削除する",
@@ -165,7 +152,7 @@ describe("TaskContent", () => {
     const focusSpy = vi.spyOn(deleteButton, "focus");
     setupUseMaintenanceItemMock({ isDeletePending: true });
 
-    rerender(<TaskContent taskData={createMockItem()} />);
+    rerender(<TaskContent taskData={createMaintenanceItem()} />);
 
     expect(focusSpy).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "キャンセル" })).toHaveFocus();
@@ -175,7 +162,7 @@ describe("TaskContent", () => {
     const user = userEvent.setup();
     const { deleteMutate } = setupUseMaintenanceItemMock();
 
-    render(<TaskContent taskData={createMockItem()} />);
+    render(<TaskContent taskData={createMaintenanceItem()} />);
 
     await user.click(
       screen.getByRole("button", { name: "このタスクを削除する" }),
@@ -200,7 +187,7 @@ describe("TaskContent", () => {
       }),
     });
 
-    render(<TaskContent taskData={createMockItem()} />);
+    render(<TaskContent taskData={createMaintenanceItem()} />);
 
     await user.click(
       screen.getByRole("button", { name: "このタスクを削除する" }),
