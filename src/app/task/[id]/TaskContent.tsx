@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import ConfirmModal from "@/components/ConfirmModal";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
@@ -24,11 +24,11 @@ const TaskContent = ({ taskData }: Props) => {
     await updateMaintenanceItem.mutateAsync(payload);
   };
 
-  const handleCancelDelete = useCallback(() => {
+  const handleCancelDelete = () => {
     setIsDeleteModalOpen(false);
-  }, []);
+  };
 
-  const handleDeleteTask = useCallback(() => {
+  const handleDeleteTask = () => {
     if (deleteMaintenanceItem.isPending) return;
 
     deleteMaintenanceItem.mutate(undefined, {
@@ -41,7 +41,7 @@ const TaskContent = ({ taskData }: Props) => {
         console.error("タスクの削除に失敗しました。");
       },
     });
-  }, [deleteMaintenanceItem]);
+  };
 
   const defaultFormValues: TaskFormValues = {
     name: taskData.name,
