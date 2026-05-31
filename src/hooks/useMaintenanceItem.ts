@@ -62,9 +62,6 @@ const useMaintenanceItem = (id: string) => {
       queryClient.invalidateQueries({
         queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
       });
-      queryClient.removeQueries({
-        queryKey: MAINTENANCE_ITEM_QUERY_KEY(normalizedId),
-      });
     },
     onError: () => {
       console.error("定期タスクの削除に失敗しました。");

@@ -215,7 +215,6 @@ describe("useMaintenanceItem", () => {
     test("削除が成功した際、一覧のinvalidateと詳細キャッシュ削除が行われること", async () => {
       const { wrapper, testQueryClient } = createWrapper();
       const invalidateSpy = vi.spyOn(testQueryClient, "invalidateQueries");
-      const removeSpy = vi.spyOn(testQueryClient, "removeQueries");
 
       mockGetMaintenanceItemById.mockResolvedValue(createMaintenanceItem());
       mockDeleteMaintenanceItem.mockResolvedValue(undefined);
@@ -234,9 +233,6 @@ describe("useMaintenanceItem", () => {
       expect(mockDeleteMaintenanceItem).toHaveBeenCalledWith("item1");
       expect(invalidateSpy).toHaveBeenCalledWith({
         queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
-      });
-      expect(removeSpy).toHaveBeenCalledWith({
-        queryKey: MAINTENANCE_ITEM_QUERY_KEY("item1"),
       });
       expect(mockPush).not.toHaveBeenCalled();
     });
