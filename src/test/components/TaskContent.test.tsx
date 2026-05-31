@@ -36,10 +36,12 @@ const createMockItem = (
 });
 
 const setupUseMaintenanceItemMock = ({
-  deleteMutateAsync = vi.fn().mockResolvedValue(undefined),
+  deleteMutate = vi.fn().mockImplementation((_, options) => {
+    options?.onSuccess?.();
+  }),
   isDeletePending = false,
 }: {
-  deleteMutateAsync?: ReturnType<typeof vi.fn>;
+  deleteMutate?: ReturnType<typeof vi.fn>;
   isDeletePending?: boolean;
 } = {}) => {
   mockUseMaintenanceItem.mockReturnValue({
@@ -47,12 +49,12 @@ const setupUseMaintenanceItemMock = ({
       mutateAsync: vi.fn().mockResolvedValue(undefined),
     },
     deleteMaintenanceItem: {
-      mutateAsync: deleteMutateAsync,
+      mutate: deleteMutate,
       isPending: isDeletePending,
     },
   } as unknown as ReturnType<typeof useMaintenanceItem>);
 
-  return { deleteMutateAsync };
+  return { deleteMutate };
 };
 
 describe("TaskContent", () => {
@@ -76,7 +78,7 @@ describe("TaskContent", () => {
 
   test("削除確認をキャンセルした場合は削除しないこと", async () => {
     const user = userEvent.setup();
-    const { deleteMutateAsync } = setupUseMaintenanceItemMock();
+    const { deleteMutate } = setupUseMaintenanceItemMock();
 
     render(<TaskContent taskData={createMockItem()} />);
 
@@ -92,12 +94,12 @@ describe("TaskContent", () => {
     expect(
       screen.queryByRole("dialog", { name: "タスクを削除しますか？" }),
     ).not.toBeInTheDocument();
-    expect(deleteMutateAsync).not.toHaveBeenCalled();
+    expect(deleteMutate).not.toHaveBeenCalled();
   });
 
   test("Escapeキーで削除確認モーダルを閉じること", async () => {
     const user = userEvent.setup();
-    const { deleteMutateAsync } = setupUseMaintenanceItemMock();
+    const { deleteMutate } = setupUseMaintenanceItemMock();
 
     render(<TaskContent taskData={createMockItem()} />);
 
@@ -109,12 +111,12 @@ describe("TaskContent", () => {
     expect(
       screen.queryByRole("dialog", { name: "タスクを削除しますか？" }),
     ).not.toBeInTheDocument();
-    expect(deleteMutateAsync).not.toHaveBeenCalled();
+    expect(deleteMutate).not.toHaveBeenCalled();
   });
 
   test("削除確認後に削除し、成功通知を表示すること", async () => {
     const user = userEvent.setup();
-    const { deleteMutateAsync } = setupUseMaintenanceItemMock();
+    const { deleteMutate } = setupUseMaintenanceItemMock();
 
     render(<TaskContent taskData={createMockItem()} />);
 
@@ -124,7 +126,7 @@ describe("TaskContent", () => {
     await user.click(screen.getByRole("button", { name: "削除する" }));
 
     await waitFor(() => {
-      expect(deleteMutateAsync).toHaveBeenCalledTimes(1);
+      expect(deleteMutate).toHaveBeenCalledTimes(1);
     });
     expect(mockToast.success).toHaveBeenCalledWith("タスクを削除しました。");
     expect(
@@ -138,7 +140,9 @@ describe("TaskContent", () => {
       .spyOn(console, "error")
       .mockImplementation(() => {});
     setupUseMaintenanceItemMock({
-      deleteMutateAsync: vi.fn().mockRejectedValue(new Error("Delete Error")),
+      deleteMutate: vi.fn().mockImplementation((_, options) => {
+        options?.onError?.(new Error("Delete Error"));
+      }),
     });
 
     render(<TaskContent taskData={createMockItem()} />);
@@ -155,7 +159,6 @@ describe("TaskContent", () => {
     });
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "タスクの削除に失敗しました。",
-      expect.any(Error),
     );
   });
 });

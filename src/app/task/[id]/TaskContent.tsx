@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import ConfirmModal from "@/components/ConfirmModal";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
@@ -24,18 +24,24 @@ const TaskContent = ({ taskData }: Props) => {
     await updateMaintenanceItem.mutateAsync(payload);
   };
 
-  const handleDeleteTask = async () => {
+  const handleCancelDelete = useCallback(() => {
+    setIsDeleteModalOpen(false);
+  }, []);
+
+  const handleDeleteTask = useCallback(() => {
     if (deleteMaintenanceItem.isPending) return;
 
-    try {
-      await deleteMaintenanceItem.mutateAsync();
-      setIsDeleteModalOpen(false);
-      toast.success("タスクを削除しました。");
-    } catch (error) {
-      console.error("タスクの削除に失敗しました。", error);
-      toast.error("タスクの削除に失敗しました。");
-    }
-  };
+    deleteMaintenanceItem.mutate(undefined, {
+      onSuccess: () => {
+        setIsDeleteModalOpen(false);
+        toast.success("タスクを削除しました。");
+      },
+      onError: () => {
+        toast.error("タスクの削除に失敗しました。");
+        console.error("タスクの削除に失敗しました。");
+      },
+    });
+  }, [deleteMaintenanceItem]);
 
   const defaultFormValues: TaskFormValues = {
     name: taskData.name,
@@ -72,7 +78,7 @@ const TaskContent = ({ taskData }: Props) => {
         description="この操作は取り消せません。完了履歴には「削除されたタスク」として表示されます。"
         confirmLabel="削除する"
         isPending={deleteMaintenanceItem.isPending}
-        onCancel={() => setIsDeleteModalOpen(false)}
+        onCancel={handleCancelDelete}
         onConfirm={handleDeleteTask}
       />
     </>
