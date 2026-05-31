@@ -5,6 +5,7 @@ import PageContent from "./PageContent";
 import SkeletonCard from "./SkeletonCard";
 
 import Header from "@/components/Header";
+import ErrorAlert from "@/components/ErrorAlert";
 import useMaintenanceItems, {
   useUserProfile,
 } from "@/hooks/useMaintenanceItems";
@@ -17,7 +18,7 @@ export default function DashboardPage() {
     useUserProfile();
   const hasActivePaidPlan =
     userProfile?.plan === "pro" &&
-    isActivePaidSubscriptionStatus(userProfile.subscription_status);
+    isActivePaidSubscriptionStatus(userProfile?.subscription_status);
   const isLimitCheckPending = isPending || isUserProfilePending;
 
   return (
@@ -39,16 +40,7 @@ export default function DashboardPage() {
         )}
 
         {/* エラー時 */}
-        {isError && (
-          <div className="flex flex-col items-center justify-center py-24 text-center gap-3">
-            <p className="text-zinc-500 dark:text-zinc-400 text-lg">
-              データの取得に失敗しました。
-            </p>
-            <p className="text-zinc-400 dark:text-zinc-500 text-sm">
-              ページを再読み込みしてお試しください。
-            </p>
-          </div>
-        )}
+        {isError && <ErrorAlert />}
 
         {/* データが0件 */}
         {!isPending && !isError && items?.length === 0 && (
