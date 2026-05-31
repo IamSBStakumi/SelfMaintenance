@@ -40,7 +40,7 @@ export default function CreateTaskPage() {
     name: "",
     icon: "✨",
     interval_days: 30,
-    last_completed_at: new Date().toISOString(),
+    last_completed_at: new Date().toISOString().split("T")[0],
     memo: "",
   };
 
