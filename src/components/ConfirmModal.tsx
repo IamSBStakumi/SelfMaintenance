@@ -13,6 +13,13 @@ type ConfirmModalProps = {
   onCancel: () => void;
 };
 
+const getFocusableElements = (element: HTMLElement) =>
+  Array.from(
+    element.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    ),
+  );
+
 const ConfirmModal = ({
   isOpen,
   title,
@@ -37,7 +44,11 @@ const ConfirmModal = ({
     if (!isOpen) return;
 
     previouslyFocusedElementRef.current = document.activeElement;
-    dialogRef.current?.focus();
+    const dialog = dialogRef.current;
+    const firstFocusableElement = dialog
+      ? getFocusableElements(dialog)[0]
+      : null;
+    (firstFocusableElement ?? dialog)?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !isPendingRef.current) {
@@ -52,11 +63,7 @@ const ConfirmModal = ({
       const dialog = dialogRef.current;
       if (!dialog) return;
 
-      const focusableElements = Array.from(
-        dialog.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-        ),
-      );
+      const focusableElements = getFocusableElements(dialog);
 
       if (focusableElements.length === 0) {
         event.preventDefault();

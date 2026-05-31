@@ -95,7 +95,8 @@ describe("TaskContent", () => {
     const dialog = screen.getByRole("dialog", {
       name: "タスクを削除しますか？",
     });
-    expect(dialog).toHaveFocus();
+    expect(dialog).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "キャンセル" })).toHaveFocus();
 
     await user.click(screen.getByRole("button", { name: "キャンセル" }));
 
@@ -133,15 +134,9 @@ describe("TaskContent", () => {
       screen.getByRole("button", { name: "このタスクを削除する" }),
     );
 
-    const dialog = screen.getByRole("dialog", {
-      name: "タスクを削除しますか？",
-    });
     const cancelButton = screen.getByRole("button", { name: "キャンセル" });
     const confirmButton = screen.getByRole("button", { name: "削除する" });
 
-    expect(dialog).toHaveFocus();
-
-    await user.tab();
     expect(cancelButton).toHaveFocus();
 
     await user.tab();
@@ -165,10 +160,7 @@ describe("TaskContent", () => {
     });
     await user.click(deleteButton);
 
-    const dialog = screen.getByRole("dialog", {
-      name: "タスクを削除しますか？",
-    });
-    expect(dialog).toHaveFocus();
+    expect(screen.getByRole("button", { name: "キャンセル" })).toHaveFocus();
 
     const focusSpy = vi.spyOn(deleteButton, "focus");
     setupUseMaintenanceItemMock({ isDeletePending: true });
@@ -176,9 +168,7 @@ describe("TaskContent", () => {
     rerender(<TaskContent taskData={createMockItem()} />);
 
     expect(focusSpy).not.toHaveBeenCalled();
-    expect(
-      screen.getByRole("dialog", { name: "タスクを削除しますか？" }),
-    ).toHaveFocus();
+    expect(screen.getByRole("button", { name: "キャンセル" })).toHaveFocus();
   });
 
   test("削除確認後に削除し、成功通知を表示すること", async () => {
