@@ -49,7 +49,10 @@ const ConfirmModal = ({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
 
-      if (previouslyFocusedElementRef.current instanceof HTMLElement) {
+      if (
+        previouslyFocusedElementRef.current instanceof HTMLElement &&
+        document.body.contains(previouslyFocusedElementRef.current)
+      ) {
         previouslyFocusedElementRef.current.focus();
       }
     };
