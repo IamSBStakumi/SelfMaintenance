@@ -31,12 +31,11 @@ const ConfirmModal = ({
   onCancel,
 }: ConfirmModalProps) => {
   const dialogRef = useRef<HTMLDivElement>(null);
-  const previouslyFocusedElementRef = useRef<Element | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    previouslyFocusedElementRef.current = document.activeElement;
+    const previouslyFocusedElement = document.activeElement;
     const dialog = dialogRef.current;
     const firstFocusableElement = dialog
       ? getFocusableElements(dialog)[0]
@@ -45,10 +44,10 @@ const ConfirmModal = ({
 
     return () => {
       if (
-        previouslyFocusedElementRef.current instanceof HTMLElement &&
-        document.body.contains(previouslyFocusedElementRef.current)
+        previouslyFocusedElement instanceof HTMLElement &&
+        document.body.contains(previouslyFocusedElement)
       ) {
-        previouslyFocusedElementRef.current.focus();
+        previouslyFocusedElement.focus();
       }
     };
   }, [isOpen]);
