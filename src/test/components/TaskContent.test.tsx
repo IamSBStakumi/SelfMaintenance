@@ -118,6 +118,33 @@ describe("TaskContent", () => {
     expect(deleteMutate).not.toHaveBeenCalled();
   });
 
+  test("削除中状態への更新ではフォーカスを元のボタンへ戻さないこと", async () => {
+    const user = userEvent.setup();
+    setupUseMaintenanceItemMock();
+
+    const { rerender } = render(<TaskContent taskData={createMockItem()} />);
+
+    const deleteButton = screen.getByRole("button", {
+      name: "このタスクを削除する",
+    });
+    await user.click(deleteButton);
+
+    const dialog = screen.getByRole("dialog", {
+      name: "タスクを削除しますか？",
+    });
+    expect(dialog).toHaveFocus();
+
+    const focusSpy = vi.spyOn(deleteButton, "focus");
+    setupUseMaintenanceItemMock({ isDeletePending: true });
+
+    rerender(<TaskContent taskData={createMockItem()} />);
+
+    expect(focusSpy).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole("dialog", { name: "タスクを削除しますか？" }),
+    ).toHaveFocus();
+  });
+
   test("削除確認後に削除し、成功通知を表示すること", async () => {
     const user = userEvent.setup();
     const { deleteMutate } = setupUseMaintenanceItemMock();
