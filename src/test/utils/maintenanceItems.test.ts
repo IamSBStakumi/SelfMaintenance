@@ -3,6 +3,7 @@ import {
   getMaintenanceItems,
   getMaintenanceItemById,
   createMaintenanceItem,
+  getCurrentUserProfile,
   updateMaintenanceItem,
   updateMaintenanceItemNextCycle,
   getMaintenanceLogs,
@@ -12,7 +13,12 @@ import type {
   MaintenanceItem,
   InsertMaintenanceItem,
   MaintenanceLog,
+  UserProfile,
 } from "@/types/maintenance";
+import {
+  FREE_PLAN_LIMIT_MESSAGE,
+  FREE_PLAN_MAINTENANCE_ITEM_LIMIT,
+} from "@/constants/planLimits";
 
 // モック用の定義
 const mockGetUser = vi.fn();
@@ -32,6 +38,7 @@ vi.mock("@/lib/supabase/server", () => ({
 type MockSupabaseResponse<T> = {
   data: T | null;
   error: Error | unknown | null;
+  count?: number | null;
 };
 
 // チェーンメソッドを管理するためのインターフェース
@@ -45,13 +52,14 @@ interface MockChain<T> {
   lte: ReturnType<typeof vi.fn>;
   order: ReturnType<typeof vi.fn>;
   single: ReturnType<typeof vi.fn>;
+  maybeSingle: ReturnType<typeof vi.fn>;
   then: (resolve: (val: MockSupabaseResponse<T>) => void) => void;
 }
 
 describe("src/services/maintenance_items", () => {
   // すべてのテストで共通してモックをリセットする
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
 
     // デフォルトで認証が成功している状態をシミュレート
     mockGetUser.mockResolvedValue({
@@ -81,6 +89,7 @@ describe("src/services/maintenance_items", () => {
       lte: vi.fn(() => chain),
       order: vi.fn(() => chain),
       single: vi.fn(() => chain),
+      maybeSingle: vi.fn(() => chain),
       then: (resolve: (val: MockSupabaseResponse<T>) => void) =>
         resolve(returnValue),
     };
@@ -103,6 +112,68 @@ describe("src/services/maintenance_items", () => {
     created_at: "2026-04-15T10:00:00Z",
     updated_at: "2026-04-15T10:00:00Z",
     ...override,
+  });
+
+  const createMockUserProfile = (
+    override: Partial<UserProfile> = {},
+  ): UserProfile => ({
+    user_id: "test-user-id",
+    plan: "free",
+    subscription_status: null,
+    stripe_customer_id: null,
+    stripe_subscription_id: null,
+    current_period_end: null,
+    created_at: "2026-04-15T10:00:00Z",
+    updated_at: "2026-04-15T10:00:00Z",
+    ...override,
+  });
+
+  const createProfileChain = (override: Partial<UserProfile> = {}) =>
+    createMockChain<UserProfile>({
+      data: createMockUserProfile(override),
+      error: null,
+    });
+
+  describe("getCurrentUserProfile", () => {
+    test("正常にユーザープロフィールを取得できること", async () => {
+      const profile = createMockUserProfile();
+      const chain = createMockChain<UserProfile>({
+        data: profile,
+        error: null,
+      });
+      mockFrom.mockReturnValue(chain);
+
+      const result = await getCurrentUserProfile();
+
+      expect(mockFrom).toHaveBeenCalledWith("user_profiles");
+      expect(chain.select).toHaveBeenCalledWith("*");
+      expect(chain.eq).toHaveBeenCalledWith("user_id", "test-user-id");
+      expect(chain.maybeSingle).toHaveBeenCalled();
+      expect(result).toEqual(profile);
+    });
+
+    test("未ログインの場合、エラーがスローされること", async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: null },
+        error: null,
+      });
+
+      await expect(getCurrentUserProfile()).rejects.toThrow(
+        "認証に失敗しました。ログインしているか確認してください。",
+      );
+    });
+
+    test("プロフィール取得に失敗した場合、エラーがスローされること", async () => {
+      const chain = createMockChain<UserProfile>({
+        data: null,
+        error: new Error("Profile Error"),
+      });
+      mockFrom.mockReturnValue(chain);
+
+      await expect(getCurrentUserProfile()).rejects.toThrow(
+        "ユーザープランの取得に失敗しました。",
+      );
+    });
   });
 
   describe("getMaintenanceItems", () => {
@@ -155,7 +226,7 @@ describe("src/services/maintenance_items", () => {
       mockFrom.mockReturnValue(chain);
 
       await expect(getMaintenanceItems()).rejects.toThrow(
-        "メンテナンス項目の取得に失敗しました。",
+        "定期タスクの取得に失敗しました。",
       );
     });
   });
@@ -193,7 +264,7 @@ describe("src/services/maintenance_items", () => {
       mockFrom.mockReturnValue(chain);
 
       await expect(getMaintenanceItemById("item1")).rejects.toThrow(
-        "メンテナンス項目の取得に失敗しました。",
+        "定期タスクの取得に失敗しました。",
       );
     });
   });
@@ -234,30 +305,55 @@ describe("src/services/maintenance_items", () => {
         memo: validInsertData.memo,
         id: "new_item",
       });
-      const chain = createMockChain<MaintenanceItem>({
+      const profileChain = createProfileChain();
+      const countChain = createMockChain<null>({
+        data: null,
+        error: null,
+        count: FREE_PLAN_MAINTENANCE_ITEM_LIMIT - 1,
+      });
+      const insertChain = createMockChain<MaintenanceItem>({
         data: createdData,
         error: null,
       });
-      mockFrom.mockReturnValue(chain);
+      mockFrom
+        .mockReturnValueOnce(profileChain)
+        .mockReturnValueOnce(countChain)
+        .mockReturnValueOnce(insertChain);
 
       const result = await createMaintenanceItem(validInsertData);
 
-      expect(mockFrom).toHaveBeenCalledWith("maintenance_items");
-      expect(chain.insert).toHaveBeenCalledWith({
+      expect(mockFrom).toHaveBeenNthCalledWith(1, "user_profiles");
+      expect(mockFrom).toHaveBeenNthCalledWith(2, "maintenance_items");
+      expect(countChain.select).toHaveBeenCalledWith("id", {
+        count: "exact",
+        head: true,
+      });
+      expect(countChain.eq).toHaveBeenCalledWith("user_id", "test-user-id");
+      expect(mockFrom).toHaveBeenNthCalledWith(3, "maintenance_items");
+      expect(insertChain.insert).toHaveBeenCalledWith({
         ...validInsertData,
         user_id: "test-user-id",
       });
-      expect(chain.select).toHaveBeenCalled();
-      expect(chain.single).toHaveBeenCalled();
+      expect(insertChain.select).toHaveBeenCalled();
+      expect(insertChain.single).toHaveBeenCalled();
       expect(result).toEqual(createdData);
     });
 
     test("作成時に入力値が正規化されること", async () => {
-      const chain = createMockChain<MaintenanceItem>({
+      const profileChain = createProfileChain();
+      const countChain = createMockChain<null>({
+        data: null,
+        error: null,
+        count: 0,
+      });
+      const insertChain = createMockChain<MaintenanceItem>({
         data: createMockItem({ name: "テスト作成" }),
         error: null,
       });
-      mockFrom.mockReturnValue(chain);
+      mockFrom
+        .mockReturnValueOnce(profileChain)
+        .mockReturnValueOnce(countChain)
+        .mockReturnValueOnce(insertChain);
 
       await createMaintenanceItem({
         ...validInsertData,
@@ -266,7 +362,7 @@ describe("src/services/maintenance_items", () => {
         memo: "",
       });
 
-      expect(chain.insert).toHaveBeenCalledWith({
+      expect(insertChain.insert).toHaveBeenCalledWith({
         ...validInsertData,
         name: "テスト作成",
         icon: null,
@@ -275,16 +371,111 @@ describe("src/services/maintenance_items", () => {
       });
     });
 
+    test("無料版の上限に達している場合、作成せずにエラーがスローされること", async () => {
+      const profileChain = createProfileChain();
+      const countChain = createMockChain<null>({
+        data: null,
+        error: null,
+        count: FREE_PLAN_MAINTENANCE_ITEM_LIMIT,
+      });
+      mockFrom
+        .mockReturnValueOnce(profileChain)
+        .mockReturnValueOnce(countChain);
+
+      await expect(createMaintenanceItem(validInsertData)).rejects.toThrow(
+        FREE_PLAN_LIMIT_MESSAGE,
+      );
+
+      expect(countChain.insert).not.toHaveBeenCalled();
+    });
+
+    test("タスク数の確認に失敗した場合、エラーがスローされること", async () => {
+      const profileChain = createProfileChain();
+      const countChain = createMockChain<null>({
+        data: null,
+        error: new Error("Count Error"),
+      });
+      mockFrom
+        .mockReturnValueOnce(profileChain)
+        .mockReturnValueOnce(countChain);
+
+      await expect(createMaintenanceItem(validInsertData)).rejects.toThrow(
+        "定期タスク数の確認に失敗しました。",
+      );
+
+      expect(countChain.insert).not.toHaveBeenCalled();
+    });
+
     test("DB作成時にエラーが発生した場合、エラーがスローされること", async () => {
-      const chain = createMockChain<MaintenanceItem>({
+      const profileChain = createProfileChain();
+      const countChain = createMockChain<null>({
+        data: null,
+        error: null,
+        count: 0,
+      });
+      const insertChain = createMockChain<MaintenanceItem>({
         data: null,
         error: new Error("DB Error"),
       });
-      mockFrom.mockReturnValue(chain);
+      mockFrom
+        .mockReturnValueOnce(profileChain)
+        .mockReturnValueOnce(countChain)
+        .mockReturnValueOnce(insertChain);
 
       await expect(createMaintenanceItem(validInsertData)).rejects.toThrow(
         "項目の作成に失敗しました。",
       );
+    });
+
+    test("DB側の無料版上限エラーは上限メッセージとしてスローされること", async () => {
+      const profileChain = createProfileChain();
+      const countChain = createMockChain<null>({
+        data: null,
+        error: null,
+        count: FREE_PLAN_MAINTENANCE_ITEM_LIMIT - 1,
+      });
+      const insertChain = createMockChain<MaintenanceItem>({
+        data: null,
+        error: new Error(FREE_PLAN_LIMIT_MESSAGE),
+      });
+      mockFrom
+        .mockReturnValueOnce(profileChain)
+        .mockReturnValueOnce(countChain)
+        .mockReturnValueOnce(insertChain);
+
+      await expect(createMaintenanceItem(validInsertData)).rejects.toThrow(
+        FREE_PLAN_LIMIT_MESSAGE,
+      );
+    });
+
+    test("有効な有料プランの場合、3件以上でも作成できること", async () => {
+      const profileChain = createProfileChain({
+        plan: "pro",
+        subscription_status: "active",
+      });
+      const createdData = createMockItem({
+        name: validInsertData.name,
+        interval_days: validInsertData.interval_days,
+        memo: validInsertData.memo,
+        id: "paid_item",
+      });
+      const insertChain = createMockChain<MaintenanceItem>({
+        data: createdData,
+        error: null,
+      });
+      mockFrom
+        .mockReturnValueOnce(profileChain)
+        .mockReturnValueOnce(insertChain);
+
+      const result = await createMaintenanceItem(validInsertData);
+
+      expect(mockFrom).toHaveBeenNthCalledWith(1, "user_profiles");
+      expect(mockFrom).toHaveBeenNthCalledWith(2, "maintenance_items");
+      expect(insertChain.insert).toHaveBeenCalledWith({
+        ...validInsertData,
+        user_id: "test-user-id",
+      });
+      expect(result).toEqual(createdData);
     });
   });
 
@@ -384,7 +575,7 @@ describe("src/services/maintenance_items", () => {
       expect(result).toEqual(mockUpdatedData);
     });
 
-    test("メンテナンスログの作成に失敗した場合でも更新結果が返されること", async () => {
+    test("完了履歴の作成に失敗した場合でも更新結果が返されること", async () => {
       vi.useFakeTimers();
       const mockNow = "2026-04-30T12:00:00.000Z";
       vi.setSystemTime(mockNow);
@@ -535,7 +726,7 @@ describe("src/services/maintenance_items", () => {
 
       await expect(
         getMaintenanceLogs("2026-04-01", "2026-04-30"),
-      ).rejects.toThrow("メンテナンス履歴の取得に失敗しました。");
+      ).rejects.toThrow("完了履歴の取得に失敗しました。");
     });
   });
 });

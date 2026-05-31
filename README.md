@@ -1,10 +1,9 @@
-# SelfMaintenance
+# メグループ
 
 [![CI](https://github.com/IamSBStakumi/SelfMaintenance/actions/workflows/ci.yml/badge.svg)](https://github.com/IamSBStakumi/SelfMaintenance/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 
-セルフメンテナンスをサポートするアプリ\
-個人のコンディションを最適に保ち、日々の気持ちを向上させる。
+忘れがちな定期タスクを、ちょうどよく巡らせる自己管理アプリ。
 
 具体的には以下の周期的なタスクを管理する
 
@@ -25,7 +24,7 @@
 
 美容室の予約やコンタクトレンズの交換など、定期的に行うべきタスクについて周期が乱れたり、最後にいつやったか忘れてしまうことがあったため。
 
-自分や部屋、生活についてのメンテナンスを管理・サポートすることを目的として開発している。
+自分や部屋、生活についての定期タスクを管理し、次にやるタイミングを忘れないことを目的として開発している。
 
 ## ✨ 主な機能
 
@@ -79,6 +78,12 @@ cp .env.example .env.local
 #### 2. Supabase の起動
 
 アプリケーションを起動する前に、バックエンドの環境を立ち上げます。
+
+> **Supabase project_id について**
+>
+> `package.json` のパッケージ名は `megloop` ですが、`supabase/config.toml` の `project_id` は既存のローカル Supabase 開発環境との互換性を保つため、意図的に `self-maintenance` のままにしています。
+> この値は Supabase CLI が同一ホスト上のローカルプロジェクトを識別するための名前であり、ホスト済み Supabase プロジェクト名や本番データベースをリネームするものではありません。
+> 本番・プレビュー環境の接続先は `.env` / `.env.local` の `NEXT_PUBLIC_SUPABASE_URL` などで管理します。
 
 ```bash
 # Supabase ローカル開発環境の起動

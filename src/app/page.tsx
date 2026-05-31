@@ -74,12 +74,12 @@ export default function SplashScreen() {
 
         {/* アプリタイトル */}
         <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
-          SelfMaintenance
+          メグループ
         </h1>
 
         {/* サブタイトル */}
         <p className="mt-3 text-sm font-medium tracking-wide text-zinc-500 dark:text-zinc-400">
-          あなたの快適な日々をサポート
+          忘れがちな定期タスクを、ちょうどよく巡らせる
         </p>
 
         {/* ローディングインジケーター（オプショナル） */}

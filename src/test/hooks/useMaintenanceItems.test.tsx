@@ -1,40 +1,27 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import useMaintenanceItems, {
   MAINTENANCE_ITEMS_QUERY_KEY,
+  USER_PROFILE_QUERY_KEY,
+  useCreateMaintenanceItem,
+  useUserProfile,
 } from "@/hooks/useMaintenanceItems";
 import * as services from "@/services/maintenanceService";
-import type {
-  MaintenanceItem,
-  InsertMaintenanceItem,
-} from "@/types/maintenance";
+import { createMaintenanceItem } from "@/test/factories/maintenanceItemFactory";
+import type { InsertMaintenanceItem } from "@/types/maintenance";
 
 // サービスのモック化
 vi.mock("@/services/maintenanceService", () => ({
   getMaintenanceItems: vi.fn(),
   createMaintenanceItem: vi.fn(),
+  getCurrentUserProfile: vi.fn(),
 }));
 
 const mockGetMaintenanceItems = vi.mocked(services.getMaintenanceItems);
 const mockCreateMaintenanceItem = vi.mocked(services.createMaintenanceItem);
-
-// テスト用のダミーデータ生成ヘルパー
-const createMockItem = (
-  override: Partial<MaintenanceItem> = {},
-): MaintenanceItem => ({
-  id: "item1",
-  user_id: "test-user-id",
-  name: "テスト項目",
-  icon: null,
-  interval_days: 30,
-  last_completed_at: "2024-01-01T00:00:00.000Z",
-  memo: null,
-  created_at: "2024-01-01T00:00:00.000Z",
-  updated_at: "2024-01-01T00:00:00.000Z",
-  ...override,
-});
+const mockGetCurrentUserProfile = vi.mocked(services.getCurrentUserProfile);
 
 describe("useMaintenanceItems", () => {
   const createWrapper = () => {
@@ -56,6 +43,16 @@ describe("useMaintenanceItems", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetCurrentUserProfile.mockResolvedValue({
+      user_id: "test-user-id",
+      plan: "free",
+      subscription_status: null,
+      stripe_customer_id: null,
+      stripe_subscription_id: null,
+      current_period_end: null,
+      created_at: "2024-01-01T00:00:00.000Z",
+      updated_at: "2024-01-01T00:00:00.000Z",
+    });
   });
 
   afterEach(() => {
@@ -64,7 +61,7 @@ describe("useMaintenanceItems", () => {
 
   describe("Query: fetchMaintenanceItems", () => {
     test("正常にgetMaintenanceItemsが呼ばれ、データが取得できること", async () => {
-      const mockData = [createMockItem()];
+      const mockData = [createMaintenanceItem()];
       mockGetMaintenanceItems.mockResolvedValue(mockData);
 
       const { wrapper } = createWrapper();
@@ -93,6 +90,20 @@ describe("useMaintenanceItems", () => {
     });
   });
 
+  describe("Query: useUserProfile", () => {
+    test("正常にgetCurrentUserProfileが呼ばれ、プロフィールが取得できること", async () => {
+      const { wrapper } = createWrapper();
+      const { result } = renderHook(() => useUserProfile(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(mockGetCurrentUserProfile).toHaveBeenCalledTimes(1);
+      expect(result.current.data?.plan).toBe("free");
+    });
+  });
+
   describe("Mutation: createMaintenanceItem", () => {
     test("作成に成功した際、クエリのinvalidateが行われること", async () => {
       const { wrapper, testQueryClient } = createWrapper();
@@ -110,7 +121,10 @@ describe("useMaintenanceItems", () => {
       // invalidate後の再フェッチに対応するためデフォルトで空配列を返すようにする
       mockGetMaintenanceItems.mockResolvedValue([]);
 
-      const mockResponse = createMockItem({ id: "new-id", ...insertData });
+      const mockResponse = createMaintenanceItem({
+        id: "new-id",
+        ...insertData,
+      });
       mockCreateMaintenanceItem.mockResolvedValue(mockResponse);
 
       const { result } = renderHook(() => useMaintenanceItems(), { wrapper });
@@ -127,6 +141,9 @@ describe("useMaintenanceItems", () => {
       expect(mockCreateMaintenanceItem.mock.calls[0][0]).toEqual(insertData);
       expect(resetSpy).toHaveBeenCalledWith({
         queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
+      });
+      expect(resetSpy).toHaveBeenCalledWith({
+        queryKey: USER_PROFILE_QUERY_KEY,
       });
     });
 
@@ -156,9 +173,39 @@ describe("useMaintenanceItems", () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "メンテナンス項目の作成に失敗しました。",
+        "定期タスクの作成に失敗しました。",
       );
       consoleErrorSpy.mockRestore();
+    });
+
+    test("作成専用hookはタスク一覧とプロフィールを取得しないこと", async () => {
+      const { wrapper } = createWrapper();
+      const { result } = renderHook(() => useCreateMaintenanceItem(), {
+        wrapper,
+      });
+
+      const insertData: InsertMaintenanceItem = {
+        name: "新しいテスト",
+        icon: null,
+        interval_days: 7,
+        last_completed_at: new Date().toISOString(),
+        memo: "",
+      };
+      const mockResponse = createMaintenanceItem({
+        id: "new-id",
+        ...insertData,
+      });
+      mockCreateMaintenanceItem.mockResolvedValue(mockResponse);
+
+      result.current.mutate(insertData);
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(mockGetMaintenanceItems).not.toHaveBeenCalled();
+      expect(mockGetCurrentUserProfile).not.toHaveBeenCalled();
+      expect(mockCreateMaintenanceItem).toHaveBeenCalledTimes(1);
     });
   });
 });

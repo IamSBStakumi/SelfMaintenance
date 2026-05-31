@@ -4,7 +4,7 @@ import { MaintenanceItem, MaintenanceLog } from "@/types/maintenance";
 type Props = {
   /** 表示するログデータ */
   log: MaintenanceLog;
-  /** ログに対応するメンテナンス項目（削除済みの場合は undefined） */
+  /** ログに対応する定期タスク（削除済みの場合は undefined） */
   item: MaintenanceItem | undefined;
 };
 

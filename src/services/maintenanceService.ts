@@ -11,7 +11,14 @@ import {
   MaintenanceItem,
   UpdateMaintenanceItem,
   MaintenanceLog,
+  UserProfile,
 } from "@/types/maintenance";
+import {
+  FREE_PLAN_LIMIT_MESSAGE,
+  FREE_PLAN_LIMIT_PREFIX,
+  FREE_PLAN_MAINTENANCE_ITEM_LIMIT,
+  isActivePaidSubscriptionStatus,
+} from "@/constants/planLimits";
 
 const validateMaintenanceTask = (data: InsertMaintenanceItem) => {
   const validationResult = maintenanceTaskSchema.safeParse(data);
@@ -39,9 +46,60 @@ const normalizeAndValidateId = (id: string) => {
   return normalizedId;
 };
 
+const isActivePaidProfile = (profile: UserProfile) =>
+  profile.plan === "pro" &&
+  isActivePaidSubscriptionStatus(profile.subscription_status);
+
+const getUserProfileByUserId = async (
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<UserProfile> => {
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error fetching user profile:", error);
+    throw new Error("ユーザープランの取得に失敗しました。");
+  }
+
+  if (!data) {
+    const now = new Date().toISOString();
+    return {
+      user_id: userId,
+      plan: "free",
+      subscription_status: null,
+      stripe_customer_id: null,
+      stripe_subscription_id: null,
+      current_period_end: null,
+      created_at: now,
+      updated_at: now,
+    };
+  }
+
+  return data as UserProfile;
+};
+
+export async function getCurrentUserProfile(): Promise<UserProfile> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error("認証に失敗しました。ログインしているか確認してください。");
+  }
+
+  return getUserProfileByUserId(supabase, user.id);
+}
+
 /**
- * ログインユーザーのすべてのメンテナンス項目を取得します。
- * @returns メンテナンス項目の配列
+ * ログインユーザーのすべての定期タスクを取得します。
+ * @returns 定期タスクの配列
  * @throws 認証エラーまたはデータベースエラーが発生した場合
  */
 export async function getMaintenanceItems(): Promise<MaintenanceItem[]> {
@@ -57,7 +115,7 @@ export async function getMaintenanceItems(): Promise<MaintenanceItem[]> {
     throw new Error("認証に失敗しました。ログインしているか確認してください。");
   }
 
-  // メンテナンス項目を取得
+  // 定期タスクを取得
   const { data, error } = await supabase
     .from("maintenance_items")
     .select("*")
@@ -66,14 +124,14 @@ export async function getMaintenanceItems(): Promise<MaintenanceItem[]> {
 
   if (error) {
     console.error("Error fetching maintenance items:", error);
-    throw new Error("メンテナンス項目の取得に失敗しました。");
+    throw new Error("定期タスクの取得に失敗しました。");
   }
 
   return (data as MaintenanceItem[]) || [];
 }
 
 /**
- * 指定したIDのメンテナンス項目を取得します。
+ * 指定したIDの定期タスクを取得します。
  */
 export async function getMaintenanceItemById(
   id: string,
@@ -100,14 +158,14 @@ export async function getMaintenanceItemById(
 
   if (error) {
     console.error("Error fetching maintenance item:", error);
-    throw new Error("メンテナンス項目の取得に失敗しました。");
+    throw new Error("定期タスクの取得に失敗しました。");
   }
 
   return data as MaintenanceItem;
 }
 
 /**
- * 新しいメンテナンス項目を登録します。
+ * 新しい定期タスクを登録します。
  */
 export async function createMaintenanceItem(
   data: InsertMaintenanceItem,
@@ -122,6 +180,24 @@ export async function createMaintenanceItem(
     throw new Error("認証が必要です。");
   }
 
+  const userProfile = await getUserProfileByUserId(supabase, user.id);
+
+  if (!isActivePaidProfile(userProfile)) {
+    const { count, error: countError } = await supabase
+      .from("maintenance_items")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+
+    if (countError) {
+      console.error("Error counting maintenance items:", countError);
+      throw new Error("定期タスク数の確認に失敗しました。");
+    }
+
+    if ((count ?? 0) >= FREE_PLAN_MAINTENANCE_ITEM_LIMIT) {
+      throw new Error(FREE_PLAN_LIMIT_MESSAGE);
+    }
+  }
+
   const { data: insertedData, error } = await supabase
     .from("maintenance_items")
     .insert({
@@ -133,6 +209,9 @@ export async function createMaintenanceItem(
 
   if (error) {
     console.error("Error creating maintenance item:", error);
+    if (error.message?.startsWith(FREE_PLAN_LIMIT_PREFIX)) {
+      throw new Error(FREE_PLAN_LIMIT_MESSAGE);
+    }
     throw new Error("項目の作成に失敗しました。");
   }
 
@@ -140,7 +219,7 @@ export async function createMaintenanceItem(
 }
 
 /**
- * 指定したIDのメンテナンス項目を更新します。
+ * 指定したIDの定期タスクを更新します。
  */
 export async function updateMaintenanceItem(
   id: string,
@@ -175,7 +254,7 @@ export async function updateMaintenanceItem(
 }
 
 /**
- * 指定したIDのメンテナンス項目を次の周期に更新します。
+ * 指定したIDの定期タスクを次の周期に更新します。
  */
 export async function updateMaintenanceItemNextCycle(
   id: string,
@@ -209,7 +288,7 @@ export async function updateMaintenanceItemNextCycle(
 }
 
 /**
- * 指定した期間内のメンテナンスログを取得します。
+ * 指定した期間内の完了履歴を取得します。
  */
 export async function getMaintenanceLogs(
   startDate: string,
@@ -236,14 +315,14 @@ export async function getMaintenanceLogs(
 
   if (error) {
     console.error("Error fetching maintenance logs:", error);
-    throw new Error("メンテナンス履歴の取得に失敗しました。");
+    throw new Error("完了履歴の取得に失敗しました。");
   }
 
   return (data as MaintenanceLog[]) || [];
 }
 
 /**
- * 指定したIDのメンテナンス項目を削除します。
+ * 指定したIDの定期タスクを削除します。
  */
 export async function deleteMaintenanceItem(id: string): Promise<void> {
   const normalizedId = normalizeAndValidateId(id);

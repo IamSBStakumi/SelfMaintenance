@@ -44,9 +44,12 @@ export default function TaskForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
+    <form
+      onSubmit={handleSubmit(handleFormSubmit)}
+      className="space-y-6 sm:space-y-8"
+    >
       {/* アイコン選択（簡易版）とタスク名 */}
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
         <div className="w-full md:w-1/4">
           <label
             htmlFor="icon"
@@ -60,7 +63,7 @@ export default function TaskForm({
             placeholder="✨"
             maxLength={2}
             {...register("icon")}
-            className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 text-2xl text-center focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden"
+            className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-3 text-2xl text-center focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden sm:p-4"
           />
           {errors.icon && (
             <p className="text-rose-500 text-xs mt-1 ml-1">
@@ -80,7 +83,7 @@ export default function TaskForm({
             type="text"
             placeholder="例: コンタクトレンズ交換"
             {...register("name")}
-            className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 text-lg font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden"
+            className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-3 text-base font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden sm:p-4 sm:text-lg"
           />
           {errors.name && (
             <p className="text-rose-500 text-xs mt-1 ml-1">
@@ -91,7 +94,7 @@ export default function TaskForm({
       </div>
 
       {/* 周期と最終実施日 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div>
           <label
             htmlFor="interval-days"
@@ -104,7 +107,7 @@ export default function TaskForm({
             type="number"
             min="1"
             {...register("interval_days", { valueAsNumber: true })}
-            className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden"
+            className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-3 font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden sm:p-4"
           />
           {errors.interval_days && (
             <p className="text-rose-500 text-xs mt-1 ml-1">
@@ -123,7 +126,7 @@ export default function TaskForm({
             id="last-completed-at"
             type="date"
             {...register("last_completed_at")}
-            className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden"
+            className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-3 font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden sm:p-4"
           />
           {errors.last_completed_at && (
             <p className="text-rose-500 text-xs mt-1 ml-1">
@@ -146,7 +149,7 @@ export default function TaskForm({
           placeholder="備考や注意点など..."
           rows={4}
           {...register("memo")}
-          className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-4 font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden resize-none"
+          className="w-full bg-zinc-100 dark:bg-zinc-900/50 border-0 rounded-2xl p-3 font-medium focus:ring-2 focus:ring-indigo-500 transition-all outline-hidden resize-none sm:p-4"
         />
         {errors.memo && (
           <p className="text-rose-500 text-xs mt-1 ml-1">
@@ -167,7 +170,7 @@ export default function TaskForm({
         type="submit"
         disabled={isSubmitting}
         className={`
-          w-full py-5 rounded-2xl font-bold text-white text-lg shadow-xl shadow-indigo-500/20
+          w-full py-4 rounded-2xl font-bold text-white text-base shadow-xl shadow-indigo-500/20 sm:py-5 sm:text-lg
           bg-linear-to-r from-indigo-500 via-indigo-600 to-purple-600
           hover:opacity-90 active:scale-[0.98] transition-all duration-200
           disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100

@@ -7,7 +7,7 @@ description: |
 
 # コードレビュールール
 
-このスキルは `self-maintenance` プロジェクト（Next.js v16 / React 19 / TypeScript）のコードレビューに特化したルールを定義します。
+このスキルは `megloop` プロジェクト（Next.js v16 / React 19 / TypeScript）のコードレビューに特化したルールを定義します。
 コードレビューを行う際は、以下のルールに必ず従ってください。
 
 ---

@@ -7,7 +7,7 @@ description: |
 
 # Issue作成ルール
 
-このスキルは `self-maintenance` プロジェクト（Next.js v16 / React 19 / TypeScript）において、GitHub Issueとして使用するMarkdownファイルを作成する際に従うべきルールを定義します。
+このスキルは `megloop` プロジェクト（Next.js v16 / React 19 / TypeScript）において、GitHub Issueとして使用するMarkdownファイルを作成する際に従うべきルールを定義します。
 
 ## Issue作成の進め方
 

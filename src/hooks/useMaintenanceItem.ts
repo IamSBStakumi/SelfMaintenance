@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
+  deleteMaintenanceItem,
   getMaintenanceItemById,
   updateMaintenanceItem,
   updateMaintenanceItemNextCycle,
@@ -36,7 +37,7 @@ const useMaintenanceItem = (id: string) => {
       router.push("/dashboard");
     },
     onError: () => {
-      console.error("メンテナンス項目の更新に失敗しました。");
+      console.error("定期タスクの更新に失敗しました。");
     },
   });
 
@@ -51,7 +52,19 @@ const useMaintenanceItem = (id: string) => {
       });
     },
     onError: () => {
-      console.error("メンテナンス項目の更新に失敗しました。");
+      console.error("定期タスクの更新に失敗しました。");
+    },
+  });
+
+  const deleteMaintenanceItemMutation = useMutation({
+    mutationFn: () => deleteMaintenanceItem(normalizedId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
+      });
+    },
+    onError: () => {
+      console.error("定期タスクの削除に失敗しました。");
     },
   });
 
@@ -59,6 +72,7 @@ const useMaintenanceItem = (id: string) => {
     fetchMaintenanceItem,
     updateMaintenanceItem: updateMaintenanceItemMutation,
     updateMaintenanceItemNextCycle: updateMaintenanceItemNextCycleMutation,
+    deleteMaintenanceItem: deleteMaintenanceItemMutation,
   };
 };
 

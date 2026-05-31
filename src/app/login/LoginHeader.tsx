@@ -7,10 +7,10 @@ const LoginHeader = () => {
         </span>
       </div>
       <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight">
-        SelfMaintenance
+        メグループ
       </h2>
       <p className="mt-3 text-center text-sm text-zinc-500 dark:text-zinc-400 font-medium">
-        毎日のメンテナンスをスマートに
+        定期タスクを忘れずスマートに
       </p>
     </div>
   );

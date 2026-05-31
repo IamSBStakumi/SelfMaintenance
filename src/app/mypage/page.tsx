@@ -32,10 +32,10 @@ export default function MyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-lavender p-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100">
+    <div className="min-h-screen bg-lavender px-4 py-6 dark:bg-zinc-900 font-sans text-zinc-900 dark:text-zinc-100 sm:p-6">
       <Header />
 
-      <main className="max-w-4xl mx-auto space-y-8">
+      <main className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
         {loading ? <LoadingOverlay /> : <MyPageSections user={user} />}
 
         <div className="pt-8">

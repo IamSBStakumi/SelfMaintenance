@@ -7,10 +7,8 @@ import useMaintenanceItem, {
 } from "@/hooks/useMaintenanceItem";
 import { MAINTENANCE_ITEMS_QUERY_KEY } from "@/hooks/useMaintenanceItems";
 import * as services from "@/services/maintenanceService";
-import type {
-  MaintenanceItem,
-  UpdateMaintenanceItem,
-} from "@/types/maintenance";
+import { createMaintenanceItem } from "@/test/factories/maintenanceItemFactory";
+import type { UpdateMaintenanceItem } from "@/types/maintenance";
 
 // Next.js のルーターモック
 const mockPush = vi.fn();
@@ -23,6 +21,7 @@ vi.mock("@/services/maintenanceService", () => ({
   getMaintenanceItemById: vi.fn(),
   updateMaintenanceItem: vi.fn(),
   updateMaintenanceItemNextCycle: vi.fn(),
+  deleteMaintenanceItem: vi.fn(),
 }));
 
 const mockGetMaintenanceItemById = vi.mocked(services.getMaintenanceItemById);
@@ -30,21 +29,7 @@ const mockUpdateMaintenanceItem = vi.mocked(services.updateMaintenanceItem);
 const mockUpdateMaintenanceItemNextCycle = vi.mocked(
   services.updateMaintenanceItemNextCycle,
 );
-
-const createMockItem = (
-  override: Partial<MaintenanceItem> = {},
-): MaintenanceItem => ({
-  id: "item1",
-  user_id: "test-user-id",
-  name: "テスト項目",
-  icon: null,
-  interval_days: 30,
-  last_completed_at: "2024-01-01T00:00:00.000Z",
-  memo: null,
-  created_at: "2024-01-01T00:00:00.000Z",
-  updated_at: "2024-01-01T00:00:00.000Z",
-  ...override,
-});
+const mockDeleteMaintenanceItem = vi.mocked(services.deleteMaintenanceItem);
 
 describe("useMaintenanceItem", () => {
   const queryClients: QueryClient[] = [];
@@ -79,7 +64,7 @@ describe("useMaintenanceItem", () => {
 
   describe("Query: fetchMaintenanceItem", () => {
     test("正常にgetMaintenanceItemByIdが呼ばれ、データが取得できること", async () => {
-      const mockData = createMockItem();
+      const mockData = createMaintenanceItem();
       mockGetMaintenanceItemById.mockResolvedValue(mockData);
 
       const { wrapper } = createWrapper();
@@ -111,7 +96,7 @@ describe("useMaintenanceItem", () => {
       const resetSpy = vi.spyOn(testQueryClient, "invalidateQueries");
 
       const updateData: UpdateMaintenanceItem = { name: "更新後" };
-      const mockResponse = createMockItem({ name: "更新後" });
+      const mockResponse = createMaintenanceItem({ name: "更新後" });
 
       // 再フェッチ対策
       mockGetMaintenanceItemById.mockResolvedValue(mockResponse);
@@ -141,7 +126,7 @@ describe("useMaintenanceItem", () => {
         .spyOn(console, "error")
         .mockImplementation(() => {});
       mockUpdateMaintenanceItem.mockRejectedValue(new Error("Update Error"));
-      mockGetMaintenanceItemById.mockResolvedValue(createMockItem());
+      mockGetMaintenanceItemById.mockResolvedValue(createMaintenanceItem());
 
       const { wrapper } = createWrapper();
       const { result } = renderHook(() => useMaintenanceItem("item1"), {
@@ -155,7 +140,7 @@ describe("useMaintenanceItem", () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "メンテナンス項目の更新に失敗しました。",
+        "定期タスクの更新に失敗しました。",
       );
       expect(mockPush).not.toHaveBeenCalled();
     });
@@ -166,7 +151,7 @@ describe("useMaintenanceItem", () => {
       const { wrapper, testQueryClient } = createWrapper();
       const resetSpy = vi.spyOn(testQueryClient, "invalidateQueries");
 
-      const mockResponse = createMockItem();
+      const mockResponse = createMaintenanceItem();
       // 再フェッチ対策
       mockGetMaintenanceItemById.mockResolvedValue(mockResponse);
       mockUpdateMaintenanceItemNextCycle.mockResolvedValue(mockResponse);
@@ -204,7 +189,7 @@ describe("useMaintenanceItem", () => {
       mockUpdateMaintenanceItemNextCycle.mockRejectedValue(
         new Error("Update Error"),
       );
-      mockGetMaintenanceItemById.mockResolvedValue(createMockItem());
+      mockGetMaintenanceItemById.mockResolvedValue(createMaintenanceItem());
 
       const { wrapper } = createWrapper();
       const { result } = renderHook(() => useMaintenanceItem("item1"), {
@@ -220,8 +205,60 @@ describe("useMaintenanceItem", () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "メンテナンス項目の更新に失敗しました。",
+        "定期タスクの更新に失敗しました。",
       );
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe("Mutation: deleteMaintenanceItem", () => {
+    test("削除が成功した際、一覧のinvalidateと詳細キャッシュ削除が行われること", async () => {
+      const { wrapper, testQueryClient } = createWrapper();
+      const invalidateSpy = vi.spyOn(testQueryClient, "invalidateQueries");
+
+      mockGetMaintenanceItemById.mockResolvedValue(createMaintenanceItem());
+      mockDeleteMaintenanceItem.mockResolvedValue(undefined);
+
+      const { result } = renderHook(() => useMaintenanceItem("item1"), {
+        wrapper,
+      });
+
+      result.current.deleteMaintenanceItem.mutate();
+
+      await waitFor(() => {
+        expect(result.current.deleteMaintenanceItem.isSuccess).toBe(true);
+      });
+
+      expect(mockDeleteMaintenanceItem).toHaveBeenCalledTimes(1);
+      expect(mockDeleteMaintenanceItem).toHaveBeenCalledWith("item1");
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
+      });
+      expect(mockPush).not.toHaveBeenCalled();
+    });
+
+    test("削除に失敗した際、エラーがコンソールに出力され、遷移しないこと", async () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      mockGetMaintenanceItemById.mockResolvedValue(createMaintenanceItem());
+      mockDeleteMaintenanceItem.mockRejectedValue(new Error("Delete Error"));
+
+      const { wrapper } = createWrapper();
+      const { result } = renderHook(() => useMaintenanceItem("item1"), {
+        wrapper,
+      });
+
+      result.current.deleteMaintenanceItem.mutate();
+
+      await waitFor(() => {
+        expect(result.current.deleteMaintenanceItem.isError).toBe(true);
+      });
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "定期タスクの削除に失敗しました。",
+      );
+      expect(mockPush).not.toHaveBeenCalled();
       consoleErrorSpy.mockRestore();
     });
   });
