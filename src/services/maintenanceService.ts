@@ -58,11 +58,25 @@ const getUserProfileByUserId = async (
     .from("user_profiles")
     .select("*")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("Error fetching user profile:", error);
     throw new Error("ユーザープランの取得に失敗しました。");
+  }
+
+  if (!data) {
+    const now = new Date().toISOString();
+    return {
+      user_id: userId,
+      plan: "free",
+      subscription_status: null,
+      stripe_customer_id: null,
+      stripe_subscription_id: null,
+      current_period_end: null,
+      created_at: now,
+      updated_at: now,
+    };
   }
 
   return data as UserProfile;

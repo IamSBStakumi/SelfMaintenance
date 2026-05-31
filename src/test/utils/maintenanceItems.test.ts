@@ -52,13 +52,14 @@ interface MockChain<T> {
   lte: ReturnType<typeof vi.fn>;
   order: ReturnType<typeof vi.fn>;
   single: ReturnType<typeof vi.fn>;
+  maybeSingle: ReturnType<typeof vi.fn>;
   then: (resolve: (val: MockSupabaseResponse<T>) => void) => void;
 }
 
 describe("src/services/maintenance_items", () => {
   // すべてのテストで共通してモックをリセットする
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
 
     // デフォルトで認証が成功している状態をシミュレート
     mockGetUser.mockResolvedValue({
@@ -88,6 +89,7 @@ describe("src/services/maintenance_items", () => {
       lte: vi.fn(() => chain),
       order: vi.fn(() => chain),
       single: vi.fn(() => chain),
+      maybeSingle: vi.fn(() => chain),
       then: (resolve: (val: MockSupabaseResponse<T>) => void) =>
         resolve(returnValue),
     };
@@ -146,7 +148,7 @@ describe("src/services/maintenance_items", () => {
       expect(mockFrom).toHaveBeenCalledWith("user_profiles");
       expect(chain.select).toHaveBeenCalledWith("*");
       expect(chain.eq).toHaveBeenCalledWith("user_id", "test-user-id");
-      expect(chain.single).toHaveBeenCalled();
+      expect(chain.maybeSingle).toHaveBeenCalled();
       expect(result).toEqual(profile);
     });
 
