@@ -41,7 +41,6 @@ const TaskContent = ({ taskData }: Props) => {
       },
       onError: () => {
         toast.error("タスクの削除に失敗しました。");
-        console.error("タスクの削除に失敗しました。");
       },
     });
   };

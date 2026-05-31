@@ -204,9 +204,6 @@ describe("TaskContent", () => {
 
   test("削除に失敗した場合はエラー通知を表示すること", async () => {
     const user = userEvent.setup();
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
     setupUseMaintenanceItemMock({
       deleteMutate: vi.fn().mockImplementation((_, options) => {
         options?.onError?.(new Error("Delete Error"));
@@ -225,9 +222,6 @@ describe("TaskContent", () => {
         "タスクの削除に失敗しました。",
       );
     });
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "タスクの削除に失敗しました。",
-    );
     expect(mockPush).not.toHaveBeenCalled();
   });
 });
