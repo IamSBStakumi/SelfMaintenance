@@ -32,13 +32,6 @@ const ConfirmModal = ({
 }: ConfirmModalProps) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElementRef = useRef<Element | null>(null);
-  const isPendingRef = useRef(isPending);
-  const onCancelRef = useRef(onCancel);
-
-  useEffect(() => {
-    isPendingRef.current = isPending;
-    onCancelRef.current = onCancel;
-  }, [isPending, onCancel]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -50,9 +43,22 @@ const ConfirmModal = ({
       : null;
     (firstFocusableElement ?? dialog)?.focus();
 
+    return () => {
+      if (
+        previouslyFocusedElementRef.current instanceof HTMLElement &&
+        document.body.contains(previouslyFocusedElementRef.current)
+      ) {
+        previouslyFocusedElementRef.current.focus();
+      }
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !isPendingRef.current) {
-        onCancelRef.current();
+      if (event.key === "Escape" && !isPending) {
+        onCancel();
         return;
       }
 
@@ -96,15 +102,8 @@ const ConfirmModal = ({
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-
-      if (
-        previouslyFocusedElementRef.current instanceof HTMLElement &&
-        document.body.contains(previouslyFocusedElementRef.current)
-      ) {
-        previouslyFocusedElementRef.current.focus();
-      }
     };
-  }, [isOpen]);
+  }, [isOpen, isPending, onCancel]);
 
   if (!isOpen) return null;
 
@@ -113,8 +112,8 @@ const ConfirmModal = ({
       className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/50 px-4 py-6"
       role="presentation"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget && !isPendingRef.current) {
-          onCancelRef.current();
+        if (event.target === event.currentTarget && !isPending) {
+          onCancel();
         }
       }}
     >
