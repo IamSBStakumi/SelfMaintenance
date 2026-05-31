@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { parseISO, startOfDay } from "date-fns";
+import { format, parseISO, startOfDay } from "date-fns";
 import { toast } from "react-toastify";
 import { useCreateMaintenanceItem } from "@/hooks/useMaintenanceItems";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
@@ -40,7 +40,7 @@ export default function CreateTaskPage() {
     name: "",
     icon: "✨",
     interval_days: 30,
-    last_completed_at: new Date().toISOString().split("T")[0],
+    last_completed_at: format(new Date(), "yyyy-MM-dd"),
     memo: "",
   };
 
