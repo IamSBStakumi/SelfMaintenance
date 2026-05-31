@@ -27,10 +27,13 @@ const mockToast = vi.mocked(toast);
 
 const setupCreateMutation = (
   mutateAsync: ReturnType<typeof vi.fn> = vi.fn().mockResolvedValue(undefined),
-) => {
-  mockUseCreateMaintenanceItem.mockReturnValue({
+): { mutateAsync: ReturnType<typeof vi.fn> } => {
+  const mockReturn = {
     mutateAsync,
-  } as unknown as ReturnType<typeof useCreateMaintenanceItem>);
+  };
+  mockUseCreateMaintenanceItem.mockReturnValue(
+    mockReturn as unknown as ReturnType<typeof useCreateMaintenanceItem>,
+  );
 
   return { mutateAsync };
 };
