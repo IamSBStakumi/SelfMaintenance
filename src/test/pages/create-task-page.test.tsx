@@ -25,16 +25,6 @@ vi.mock("react-toastify", () => ({
 const mockUseCreateMaintenanceItem = vi.mocked(useCreateMaintenanceItem);
 const mockToast = vi.mocked(toast);
 
-const getInput = (container: HTMLElement, selector: string) => {
-  const input = container.querySelector(selector);
-
-  if (!input) {
-    throw new Error(`${selector} が見つかりません`);
-  }
-
-  return input as HTMLInputElement | HTMLTextAreaElement;
-};
-
 const setupCreateMutation = (
   mutateAsync: ReturnType<typeof vi.fn> = vi.fn().mockResolvedValue(undefined),
 ) => {
@@ -60,31 +50,31 @@ describe("CreateTaskPage", () => {
     vi.setSystemTime(new Date("2026-05-31T10:00:00.000Z"));
     setupCreateMutation();
 
-    const { container } = render(<CreateTaskPage />);
+    render(<CreateTaskPage />);
 
     expect(
       screen.getByRole("heading", { name: "タスク新規登録" }),
     ).toBeInTheDocument();
-    expect(getInput(container, "#task-name")).toHaveValue("");
-    expect(getInput(container, "#icon")).toHaveValue("✨");
-    expect(getInput(container, "#interval-days")).toHaveValue(30);
-    expect(getInput(container, "#last-completed-at")).toHaveValue("2026-05-31");
-    expect(getInput(container, "#memo")).toHaveValue("");
+    expect(screen.getByLabelText("タスク名 *")).toHaveValue("");
+    expect(screen.getByLabelText("アイコン")).toHaveValue("✨");
+    expect(screen.getByLabelText("実施周期 (日間) *")).toHaveValue(30);
+    expect(screen.getByLabelText("前回の実施日 *")).toHaveValue("2026-05-31");
+    expect(screen.getByLabelText("メモ (任意)")).toHaveValue("");
   });
 
   test("フォーム送信時に作成payloadを渡し、成功時にダッシュボードへ遷移すること", async () => {
     const user = userEvent.setup();
     const { mutateAsync } = setupCreateMutation();
-    const { container } = render(<CreateTaskPage />);
+    render(<CreateTaskPage />);
 
-    await user.type(getInput(container, "#task-name"), "コンタクト交換");
-    await user.clear(getInput(container, "#icon"));
-    await user.type(getInput(container, "#icon"), "👀");
-    await user.clear(getInput(container, "#interval-days"));
-    await user.type(getInput(container, "#interval-days"), "14");
-    await user.clear(getInput(container, "#last-completed-at"));
-    await user.type(getInput(container, "#last-completed-at"), "2026-05-01");
-    await user.type(getInput(container, "#memo"), "右目から交換");
+    await user.type(screen.getByLabelText("タスク名 *"), "コンタクト交換");
+    await user.clear(screen.getByLabelText("アイコン"));
+    await user.type(screen.getByLabelText("アイコン"), "👀");
+    await user.clear(screen.getByLabelText("実施周期 (日間) *"));
+    await user.type(screen.getByLabelText("実施周期 (日間) *"), "14");
+    await user.clear(screen.getByLabelText("前回の実施日 *"));
+    await user.type(screen.getByLabelText("前回の実施日 *"), "2026-05-01");
+    await user.type(screen.getByLabelText("メモ (任意)"), "右目から交換");
 
     await user.click(
       screen.getByRole("button", { name: "新しいタスクを登録する" }),
@@ -105,14 +95,14 @@ describe("CreateTaskPage", () => {
   test("任意項目が空の場合はnullとして作成payloadに渡すこと", async () => {
     const user = userEvent.setup();
     const { mutateAsync } = setupCreateMutation();
-    const { container } = render(<CreateTaskPage />);
+    render(<CreateTaskPage />);
 
-    await user.type(getInput(container, "#task-name"), "歯ブラシ交換");
-    await user.clear(getInput(container, "#icon"));
-    await user.clear(getInput(container, "#interval-days"));
-    await user.type(getInput(container, "#interval-days"), "30");
-    await user.clear(getInput(container, "#last-completed-at"));
-    await user.type(getInput(container, "#last-completed-at"), "2026-05-02");
+    await user.type(screen.getByLabelText("タスク名 *"), "歯ブラシ交換");
+    await user.clear(screen.getByLabelText("アイコン"));
+    await user.clear(screen.getByLabelText("実施周期 (日間) *"));
+    await user.type(screen.getByLabelText("実施周期 (日間) *"), "30");
+    await user.clear(screen.getByLabelText("前回の実施日 *"));
+    await user.type(screen.getByLabelText("前回の実施日 *"), "2026-05-02");
 
     await user.click(
       screen.getByRole("button", { name: "新しいタスクを登録する" }),
@@ -134,9 +124,9 @@ describe("CreateTaskPage", () => {
       .spyOn(console, "error")
       .mockImplementation(() => {});
     setupCreateMutation(vi.fn().mockRejectedValue(new Error("作成失敗")));
-    const { container } = render(<CreateTaskPage />);
+    render(<CreateTaskPage />);
 
-    await user.type(getInput(container, "#task-name"), "失敗するタスク");
+    await user.type(screen.getByLabelText("タスク名 *"), "失敗するタスク");
     await user.click(
       screen.getByRole("button", { name: "新しいタスクを登録する" }),
     );
