@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 type ConfirmModalProps = {
   isOpen: boolean;
@@ -23,8 +23,14 @@ const ConfirmModal = ({
   onConfirm,
   onCancel,
 }: ConfirmModalProps) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedElementRef = useRef<Element | null>(null);
+
   useEffect(() => {
     if (!isOpen) return;
+
+    previouslyFocusedElementRef.current = document.activeElement;
+    dialogRef.current?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !isPending) {
@@ -33,7 +39,13 @@ const ConfirmModal = ({
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+
+      if (previouslyFocusedElementRef.current instanceof HTMLElement) {
+        previouslyFocusedElementRef.current.focus();
+      }
+    };
   }, [isOpen, isPending, onCancel]);
 
   if (!isOpen) return null;
@@ -49,10 +61,12 @@ const ConfirmModal = ({
       }}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-modal-title"
         aria-describedby="confirm-modal-description"
+        tabIndex={-1}
         className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900"
       >
         <h2

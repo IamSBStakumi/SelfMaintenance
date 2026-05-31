@@ -82,18 +82,22 @@ describe("TaskContent", () => {
 
     render(<TaskContent taskData={createMockItem()} />);
 
-    await user.click(
-      screen.getByRole("button", { name: "このタスクを削除する" }),
-    );
-    expect(
-      screen.getByRole("dialog", { name: "タスクを削除しますか？" }),
-    ).toBeInTheDocument();
+    const deleteButton = screen.getByRole("button", {
+      name: "このタスクを削除する",
+    });
+    await user.click(deleteButton);
+
+    const dialog = screen.getByRole("dialog", {
+      name: "タスクを削除しますか？",
+    });
+    expect(dialog).toHaveFocus();
 
     await user.click(screen.getByRole("button", { name: "キャンセル" }));
 
     expect(
       screen.queryByRole("dialog", { name: "タスクを削除しますか？" }),
     ).not.toBeInTheDocument();
+    expect(deleteButton).toHaveFocus();
     expect(deleteMutate).not.toHaveBeenCalled();
   });
 
