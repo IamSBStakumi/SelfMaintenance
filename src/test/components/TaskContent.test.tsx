@@ -77,35 +77,59 @@ describe("TaskContent", () => {
   test("削除確認をキャンセルした場合は削除しないこと", async () => {
     const user = userEvent.setup();
     const { deleteMutateAsync } = setupUseMaintenanceItemMock();
-    vi.spyOn(window, "confirm").mockReturnValue(false);
 
     render(<TaskContent taskData={createMockItem()} />);
 
     await user.click(
       screen.getByRole("button", { name: "このタスクを削除する" }),
     );
+    expect(
+      screen.getByRole("dialog", { name: "タスクを削除しますか？" }),
+    ).toBeInTheDocument();
 
-    expect(window.confirm).toHaveBeenCalledWith(
-      "このタスクを削除しますか？完了履歴には「削除されたタスク」として表示されます。",
+    await user.click(screen.getByRole("button", { name: "キャンセル" }));
+
+    expect(
+      screen.queryByRole("dialog", { name: "タスクを削除しますか？" }),
+    ).not.toBeInTheDocument();
+    expect(deleteMutateAsync).not.toHaveBeenCalled();
+  });
+
+  test("Escapeキーで削除確認モーダルを閉じること", async () => {
+    const user = userEvent.setup();
+    const { deleteMutateAsync } = setupUseMaintenanceItemMock();
+
+    render(<TaskContent taskData={createMockItem()} />);
+
+    await user.click(
+      screen.getByRole("button", { name: "このタスクを削除する" }),
     );
+    await user.keyboard("{Escape}");
+
+    expect(
+      screen.queryByRole("dialog", { name: "タスクを削除しますか？" }),
+    ).not.toBeInTheDocument();
     expect(deleteMutateAsync).not.toHaveBeenCalled();
   });
 
   test("削除確認後に削除し、成功通知を表示すること", async () => {
     const user = userEvent.setup();
     const { deleteMutateAsync } = setupUseMaintenanceItemMock();
-    vi.spyOn(window, "confirm").mockReturnValue(true);
 
     render(<TaskContent taskData={createMockItem()} />);
 
     await user.click(
       screen.getByRole("button", { name: "このタスクを削除する" }),
     );
+    await user.click(screen.getByRole("button", { name: "削除する" }));
 
     await waitFor(() => {
       expect(deleteMutateAsync).toHaveBeenCalledTimes(1);
     });
     expect(mockToast.success).toHaveBeenCalledWith("タスクを削除しました。");
+    expect(
+      screen.queryByRole("dialog", { name: "タスクを削除しますか？" }),
+    ).not.toBeInTheDocument();
   });
 
   test("削除に失敗した場合はエラー通知を表示すること", async () => {
@@ -116,13 +140,13 @@ describe("TaskContent", () => {
     setupUseMaintenanceItemMock({
       deleteMutateAsync: vi.fn().mockRejectedValue(new Error("Delete Error")),
     });
-    vi.spyOn(window, "confirm").mockReturnValue(true);
 
     render(<TaskContent taskData={createMockItem()} />);
 
     await user.click(
       screen.getByRole("button", { name: "このタスクを削除する" }),
     );
+    await user.click(screen.getByRole("button", { name: "削除する" }));
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalledWith(
