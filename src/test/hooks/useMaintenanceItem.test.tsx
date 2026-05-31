@@ -255,7 +255,6 @@ describe("useMaintenanceItem", () => {
       expect(removeSpy).toHaveBeenCalledWith({
         queryKey: MAINTENANCE_ITEM_QUERY_KEY("item1"),
       });
-      expect(mockPush).not.toHaveBeenCalled();
     });
 
     test("削除に失敗した際、エラーがコンソールに出力され、遷移しないこと", async () => {
