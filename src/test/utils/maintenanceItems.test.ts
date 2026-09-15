@@ -572,6 +572,13 @@ describe("src/services/maintenance_items", () => {
       expect(chain.update).toHaveBeenCalledWith({
         last_completed_at: mockNow,
       });
+      expect(chain.insert).toHaveBeenCalledWith({
+        item_id: "item1",
+        user_id: "test-user-id",
+        completed_at: mockNow,
+        maintenance_item_name: "テスト項目",
+        maintenance_item_icon: null,
+      });
       expect(result).toEqual(mockUpdatedData);
     });
 
@@ -603,6 +610,13 @@ describe("src/services/maintenance_items", () => {
 
       expect(mockFrom).toHaveBeenNthCalledWith(1, "maintenance_items");
       expect(mockFrom).toHaveBeenNthCalledWith(2, "maintenance_logs");
+      expect(logChain.insert).toHaveBeenCalledWith({
+        item_id: "item1",
+        user_id: "test-user-id",
+        completed_at: mockNow,
+        maintenance_item_name: "テスト項目",
+        maintenance_item_icon: null,
+      });
 
       // ログ作成エラーは内部でのみ処理され、戻り値には影響しない
       expect(result).toEqual(mockUpdatedData);
@@ -683,6 +697,8 @@ describe("src/services/maintenance_items", () => {
           user_id: "test-user-id",
           completed_at: "2026-04-15T10:00:00Z",
           notes: null,
+          maintenance_item_name: "テスト項目",
+          maintenance_item_icon: null,
           created_at: "2026-04-15T10:00:00Z",
         },
       ];

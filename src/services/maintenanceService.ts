@@ -278,6 +278,8 @@ export async function updateMaintenanceItemNextCycle(
     item_id: normalizedId,
     user_id: user.id,
     completed_at: now,
+    maintenance_item_name: updatedItem.name,
+    maintenance_item_icon: updatedItem.icon,
   });
 
   if (logError) {

@@ -16,7 +16,7 @@ import {
 import { ja } from "date-fns/locale";
 
 interface CalendarProps {
-  logs: { id: string; completed_at: string; item_id: string }[];
+  logs: { id: string; completed_at: string; item_id: string | null }[];
   onDayClick: (date: Date) => void;
   currentDate: Date;
   setCurrentDate: (date: Date) => void;

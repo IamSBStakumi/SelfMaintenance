@@ -19,10 +19,12 @@ export type UpdateMaintenanceItem = Partial<InsertMaintenanceItem>;
 
 export interface MaintenanceLog {
   id: string;
-  item_id: string;
+  item_id: string | null;
   user_id: string;
   completed_at: string;
   notes: string | null;
+  maintenance_item_name: string | null;
+  maintenance_item_icon: string | null;
   created_at: string;
 }
 

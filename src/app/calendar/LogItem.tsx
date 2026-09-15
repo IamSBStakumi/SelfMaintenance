@@ -13,14 +13,17 @@ type Props = {
  * アイコン・タスク名・完了時刻を表示します。
  */
 const LogItem = ({ log, item }: Props) => {
+  const icon = log.maintenance_item_icon ?? item?.icon ?? "✅";
+  const name = log.maintenance_item_name ?? item?.name ?? "削除されたタスク";
+
   return (
     <div className="p-4 flex items-center gap-4 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors group">
       <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 text-xl shadow-inner group-hover:scale-105 transition-transform">
-        {item?.icon || "✅"}
+        {icon}
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-zinc-800 dark:text-zinc-200 truncate">
-          {item?.name || "削除されたタスク"}
+          {name}
         </p>
         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-1">
           <svg
