@@ -10,6 +10,7 @@ import {
 } from "@/services/maintenanceService";
 import { UpdateMaintenanceItem } from "@/types/maintenance";
 import { MAINTENANCE_ITEMS_QUERY_KEY } from "./useMaintenanceItems";
+import { MAINTENANCE_LOGS_QUERY_ROOT_KEY } from "./useMaintenanceLogs";
 
 export const MAINTENANCE_ITEM_QUERY_KEY = (id: string) =>
   ["maintenance_item", id] as const;
@@ -49,6 +50,9 @@ const useMaintenanceItem = (id: string) => {
       });
       queryClient.invalidateQueries({
         queryKey: MAINTENANCE_ITEM_QUERY_KEY(normalizedId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: MAINTENANCE_LOGS_QUERY_ROOT_KEY,
       });
     },
     onError: () => {
