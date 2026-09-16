@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { getMaintenanceLogs } from "@/services/maintenanceService";
 
+export const MAINTENANCE_LOGS_QUERY_ROOT_KEY = ["maintenance_logs"] as const;
 export const MAINTENANCE_LOGS_QUERY_KEY = (
   startDate: string,
   endDate: string,
-) => ["maintenance_logs", startDate, endDate] as const;
+) => [...MAINTENANCE_LOGS_QUERY_ROOT_KEY, startDate, endDate] as const;
 
 export const useMaintenanceLogs = (startDate: string, endDate: string) => {
   return useQuery({
