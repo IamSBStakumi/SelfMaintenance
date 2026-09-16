@@ -46,6 +46,19 @@ describe("LogItem", () => {
     expect(screen.getByText("🧼")).toBeInTheDocument();
   });
 
+  test("スナップショットにアイコンがない場合は現在のタスクアイコンへフォールバックしないこと", () => {
+    render(
+      <LogItem
+        log={createLog({ maintenance_item_icon: null })}
+        item={createItem()}
+      />,
+    );
+
+    expect(screen.getByText("完了時のタスク")).toBeInTheDocument();
+    expect(screen.getByText("✅")).toBeInTheDocument();
+    expect(screen.queryByText("🧽")).not.toBeInTheDocument();
+  });
+
   test("古いログでスナップショットがない場合は既存のフォールバックを表示すること", () => {
     render(
       <LogItem

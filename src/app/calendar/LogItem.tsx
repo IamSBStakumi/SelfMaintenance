@@ -13,7 +13,10 @@ type Props = {
  * アイコン・タスク名・完了時刻を表示します。
  */
 const LogItem = ({ log, item }: Props) => {
-  const icon = log.maintenance_item_icon ?? item?.icon ?? "✅";
+  const hasSnapshot = log.maintenance_item_name !== null;
+  const icon = hasSnapshot
+    ? (log.maintenance_item_icon ?? "✅")
+    : (item?.icon ?? "✅");
   const name = log.maintenance_item_name ?? item?.name ?? "削除されたタスク";
 
   return (
