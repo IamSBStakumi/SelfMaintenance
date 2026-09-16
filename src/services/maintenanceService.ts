@@ -270,21 +270,17 @@ export async function updateMaintenanceItemNextCycle(
     throw new Error("認証が必要です。");
   }
 
-  const updatedItem = await updateMaintenanceItem(normalizedId, {
-    last_completed_at: now,
+  const { data, error } = await supabase.rpc("complete_maintenance_item", {
+    p_item_id: normalizedId,
+    p_completed_at: now,
   });
 
-  const { error: logError } = await supabase.from("maintenance_logs").insert({
-    item_id: normalizedId,
-    user_id: user.id,
-    completed_at: now,
-  });
-
-  if (logError) {
-    console.error("Error creating maintenance log:", logError);
+  if (error) {
+    console.error("Error completing maintenance item:", error);
+    throw new Error("項目の完了処理に失敗しました。");
   }
 
-  return updatedItem;
+  return data as MaintenanceItem;
 }
 
 /**

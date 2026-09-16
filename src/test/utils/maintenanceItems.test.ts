@@ -23,6 +23,7 @@ import {
 // モック用の定義
 const mockGetUser = vi.fn();
 const mockFrom = vi.fn();
+const mockRpc = vi.fn();
 
 // Supabaseクライアントのモック
 vi.mock("@/lib/supabase/server", () => ({
@@ -31,6 +32,7 @@ vi.mock("@/lib/supabase/server", () => ({
       getUser: mockGetUser,
     },
     from: mockFrom,
+    rpc: mockRpc,
   }),
 }));
 
@@ -551,7 +553,7 @@ describe("src/services/maintenance_items", () => {
       );
     });
 
-    test("last_completed_atが現在時刻で更新されること", async () => {
+    test("RPCでlast_completed_at更新と完了履歴作成が実行されること", async () => {
       vi.useFakeTimers();
       const mockNow = "2026-04-16T12:00:00.000Z";
       vi.setSystemTime(mockNow);
@@ -559,55 +561,45 @@ describe("src/services/maintenance_items", () => {
       const mockUpdatedData = createMockItem({
         last_completed_at: mockNow,
       });
-      const chain = createMockChain<MaintenanceItem>({
+      mockRpc.mockResolvedValue({
         data: mockUpdatedData,
         error: null,
       });
-      mockFrom.mockReturnValue(chain);
 
       const result = await updateMaintenanceItemNextCycle("item1");
 
-      expect(mockFrom).toHaveBeenNthCalledWith(1, "maintenance_items");
-      expect(mockFrom).toHaveBeenNthCalledWith(2, "maintenance_logs");
-      expect(chain.update).toHaveBeenCalledWith({
-        last_completed_at: mockNow,
+      expect(mockRpc).toHaveBeenCalledWith("complete_maintenance_item", {
+        p_item_id: "item1",
+        p_completed_at: mockNow,
       });
+      expect(mockFrom).not.toHaveBeenCalled();
       expect(result).toEqual(mockUpdatedData);
     });
 
-    test("完了履歴の作成に失敗した場合でも更新結果が返されること", async () => {
+    test("RPCが失敗した場合、エラーがスローされること", async () => {
       vi.useFakeTimers();
       const mockNow = "2026-04-30T12:00:00.000Z";
       vi.setSystemTime(mockNow);
 
-      const mockUpdatedData = createMockItem({
-        last_completed_at: mockNow,
-      });
-      // 1回目: maintenance_items の update 用チェーン（成功）
-      const itemChain = createMockChain<MaintenanceItem>({
-        data: mockUpdatedData,
-        error: null,
-      });
-      // 2回目: maintenance_logs の insert 用チェーン（失敗）
-      const logChain = createMockChain<null>({
+      mockRpc.mockResolvedValue({
         data: null,
-        error: new Error("Log Error"),
+        error: new Error("RPC Error"),
       });
-      mockFrom.mockReturnValueOnce(itemChain).mockReturnValueOnce(logChain);
 
       const consoleSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
 
-      const result = await updateMaintenanceItemNextCycle("item1");
+      await expect(updateMaintenanceItemNextCycle("item1")).rejects.toThrow(
+        "項目の完了処理に失敗しました。",
+      );
 
-      expect(mockFrom).toHaveBeenNthCalledWith(1, "maintenance_items");
-      expect(mockFrom).toHaveBeenNthCalledWith(2, "maintenance_logs");
-
-      // ログ作成エラーは内部でのみ処理され、戻り値には影響しない
-      expect(result).toEqual(mockUpdatedData);
+      expect(mockRpc).toHaveBeenCalledWith("complete_maintenance_item", {
+        p_item_id: "item1",
+        p_completed_at: mockNow,
+      });
       expect(consoleSpy).toHaveBeenCalledWith(
-        "Error creating maintenance log:",
+        "Error completing maintenance item:",
         expect.any(Error),
       );
 
