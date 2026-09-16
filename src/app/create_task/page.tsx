@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { format, parseISO, startOfDay } from "date-fns";
 import { toast } from "react-toastify";
 import { useCreateMaintenanceItem } from "@/hooks/useMaintenanceItems";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
@@ -9,6 +8,10 @@ import TaskFormWrapper from "@/components/TaskFormWrapper";
 import TaskFormCard from "@/components/TaskFormCard";
 import TaskFormHeader from "@/components/TaskFormHeader";
 import TaskFormFooter from "@/components/TaskFormFooter";
+import {
+  dateInputValueToTimestamp,
+  dateToDateInputValue,
+} from "@/utils/dateInput";
 
 export default function CreateTaskPage() {
   const router = useRouter();
@@ -21,9 +24,7 @@ export default function CreateTaskPage() {
         name: data.name,
         icon: data.icon || null,
         interval_days: data.interval_days,
-        last_completed_at: startOfDay(
-          parseISO(data.last_completed_at),
-        ).toISOString(),
+        last_completed_at: dateInputValueToTimestamp(data.last_completed_at),
         memo: data.memo || null,
       });
       // 成功時にダッシュボードへリダイレクト
@@ -40,7 +41,7 @@ export default function CreateTaskPage() {
     name: "",
     icon: "✨",
     interval_days: 30,
-    last_completed_at: format(new Date(), "yyyy-MM-dd"),
+    last_completed_at: dateToDateInputValue(new Date()),
     memo: "",
   };
 
