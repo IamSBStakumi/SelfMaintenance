@@ -47,3 +47,6 @@ storybook-static
 # issues
 .anti_docs/**/*
 !.anti_docs/mvp_schedule.md
+
+# local document
+repomix-output.xml
