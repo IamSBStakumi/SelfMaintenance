@@ -5,6 +5,10 @@ import ConfirmModal from "@/components/ConfirmModal";
 import TaskForm, { TaskFormValues } from "@/components/TaskForm";
 import useMaintenanceItem from "@/hooks/useMaintenanceItem";
 import { MaintenanceItem } from "@/types/maintenance";
+import {
+  dateInputValueToTimestamp,
+  timestampToDateInputValue,
+} from "@/utils/dateInput";
 
 type Props = {
   taskData: MaintenanceItem;
@@ -21,6 +25,7 @@ const TaskContent = ({ taskData }: Props) => {
     const payload = {
       ...data,
       icon: data.icon?.trim() ? data.icon : null,
+      last_completed_at: dateInputValueToTimestamp(data.last_completed_at),
       memo: data.memo?.trim() ? data.memo : null,
     };
     await updateMaintenanceItem.mutateAsync(payload);
@@ -49,7 +54,7 @@ const TaskContent = ({ taskData }: Props) => {
     name: taskData.name,
     icon: taskData.icon || "",
     interval_days: taskData.interval_days,
-    last_completed_at: taskData.last_completed_at.split("T")[0],
+    last_completed_at: timestampToDateInputValue(taskData.last_completed_at),
     memo: taskData.memo || "",
   };
 

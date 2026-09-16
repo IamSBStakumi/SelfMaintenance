@@ -5,6 +5,7 @@ import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import TaskContent from "@/app/task/[id]/TaskContent";
 import useMaintenanceItem from "@/hooks/useMaintenanceItem";
 import { createMaintenanceItem } from "@/test/factories/maintenanceItemFactory";
+import { dateInputValueToTimestamp } from "@/utils/dateInput";
 
 vi.mock("@/hooks/useMaintenanceItem", () => ({
   default: vi.fn(),
@@ -26,17 +27,19 @@ const mockUseMaintenanceItem = vi.mocked(useMaintenanceItem);
 const mockToast = vi.mocked(toast);
 
 const setupUseMaintenanceItemMock = ({
+  updateMutateAsync = vi.fn().mockResolvedValue(undefined),
   deleteMutate = vi.fn().mockImplementation((_, options) => {
     options?.onSuccess?.();
   }),
   isDeletePending = false,
 }: {
+  updateMutateAsync?: ReturnType<typeof vi.fn>;
   deleteMutate?: ReturnType<typeof vi.fn>;
   isDeletePending?: boolean;
 } = {}) => {
   mockUseMaintenanceItem.mockReturnValue({
     updateMaintenanceItem: {
-      mutateAsync: vi.fn().mockResolvedValue(undefined),
+      mutateAsync: updateMutateAsync,
     },
     deleteMaintenanceItem: {
       mutate: deleteMutate,
@@ -44,7 +47,7 @@ const setupUseMaintenanceItemMock = ({
     },
   } as unknown as ReturnType<typeof useMaintenanceItem>);
 
-  return { deleteMutate };
+  return { deleteMutate, updateMutateAsync };
 };
 
 describe("TaskContent", () => {
@@ -64,6 +67,42 @@ describe("TaskContent", () => {
     expect(
       screen.getByRole("button", { name: "このタスクを削除する" }),
     ).toBeInTheDocument();
+  });
+
+  test("timestampをローカル日付として前回の実施日に表示すること", () => {
+    setupUseMaintenanceItemMock();
+
+    render(
+      <TaskContent
+        taskData={createMaintenanceItem({
+          last_completed_at: dateInputValueToTimestamp("2026-05-01"),
+        })}
+      />,
+    );
+
+    expect(screen.getByLabelText("前回の実施日 *")).toHaveValue("2026-05-01");
+  });
+
+  test("更新時に前回の実施日を作成時と同じtimestamp形式で送信すること", async () => {
+    const user = userEvent.setup();
+    const { updateMutateAsync } = setupUseMaintenanceItemMock();
+
+    render(<TaskContent taskData={createMaintenanceItem()} />);
+
+    await user.clear(screen.getByLabelText("タスク名 *"));
+    await user.type(screen.getByLabelText("タスク名 *"), "更新するタスク");
+    await user.clear(screen.getByLabelText("前回の実施日 *"));
+    await user.type(screen.getByLabelText("前回の実施日 *"), "2026-05-01");
+    await user.click(screen.getByRole("button", { name: "タスクを更新する" }));
+
+    await waitFor(() => {
+      expect(updateMutateAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: "更新するタスク",
+          last_completed_at: dateInputValueToTimestamp("2026-05-01"),
+        }),
+      );
+    });
   });
 
   test("削除確認をキャンセルした場合は削除しないこと", async () => {

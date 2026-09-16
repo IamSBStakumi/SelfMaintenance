@@ -270,23 +270,17 @@ export async function updateMaintenanceItemNextCycle(
     throw new Error("認証が必要です。");
   }
 
-  const updatedItem = await updateMaintenanceItem(normalizedId, {
-    last_completed_at: now,
+  const { data, error } = await supabase.rpc("complete_maintenance_item", {
+    p_item_id: normalizedId,
+    p_completed_at: now,
   });
 
-  const { error: logError } = await supabase.from("maintenance_logs").insert({
-    item_id: normalizedId,
-    user_id: user.id,
-    completed_at: now,
-    maintenance_item_name: updatedItem.name,
-    maintenance_item_icon: updatedItem.icon,
-  });
-
-  if (logError) {
-    console.error("Error creating maintenance log:", logError);
+  if (error) {
+    console.error("Error completing maintenance item:", error);
+    throw new Error("項目の完了処理に失敗しました。");
   }
 
-  return updatedItem;
+  return data as MaintenanceItem;
 }
 
 /**
@@ -338,14 +332,19 @@ export async function deleteMaintenanceItem(id: string): Promise<void> {
     throw new Error("認証が必要です。");
   }
 
-  const { error } = await supabase
+  const { data: deletedItems, error } = await supabase
     .from("maintenance_items")
     .delete()
     .eq("id", normalizedId)
-    .eq("user_id", user.id); // 所有者チェックを追加
+    .eq("user_id", user.id) // 所有者チェックを追加
+    .select("id");
 
   if (error) {
     console.error("Error deleting maintenance item:", error);
     throw new Error("項目の削除に失敗しました。");
+  }
+
+  if (!deletedItems || deletedItems.length === 0) {
+    throw new Error("削除対象の定期タスクが見つかりません。");
   }
 }

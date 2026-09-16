@@ -6,6 +6,7 @@ import useMaintenanceItem, {
   MAINTENANCE_ITEM_QUERY_KEY,
 } from "@/hooks/useMaintenanceItem";
 import { MAINTENANCE_ITEMS_QUERY_KEY } from "@/hooks/useMaintenanceItems";
+import { MAINTENANCE_LOGS_QUERY_ROOT_KEY } from "@/hooks/useMaintenanceLogs";
 import * as services from "@/services/maintenanceService";
 import { createMaintenanceItem } from "@/test/factories/maintenanceItemFactory";
 import type { UpdateMaintenanceItem } from "@/types/maintenance";
@@ -147,7 +148,7 @@ describe("useMaintenanceItem", () => {
   });
 
   describe("Mutation: updateMaintenanceItemNextCycle", () => {
-    test("更新が成功した際、一覧と詳細の両方のクエリがinvalidateされること", async () => {
+    test("更新が成功した際、一覧・詳細・完了ログのクエリがinvalidateされること", async () => {
       const { wrapper, testQueryClient } = createWrapper();
       const resetSpy = vi.spyOn(testQueryClient, "invalidateQueries");
 
@@ -173,12 +174,14 @@ describe("useMaintenanceItem", () => {
         "item1",
       );
 
-      // 一覧と詳細の両方のキーに対して呼ばれることを確認
       expect(resetSpy).toHaveBeenCalledWith({
         queryKey: MAINTENANCE_ITEMS_QUERY_KEY,
       });
       expect(resetSpy).toHaveBeenCalledWith({
         queryKey: MAINTENANCE_ITEM_QUERY_KEY("item1"),
+      });
+      expect(resetSpy).toHaveBeenCalledWith({
+        queryKey: MAINTENANCE_LOGS_QUERY_ROOT_KEY,
       });
     });
 

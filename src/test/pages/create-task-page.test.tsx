@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { parseISO, startOfDay } from "date-fns";
 import { toast } from "react-toastify";
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import CreateTaskPage from "@/app/create_task/page";
 import { useCreateMaintenanceItem } from "@/hooks/useMaintenanceItems";
+import { dateInputValueToTimestamp } from "@/utils/dateInput";
 
 const mockPush = vi.fn();
 
@@ -88,7 +88,7 @@ describe("CreateTaskPage", () => {
         name: "コンタクト交換",
         icon: "👀",
         interval_days: 14,
-        last_completed_at: startOfDay(parseISO("2026-05-01")).toISOString(),
+        last_completed_at: dateInputValueToTimestamp("2026-05-01"),
         memo: "右目から交換",
       });
       expect(mockPush).toHaveBeenCalledWith("/dashboard");
