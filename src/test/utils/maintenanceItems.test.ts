@@ -623,8 +623,10 @@ describe("src/services/maintenance_items", () => {
     });
 
     test("正常にデータを削除できること", async () => {
-      // 成功時はnullが返る
-      const chain = createMockChain<null>({ data: null, error: null });
+      const chain = createMockChain<{ id: string }[]>({
+        data: [{ id: "item1" }],
+        error: null,
+      });
       mockFrom.mockReturnValue(chain);
 
       await deleteMaintenanceItem("item1");
@@ -633,6 +635,23 @@ describe("src/services/maintenance_items", () => {
       expect(chain.delete).toHaveBeenCalled();
       expect(chain.eq).toHaveBeenCalledWith("id", "item1");
       expect(chain.eq).toHaveBeenCalledWith("user_id", "test-user-id");
+      expect(chain.select).toHaveBeenCalledWith("id");
+    });
+
+    test("削除対象が存在しない場合、エラーがスローされること", async () => {
+      const chain = createMockChain<{ id: string }[]>({
+        data: [],
+        error: null,
+      });
+      mockFrom.mockReturnValue(chain);
+
+      await expect(deleteMaintenanceItem("missing-item")).rejects.toThrow(
+        "削除対象の定期タスクが見つかりません。",
+      );
+
+      expect(chain.eq).toHaveBeenCalledWith("id", "missing-item");
+      expect(chain.eq).toHaveBeenCalledWith("user_id", "test-user-id");
+      expect(chain.select).toHaveBeenCalledWith("id");
     });
 
     test("DB削除時にエラーが発生した場合、エラーがスローされること", async () => {
