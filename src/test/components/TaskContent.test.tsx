@@ -75,7 +75,7 @@ describe("TaskContent", () => {
     render(
       <TaskContent
         taskData={createMaintenanceItem({
-          last_completed_at: "2026-05-01T03:00:00.000Z",
+          last_completed_at: dateInputValueToTimestamp("2026-05-01"),
         })}
       />,
     );
