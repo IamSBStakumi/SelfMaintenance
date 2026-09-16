@@ -694,6 +694,8 @@ describe("src/services/maintenance_items", () => {
           user_id: "test-user-id",
           completed_at: "2026-04-15T10:00:00Z",
           notes: null,
+          maintenance_item_name: "テスト項目",
+          maintenance_item_icon: null,
           created_at: "2026-04-15T10:00:00Z",
         },
       ];

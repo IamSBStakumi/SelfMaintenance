@@ -83,9 +83,11 @@ const LogList = ({
       ) : selectedLogs.length > 0 ? (
         /* ログ一覧 */
         <div className="bg-white dark:bg-zinc-800 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-700 divide-y divide-zinc-100 dark:divide-zinc-700 overflow-hidden">
-          {selectedLogs.map((log) => (
-            <LogItem key={log.id} log={log} item={itemMap.get(log.item_id)} />
-          ))}
+          {selectedLogs.map((log) => {
+            const item = log.item_id ? itemMap.get(log.item_id) : undefined;
+
+            return <LogItem key={log.id} log={log} item={item} />;
+          })}
         </div>
       ) : (
         /* 空状態 */
