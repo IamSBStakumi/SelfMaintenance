@@ -25,7 +25,7 @@
     "@tanstack/react-query-next-experimental": "^5.103.1",
     "@vercel/analytics": "^2.0.1",
     "date-fns": "^4.4.0",
-    "next": "16.2.6",
+    "next": "16.3.5",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-hook-form": "^7.88.0",
